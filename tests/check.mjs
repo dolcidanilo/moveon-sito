@@ -185,6 +185,63 @@ const browser = await chromium.launch();
   await ctx.close();
 }
 
+/* ---------------- Telefoni con schermo a 60 e 120 Hz ---------------- */
+// Simula la frequenza dello schermo sostituendo requestAnimationFrame.
+const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = performance.now(); const c = q; q = []; c.forEach((f) => f(t)); }, ${1000 / hz}); window.requestAnimationFrame = (f) => { q.push(f); return q.length; }; window.cancelAnimationFrame = () => {}; })();`;
+{
+  const speed = {};
+  const pxSpeed = {};
+  for (const hz of [60, 120]) {
+    const ctx = await browser.newContext({ ...devices['Pixel 7'] });
+    const page = await ctx.newPage();
+    await page.addInitScript(hzShim(hz));
+    // Registra la posizione verticale di ogni pixel disegnato nella Pausa emozionale, fotogramma per fotogramma
+    await page.addInitScript(`(() => { const P = CanvasRenderingContext2D.prototype, tr = P.translate, cr = P.clearRect; window.__f = []; P.clearRect = function (...a) { if (this.canvas.classList.contains('emo-canvas')) window.__f.push([]); return cr.apply(this, a); }; P.translate = function (x, y) { if (this.canvas.classList.contains('emo-canvas') && window.__f.length) window.__f[window.__f.length - 1].push(y); return tr.call(this, x, y); }; })();`);
+    await page.goto(URL, { waitUntil: 'load' });
+    await page.waitForTimeout(2500);
+    await page.evaluate(() => window.scrollTo(0, document.querySelector('.marquee').offsetTop - 200));
+    await page.waitForTimeout(1200);
+    const X = () => page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector('.mq-track')).transform).m41);
+    const a = await X();
+    await page.waitForTimeout(1000);
+    speed[hz] = Math.abs((await X()) - a);
+    // Velocità media di salita dei pixel (px al secondo), confrontando il primo e l'ultimo fotogramma
+    await page.evaluate(() => window.scrollTo(0, document.querySelector('.emo').getBoundingClientRect().top + window.scrollY));
+    await page.waitForTimeout(800);
+    await page.evaluate(() => { window.__f = []; });
+    await page.waitForTimeout(1000);
+    pxSpeed[hz] = await page.evaluate(() => {
+      const f = window.__f.filter((x) => x.length);
+      const a = f[0], z = f[f.length - 1];
+      let tot = 0, n = 0;
+      a.forEach((y, i) => { const dy = y - z[i]; if (dy > 0 && dy < 200) { tot += dy; n++; } });
+      return n ? tot / n : 0;
+    });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    if (hz === 60) {
+      // Bug: il nastro ripartiva da capo quando la barra dell'indirizzo cambiava l'altezza della finestra
+      const before = await X();
+      await page.setViewportSize({ width: 412, height: 700 });
+      await page.waitForTimeout(150);
+      const jump = Math.abs((await X()) - before);
+      check('Nastro: nessun salto quando compare o sparisce la barra del browser', jump < 40, `${jump.toFixed(0)} px`);
+      // Pixel della Pausa emozionale: si muovono ancora (canvas che cambia nel tempo)
+      await page.evaluate(() => window.scrollTo(0, document.querySelector('.emo').getBoundingClientRect().top + window.scrollY));
+      await page.waitForTimeout(800);
+      const snap = () => page.evaluate(() => document.querySelector('.emo-canvas').toDataURL());
+      const s1 = await snap();
+      await page.waitForTimeout(400);
+      check('Pausa emozionale: pixel in movimento', s1 !== (await snap()));
+    }
+    await ctx.close();
+  }
+  const pr = pxSpeed[120] / pxSpeed[60];
+  check('Pausa emozionale: pixel autonomi, stessa velocità a 60 e a 120 Hz', pr > 0.85 && pr < 1.15 && pxSpeed[60] > 8 && pxSpeed[60] < 40, `${pxSpeed[60].toFixed(1)} vs ${pxSpeed[120].toFixed(1)} px/s`);
+  const ratio = speed[120] / speed[60];
+  check('Nastro: stessa velocità a 60 e a 120 Hz', ratio > 0.85 && ratio < 1.15, `${speed[60].toFixed(0)} vs ${speed[120].toFixed(0)} px/s`);
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

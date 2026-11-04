@@ -212,19 +212,34 @@ function initNastro(sec, { G, ST, reduce }) {
   if (reduce) return;
   const tracks = $$('.mq-track', sec);
   const rows = tracks.map((t, i) => ({ el: t, dir: i % 2 ? 1 : -1, x: 0, w: 0 }));
-  const measure = () => rows.forEach((r) => { r.w = r.el.scrollWidth / 3; r.x = r.dir > 0 ? -r.w : 0; });
+  // Rimisura conservando il punto del giro (bug risolto su mobile: prima il nastro ripartiva da capo
+  // ogni volta che la barra dell'indirizzo compariva o spariva, perché il browser lo segnala come "resize").
+  const measure = () => rows.forEach((r) => {
+    const w = r.el.scrollWidth / 3;
+    if (!w) return;
+    r.x = r.w ? (r.x / r.w) * w : r.dir > 0 ? -w : 0;
+    r.w = w;
+  });
   measure();
-  window.addEventListener('resize', measure);
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === lastW) return; // cambia solo l'altezza (barra del browser): niente da rimisurare
+    lastW = window.innerWidth;
+    measure();
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
   let vel = 0;
   let visible = true;
   ST.create({ start: 0, end: 'max', onUpdate: (s) => { vel = s.getVelocity(); } });
   if ('IntersectionObserver' in window) new IntersectionObserver((en) => { visible = en[0].isIntersecting; }).observe(sec);
   G.ticker.add(() => {
+    // Passo legato al tempo, non ai fotogrammi: stessa velocità a 60 e a 120 Hz.
+    const k = Math.min(G.ticker.deltaRatio(60), 4);
     const boost = 1 + Math.min(Math.abs(vel) / 250, 10);
     const skew = G.utils.clamp(-10, 10, vel / -220);
-    vel *= 0.92;
+    vel *= Math.pow(0.92, k);
     rows.forEach((r) => {
-      r.x += r.dir * 0.7 * boost;
+      r.x += r.dir * 0.7 * boost * k;
       if (r.x <= -r.w) r.x += r.w;
       if (r.x >= 0 && r.dir > 0) r.x -= r.w;
       if (visible) G.set(r.el, { x: r.x, skewX: skew });
@@ -306,6 +321,9 @@ function emoCanvas(cv, reduce) {
   const rnd = (a, b) => a + Math.random() * (b - a);
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Stesse misure (es. la barra dell'indirizzo del telefono che compare o sparisce): niente da rifare,
+    // così i pixel non vengono rigenerati in posizioni nuove.
+    if (cv.clientWidth === W && cv.clientHeight === H && cv.width === Math.round(W * dpr)) return false;
     W = cv.clientWidth; H = cv.clientHeight;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -325,7 +343,7 @@ function emoCanvas(cv, reduce) {
     ctx.quadraticCurveTo(-h, h, -h, h - rr); ctx.lineTo(-h, -h + rr); ctx.quadraticCurveTo(-h, -h, -h + rr, -h);
     ctx.fill(); ctx.restore();
   }
-  function draw(t) {
+  function draw(t, dk = 0) {
     ctx.clearRect(0, 0, W, H);
     ctx.lineWidth = 1.5;
     for (let i = 0; i < 6; i++) {
@@ -340,7 +358,9 @@ function emoCanvas(cv, reduce) {
     }
     for (let k = 0; k < parts.length; k++) {
       const p = parts[k];
-      if (running) { p.y -= p.vy; p.rot += p.vr; }
+      // Movimento legato al tempo trascorso (dk = fotogrammi "da 60 Hz" passati): i pixel restano
+      // autonomi e non accelerano quando il telefono alza la frequenza dello schermo durante lo scroll.
+      p.y -= p.vy * dk; p.rot += p.vr * dk;
       if (p.y < -24) { p.y = H + 24; p.x = rnd(0, W); }
       ctx.globalAlpha = p.a;
       ctx.fillStyle = p.c;
@@ -348,14 +368,20 @@ function emoCanvas(cv, reduce) {
     }
     ctx.globalAlpha = 1;
   }
-  function loop(t) { draw(t); if (running) raf = requestAnimationFrame(loop); }
+  let last = 0;
+  function loop(t) {
+    const dk = last ? Math.min((t - last) / (1000 / 60), 3) : 0;
+    last = t;
+    draw(t, dk);
+    if (running) raf = requestAnimationFrame(loop);
+  }
   resize();
   draw(0);
-  window.addEventListener('resize', () => { resize(); draw(performance.now()); });
+  window.addEventListener('resize', () => { if (resize() !== false && !running) draw(performance.now()); });
   if (reduce || !('IntersectionObserver' in window)) return;
   new IntersectionObserver((entries) => {
     const vis = entries[0].isIntersecting;
-    if (vis && !running) { running = true; raf = requestAnimationFrame(loop); }
+    if (vis && !running) { running = true; last = 0; raf = requestAnimationFrame(loop); }
     else if (!vis && running) { running = false; cancelAnimationFrame(raf); }
   }).observe(cv);
 }
