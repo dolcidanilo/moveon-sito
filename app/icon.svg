@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#2563eb"/>
+  <text x="32" y="42" text-anchor="middle" font-family="Montserrat, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="27" letter-spacing="-1" fill="#ffffff">MO</text>
+  <rect x="44" y="12" width="8" height="8" rx="2" fill="#f59e0b"/>
+</svg>
