@@ -12,7 +12,7 @@ Il sito definitivo di MoveOn Studio, ricostruito dal prototipo approvato, con il
 | `sanity/` | Campi del pannello (`schemaTypes/`), menu (`structure.ts`), importazione dei contenuti iniziali (`import/`) |
 | `components/blocks/` | Gli 8 blocchi della pagina: Hero, Nastro, Chi siamo, Pausa, Servizi, Portfolio, Garanzie, Contatti |
 | `components/site/` | Header, footer, menu, illustrazioni e lo script delle animazioni (`site-motion.js`) |
-| `lib/content/` | Modello dei contenuti (`types.ts`) e contenuti iniziali del prototipo (`seed.ts`) |
+| `lib/content/` | Modello dei contenuti (`types.ts`), contenuti iniziali del prototipo (`seed.ts`), lettura dal pannello (`fromSanity.ts`) |
 | `public/seed/` | Foto, logo e copertine di esempio usati dai contenuti iniziali |
 | `tests/check.mjs` | Controlli automatici sui comportamenti e sui bug già risolti |
 | `tests/schema-check.mts` | Controlli sul pannello: schema valido, importazione coerente con i campi |
@@ -21,7 +21,7 @@ Il sito definitivo di MoveOn Studio, ricostruito dal prototipo approvato, con il
 
 - [x] **Fase 1:** sito identico al prototipo, con i contenuti presi da `lib/content/seed.ts`.
 - [x] **Fase 2:** pannello Sanity in italiano su `/studio`, con il pulsante «Importa contenuti iniziali».
-- [ ] **Fase 3:** il sito legge i contenuti da Sanity, con anteprima accanto ai campi.
+- [x] **Fase 3:** il sito legge i contenuti da Sanity (aggiornamento entro circa un minuto dalla pubblicazione), con anteprima delle bozze nel pannello (voce «Anteprima»).
 - [ ] **Fase 4:** il modulo contatti invia le email (Resend), più SEO e rifiniture.
 - [ ] **Fase 5:** pubblicazione su moveonstudio.it.
 
@@ -36,4 +36,8 @@ npm run test:e2e                # controlli automatici sul sito (serve Playwrigh
 npm run test:schema             # controlli sul pannello, senza rete
 ```
 
-Vercel riconosce il progetto da solo: non serve nessuna impostazione particolare.
+Vercel riconosce il progetto da solo. L'unica variabile d'ambiente necessaria è `SANITY_API_READ_TOKEN`
+(chiave Sanity di sola lettura, ruolo Viewer), che serve all'anteprima delle bozze. Project ID e dataset sono in `sanity/env.ts`.
+
+Senza accesso a Sanity (per esempio in locale senza rete) il sito usa i contenuti iniziali di `lib/content/seed.ts`;
+su Vercel invece, se Sanity non risponde, la costruzione si ferma e resta online la versione precedente.

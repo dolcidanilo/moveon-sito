@@ -135,6 +135,21 @@ export function initSite(data) {
 
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ST.refresh());
   window.addEventListener('load', () => ST.refresh());
+
+  // Anteprima del pannello: dopo la ricarica automatica torna allo stesso punto della pagina
+  if (d.hasAttribute('data-preview')) {
+    let y = null;
+    try { y = sessionStorage.getItem('mo-preview-scroll'); sessionStorage.removeItem('mo-preview-scroll'); } catch (e) { /* niente */ }
+    if (y !== null) {
+      const torna = () => setTimeout(() => {
+        ST.refresh();
+        if (lenis) lenis.scrollTo(+y, { immediate: true, force: true });
+        else window.scrollTo(0, +y);
+      }, 60);
+      if (document.readyState === 'complete') torna();
+      else window.addEventListener('load', torna, { once: true });
+    }
+  }
 }
 
 /* =================== HERO =================== */
@@ -251,7 +266,8 @@ function initNastro(sec, { G, ST, reduce }) {
 function initChiSiamo(sec, { G, reduce }) {
   if (reduce) return;
   $$('.js-words', sec).forEach((el) => {
-    const words = el.textContent.trim().split(/\s+/);
+    // Spazi "veri" soltanto: U+FEFF fa parte del codice invisibile dell'anteprima (clic-per-modificare)
+    const words = el.textContent.replace(/^[^\S\uFEFF]+|[^\S\uFEFF]+$/g, '').split(/[^\S\uFEFF]+/);
     el.textContent = '';
     words.forEach((w, k) => {
       const s = document.createElement('span');

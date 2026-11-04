@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers';
 import { ChiSiamo } from '@/components/blocks/ChiSiamo';
 import { Contatti } from '@/components/blocks/Contatti';
 import { Garanzie } from '@/components/blocks/Garanzie';
@@ -11,8 +12,11 @@ import SiteScripts, { type SiteData } from '@/components/site/SiteScripts';
 import type { Block } from '@/lib/content';
 import { areaLabel, getSiteContent, objectPosition } from '@/lib/content';
 
+/** Il sito pubblico rilegge i contenuti pubblicati al massimo ogni 60 secondi (deve restare un numero scritto qui). */
+export const revalidate = 60;
+
 export default async function Home() {
-  const { settings, blocks, progetti } = await getSiteContent();
+  const { settings, blocks, progetti } = await getSiteContent((await draftMode()).isEnabled);
   const visible = blocks.filter((b) => b.visibile);
 
   const render = (b: Block) => {

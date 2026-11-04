@@ -3,9 +3,14 @@
  * 1) lo schema (campi del pannello) è valido secondo Sanity;
  * 2) i documenti creati da "Importa contenuti iniziali" usano solo campi che esistono nel pannello
  *    e rispettano i valori ammessi (es. colori, aree).
+ * 3) i contenuti letti dal pannello (query vera, eseguita con groq-js) ricostruiscono il sito identico
+ *    ai contenuti iniziali, e ordine/visibilità/progetti in evidenza vengono rispettati.
  * Uso: npx tsx tests/schema-check.mts
  */
 import { groupProblems, validateSchema } from '@sanity/schema/_internal';
+import { evaluate, parse } from 'groq-js';
+import { contentFromSanity } from '../lib/content/fromSanity';
+import { SINGOLI, SITE_QUERY } from '../sanity/queries';
 import { seed } from '../lib/content/seed';
 import { documentiDaSeed } from '../sanity/import/fromSeed';
 import { schemaTypes } from '../sanity/schemaTypes';
@@ -60,5 +65,40 @@ const singoli = ['impostazioni', 'pagina', 'hero', 'nastro', 'chiSiamo', 'pausa'
 for (const id of singoli) if (!docs.some((d) => d._id === id)) ko(`Importazione: manca la scheda ${id}`);
 if (docs.filter((d) => d._type === 'progetto').length !== seed.progetti.length) ko('Importazione: numero di progetti diverso dal prototipo');
 if (errori === prima) console.log(`✔ Importazione: ${docs.length} schede, tutte con campi validi`);
+
+// 3) Lettura dal pannello → contenuti del sito
+async function leggi(dataset: unknown[]) {
+  const r = await evaluate(parse(SITE_QUERY), { dataset, params: { singoli: SINGOLI } });
+  return contentFromSanity((await r.get()) as never);
+}
+// Confronto senza indirizzi delle immagini (cambiano: ora vengono dal CDN), senza _key e con le proprietà in ordine alfabetico
+const ordina = (v: unknown): unknown =>
+  Array.isArray(v) ? v.map(ordina) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, ordina((v as any)[k])])) : v;
+const senzaImmagini = (x: unknown) =>
+  ordina(JSON.parse(JSON.stringify(x, (k, v) => (v && typeof v === 'object' && 'url' in v && 'alt' in v ? { alt: v.alt } : k === '_key' || k === '_id' || (Array.isArray(v) && !v.length) ? undefined : v))));
+const p3 = errori;
+const letto = await leggi(docs);
+const a = JSON.stringify(senzaImmagini(letto)), b = JSON.stringify(senzaImmagini(seed));
+if (a !== b) {
+  ko('Lettura: i contenuti letti dal pannello non coincidono con quelli iniziali');
+  const la = JSON.stringify(senzaImmagini(letto), null, 1).split('\n'), lb = JSON.stringify(senzaImmagini(seed), null, 1).split('\n');
+  const i = la.findIndex((l, k) => l !== lb[k]);
+  console.log('   prima differenza:', la.slice(i - 2, i + 2).join(' '), ' ≠ ', lb.slice(i - 2, i + 2).join(' '));
+}
+const urls = JSON.stringify(letto).match(/https:\/\/cdn\.sanity\.io\/images\/vs8r2mfn\/production\/[^"]+/g) ?? [];
+if (urls.length < 10) ko(`Lettura: poche immagini dal CDN di Sanity (${urls.length})`);
+// ordine, visibilità e progetti in evidenza
+const mod = structuredClone(docs) as any[];
+const pag = mod.find((d) => d._id === 'pagina');
+pag.blocchi.reverse();
+pag.blocchi.find((v: any) => v.blocco === 'nastro').visibile = false;
+mod.find((d) => d._id === 'progetto-fitlab').inEvidenza = false;
+const l2 = await leggi(mod);
+if (l2.blocks[0]._type !== 'contatti') ko('Lettura: ordine dei blocchi non rispettato');
+if (l2.blocks.find((x) => x._type === 'nastro')?.visibile !== false) ko('Lettura: blocco nascosto ancora visibile');
+if (l2.progetti.some((p) => p._id === 'progetto-fitlab') || l2.progetti.length !== seed.progetti.length - 1) ko('Lettura: progetto non in evidenza ancora mostrato');
+const ordine = l2.progetti.map((p) => p.nome).join(',');
+if (ordine !== seed.progetti.filter((p) => p._id !== 'fitlab').map((p) => p.nome).join(',')) ko('Lettura: ordine dei progetti diverso da quello dell’elenco');
+if (errori === p3) console.log(`✔ Lettura dal pannello: sito identico ai contenuti iniziali, ${urls.length} immagini dal CDN, ordine/visibilità/evidenza rispettati`);
 
 process.exit(errori ? 1 : 0);

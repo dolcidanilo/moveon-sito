@@ -1,3 +1,4 @@
+import { stegaClean } from 'next-sanity';
 import type { Block, HeroBlock } from '@/lib/content';
 import { hrefFor } from '@/lib/content';
 import { HIGHLIGHT_SVG } from '../site/art';
@@ -30,12 +31,13 @@ export function Hero({ b, blocks }: { b: HeroBlock; blocks: Block[] }) {
         <div className="hero-copy">
           <h1 className="hero-title" aria-label={rows.join(' ')}>
             {rows.map((row, r) => {
-              const words = row.split(/\s+/);
+              const words = row.split(/[^\S\uFEFF]+/);
               return (
                 <span className="hl-line" aria-hidden="true" key={r}>
                   {words.map((w, k) => {
                     const sep = k < words.length - 1 ? ' ' : '';
-                    if (!marked && mark && w === mark) {
+                    // stegaClean: nell'anteprima le parole portano caratteri invisibili per il clic-per-modificare
+                    if (!marked && mark && stegaClean(w) === mark) {
                       marked = true;
                       return (
                         <span key={k}>

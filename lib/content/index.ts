@@ -1,15 +1,35 @@
+import { cache } from 'react';
+import { client, readToken } from '@/sanity/client';
+import { SINGOLI, SITE_QUERY } from '@/sanity/queries';
+import { contentFromSanity } from './fromSanity';
 import { seed } from './seed';
 import type { Block, BlockType, Img, SiteContent } from './types';
 
 export * from './types';
 
+/** Ogni quanti secondi, al massimo, il sito pubblico rilegge i contenuti pubblicati. */
+export const REVALIDATE = 60;
+
 /**
- * Restituisce tutti i contenuti del sito.
- * Fase 1: contenuti iniziali dal file seed. Fase 3: lettura da Sanity, con il seed come riserva.
+ * Restituisce tutti i contenuti del sito, letti dal pannello Sanity.
+ * - Sito pubblico: solo contenuti pubblicati, rilette al massimo ogni minuto.
+ * - Anteprima (draft mode, dal pannello): anche le bozze, sempre aggiornate, con il clic-per-modificare.
+ * Se Sanity non è raggiungibile: su Vercel la costruzione si ferma (resta online la versione precedente),
+ * in locale si usano i contenuti iniziali, così il sito si può provare anche senza rete.
  */
-export async function getSiteContent(): Promise<SiteContent> {
-  return seed;
-}
+export const getSiteContent = cache(async (preview = false): Promise<SiteContent> => {
+  try {
+    const data =
+      preview && readToken
+        ? await client.fetch(SITE_QUERY, { singoli: SINGOLI }, { perspective: 'drafts', useCdn: false, stega: true, token: readToken, cache: 'no-store' })
+        : await client.fetch(SITE_QUERY, { singoli: SINGOLI }, { next: { revalidate: REVALIDATE, tags: ['sanity'] } });
+    return contentFromSanity(data);
+  } catch (err) {
+    if (process.env.VERCEL) throw err;
+    console.warn('[contenuti] Sanity non raggiungibile, uso i contenuti iniziali:', err instanceof Error ? err.message : err);
+    return seed;
+  }
+});
 
 /** Ancora (id HTML) di ogni blocco: è anche l'indirizzo dei link del menu, es. #servizi. */
 export const ANCHOR: Record<BlockType, string> = {

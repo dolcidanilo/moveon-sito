@@ -1,9 +1,10 @@
 'use client';
 
 /* Configurazione del pannello contenuti (Sanity Studio), raggiungibile su /studio. */
-import { UploadIcon } from './sanity/icons';
+import { DesktopIcon, UploadIcon } from './sanity/icons';
 import { itITLocale } from '@sanity/locale-it-it';
 import { defineConfig } from 'sanity';
+import { defineDocuments, defineLocations, presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
 import { dataset, projectId } from './sanity/env';
 import { ImportTool } from './sanity/import/ImportTool';
@@ -16,7 +17,22 @@ export default defineConfig({
   projectId,
   dataset,
   basePath: '/studio',
-  plugins: [structureTool({ title: 'Contenuti', structure }), itITLocale()],
+  plugins: [
+    structureTool({ title: 'Contenuti', structure }),
+    // Anteprima: il sito accanto ai campi, con le bozze; clic su un testo per aprire il suo campo
+    presentationTool({
+      title: 'Anteprima',
+      icon: DesktopIcon,
+      previewUrl: { initial: '/', previewMode: { enable: '/api/draft-mode/enable', disable: '/api/draft-mode/disable' } },
+      resolve: {
+        mainDocuments: defineDocuments([{ route: '/', filter: `_id == "pagina"` }]),
+        locations: Object.fromEntries(
+          [...SINGOLI, 'progetto'].map((t) => [t, defineLocations({ locations: [{ title: 'Pagina principale', href: '/' }] })]),
+        ),
+      },
+    }),
+    itITLocale(),
+  ],
   // Funzioni avanzate di Sanity che qui non servono: il pannello resta essenziale
   releases: { enabled: false },
   scheduledDrafts: { enabled: false },

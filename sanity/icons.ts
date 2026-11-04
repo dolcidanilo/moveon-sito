@@ -4,6 +4,7 @@ export { CaseIcon } from '@sanity/icons/Case';
 export { CheckmarkCircleIcon } from '@sanity/icons/CheckmarkCircle';
 export { CogIcon } from '@sanity/icons/Cog';
 export { CommentIcon } from '@sanity/icons/Comment';
+export { DesktopIcon } from '@sanity/icons/Desktop';
 export { EyeClosedIcon } from '@sanity/icons/EyeClosed';
 export { EyeOpenIcon } from '@sanity/icons/EyeOpen';
 export { HomeIcon } from '@sanity/icons/Home';

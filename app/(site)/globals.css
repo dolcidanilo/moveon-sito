@@ -488,3 +488,6 @@ img,svg{max-width:100%}
 .svgw{display:contents}
 .foot-link{color:inherit;text-underline-offset:3px}
 .foot-link:hover{color:#fff}
+/* Avviso "stai vedendo le bozze" (solo anteprima aperta fuori dal pannello) */
+.preview-badge{position:fixed;left:16px;bottom:16px;z-index:400;padding:10px 16px;border-radius:999px;background:var(--accent);color:var(--on-accent);font:700 13px/18px var(--font);text-decoration:none;box-shadow:var(--shadow-card)}
+@media (max-width:767px){ .preview-badge{bottom:88px} }
