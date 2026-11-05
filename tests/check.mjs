@@ -85,8 +85,9 @@ const browser = await chromium.launch();
 
   // Bug: header senza sfondo in fondo alla pagina
   await smoothScroll(page, await page.evaluate(() => document.documentElement.scrollHeight));
-  const hdr = await page.evaluate(() => ({ scrolled: document.documentElement.classList.contains('mo-scrolled'), bg: getComputedStyle(document.querySelector('.mo-site-header')).backgroundColor }));
+  const hdr = await page.evaluate(() => { const cs = getComputedStyle(document.querySelector('.mo-site-header')); return { scrolled: document.documentElement.classList.contains('mo-scrolled'), bg: cs.backgroundColor, blur: cs.backdropFilter }; });
   check('Header con sfondo anche in fondo alla pagina', hdr.scrolled && hdr.bg !== 'rgba(0, 0, 0, 0)', JSON.stringify(hdr));
+  check('Header quando scorri: sfondo un po’ trasparente e sfocatura 6.5px', hdr.blur === 'blur(6.5px)' && /(rgba|color)\(.*0\.8\d?\)|\/ 0\.8/.test(hdr.bg), `${hdr.bg} · ${hdr.blur}`);
 
   // Bug: testo a solo contorno non usato
   const stroke = await page.evaluate(() => [...document.querySelectorAll('.mo-mq-item')].some((el) => parseFloat(getComputedStyle(el).webkitTextStrokeWidth) > 0));
