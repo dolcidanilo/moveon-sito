@@ -109,7 +109,11 @@ check( 'I testi vengono resi sicuri (niente <script>)', false === strpos( $html,
 $html = do_shortcode( '[mo_hero titolo="Idee | che restano." parola="restano."]' );
 check( 'Hero: due righe e parola sottolineata', 2 === substr_count( $html, 'mo-hl-line' ) && 1 === substr_count( $html, 'mo-hw-mark' ) );
 
-/* 6) Telefono e WhatsApp */
+/* 6) Pulizia dei paragrafi vuoti tra le righe: via quelli vuoti, restano quelli con una classe (es. messaggio del modulo) */
+$pul = mo_pulisci_contenuto( '<div class="vc_row">A</div><p></p><p>&nbsp;</p><p> <br /> </p><p class="mo-form-msg"></p><p>testo</p>' );
+check( 'Paragrafi vuoti tolti, messaggio del modulo e testi conservati', '<div class="vc_row">A</div><p class="mo-form-msg"></p><p>testo</p>' === $pul, $pul );
+
+/* 7) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
 check( 'WhatsApp da 0039', 'https://wa.me/393331234567' === mo_wa_href( '0039 333 1234567' ) );
 

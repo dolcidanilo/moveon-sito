@@ -46,9 +46,18 @@ add_action(
 	function () {
 		if ( mo_is_page() ) {
 			remove_filter( 'the_content', 'wpautop' );
+			add_filter( 'the_content', 'mo_pulisci_contenuto', 99 );
 		}
 	}
 );
+
+/**
+ * Toglie i paragrafi vuoti che WordPress, WPBakery o il tema possono lasciare tra una riga e l'altra (creano spazi).
+ * Solo i <p> senza attributi: quelli con una classe (es. il messaggio del modulo) servono anche se vuoti.
+ */
+function mo_pulisci_contenuto( string $html ): string {
+	return (string) preg_replace( '#<p>(?:\s|&nbsp;|&\#160;|\xC2\xA0|<br\s*/?>)*</p>#i', '', $html );
+}
 
 add_filter(
 	'body_class',

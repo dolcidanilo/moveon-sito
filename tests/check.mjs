@@ -264,6 +264,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       campi: [...document.querySelectorAll('.mo-ct-form .mo-fld :is(input,select,textarea)')].map((e) => getComputedStyle(e).backgroundColor),
       spazi: blocks.slice(1).map((b, i) => Math.round(b.top - blocks[i].bottom)),
       sfondoBody: getComputedStyle(document.body).backgroundColor,
+      lineaNastro: getComputedStyle(document.querySelector('.mo-marquee')).borderBottomWidth,
     };
   });
   check('Stili di Porto caricati come file: esclusi', !r.portoFile);
@@ -272,6 +273,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
   check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(30,41,59)'), [...new Set(r.campi)].join(' | '));
   check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
+  check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
   check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
   // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
   await page.hover('.mo-header-cta');

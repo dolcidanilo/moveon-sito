@@ -17,6 +17,8 @@ strong{color:#222}
 .vc_column_container>.vc_column-inner{padding-left:15px;padding-right:15px;padding-top:35px}
 .wpb_wrapper>*{margin-bottom:35px}
 button:hover{background:#0088cc;color:#fff}
+.vc_row-full-width{margin-bottom:35px;height:1px}
+p:empty{min-height:24px}
 ';
 // 1) Foglio di stile "di Porto" (deve essere escluso dal plugin)
 add_action( 'wp_enqueue_scripts', function () use ( $mo_ostile ) {
@@ -29,3 +31,8 @@ add_action( 'wp_enqueue_scripts', function () use ( $mo_ostile ) {
 add_action( 'wp_head', function () use ( $mo_ostile ) {
 	echo '<style id="tema-ostile">' . $mo_ostile . '</style>';
 }, 999 );
+// 3) Paragrafi vuoti tra una riga e l'altra (come può succedere dopo il salvataggio in WPBakery)
+add_filter( 'the_content', function ( $html ) {
+	return str_replace( '<div class="vc_row-full-width vc_clearfix"></div>', '<div class="vc_row-full-width vc_clearfix"></div><p>&nbsp;</p><p></p>', $html );
+}, 50 );
+

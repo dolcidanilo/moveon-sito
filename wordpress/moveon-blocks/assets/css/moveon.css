@@ -195,7 +195,7 @@ img,svg{max-width:100%}
 @keyframes cue{to{transform:translateY(52px)}}
 
 /* Marquee */
-.mo-marquee{padding:64px 0;background:var(--mo-surface);overflow:hidden;border-bottom:1px solid var(--mo-border)}
+.mo-marquee{padding:64px 0;background:var(--mo-surface);overflow:hidden}
 .mo-mq-row{overflow:hidden;white-space:nowrap}
 .mo-mq-row + .mo-mq-row{margin-top:8px}
 .mo-mq-track{display:inline-flex;will-change:transform}
@@ -609,3 +609,6 @@ img,svg{max-width:100%}
 .mo-seg.mo-seg button[aria-pressed="true"]{background:var(--mo-ink);color:var(--mo-surface)}
 .mo-pfm-btn.mo-pfm-btn:is(:focus,:active){background:transparent;color:var(--mo-link)}
 .mo-pfm-btn.mo-pfm-btn:hover{background:var(--mo-brand-tint);color:var(--mo-link)}
+/* Tra una riga e l'altra: niente spazi da elementi vuoti (paragrafi vuoti, separatore delle righe a tutta larghezza di WPBakery) */
+.mo-content > .vc_row-full-width{height:0 !important;margin:0 !important;padding:0 !important;border:0 !important}
+.mo-content > :is(p,br):empty{display:none}
