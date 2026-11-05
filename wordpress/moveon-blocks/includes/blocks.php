@@ -40,6 +40,32 @@ function mo_p_anchor( $std ) {
 	return mo_p_text( 'anchor', 'Ancora (indirizzo della sezione)', 'Il nome usato dai link del menu, es. «' . $std . '» → il link è #' . $std . '. Solo lettere minuscole e trattini.', 'Avanzate', $std );
 }
 
+/** Campi della scheda "Sfondo", uguali per tutti gli elementi. */
+function mo_p_sfondo(): array {
+	$opacita = array();
+	foreach ( array( 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100 ) as $n ) {
+		$opacita[ $n . '%' ] = (string) $n;
+	}
+	return array(
+		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore della sezione e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore della sezione.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_dimensione', 'Dimensione', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
+		mo_p_text( 'sfondo_posizione', 'Posizione', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra.', 'Sfondo', '50% 50%' ),
+	);
+}
+
+/** Livello con l'immagine di sfondo della sezione (vuoto se non c'è un'immagine). */
+function mo_sfondo_html( array $a ): string {
+	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
+	if ( ! $img ) {
+		return '';
+	}
+	$op  = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
+	$dim = in_array( $a['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $a['sfondo_dimensione'] : 'cover';
+	list( $x, $y ) = mo_focus( $a['sfondo_posizione'] ?? '50% 50%' );
+	return '<div class="mo-bg" aria-hidden="true" style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . '"></div>';
+}
+
 /** Definizioni degli elementi: nome, descrizione, campi. */
 function mo_blocks(): array {
 	$d     = mo_defaults();
@@ -60,6 +86,7 @@ function mo_blocks(): array {
 				mo_p_text( 'pulsante_testo', 'Pulsante: testo', 'Verbo all’imperativo + oggetto, es. «Scopri i Servizi». Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['hero']['pulsante_testo'] ),
 				mo_p_text( 'pulsante_link', 'Pulsante: porta a', 'L’ancora di una sezione (es. #servizi) oppure un indirizzo intero.', 'Testi', $d['hero']['pulsante_link'] ),
 				mo_p_anchor( $d['hero']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'nastro'    => array(
@@ -71,6 +98,7 @@ function mo_blocks(): array {
 				mo_p_img( 'foto', 'Foto per le parole riempite', 'Colori saturi e contrastati funzionano meglio. Almeno 1200 px di larghezza.' ),
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['nastro']['foto_pos'] ),
 				mo_p_anchor( $d['nastro']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'chi_siamo' => array(
@@ -107,6 +135,7 @@ function mo_blocks(): array {
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['chi_siamo']['foto_pos'] ),
 				mo_p_img( 'idea_immagine', 'Immagine dell’idea (facoltativa)', 'Se la lasci vuota resta l’animazione del cubo che si disegna.' ),
 				mo_p_anchor( $d['chi_siamo']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'pausa'     => array(
@@ -117,6 +146,7 @@ function mo_blocks(): array {
 				mo_p_img( 'foto', 'Foto', 'Orizzontale, almeno 1600 px. Controlla che i bordi non abbiano strisce chiare.' ),
 				mo_p_text( 'punto_focale', 'Punto focale (centro del cerchio iniziale)', $fuoco, 'Immagini', $d['pausa']['punto_focale'] ),
 				mo_p_anchor( $d['pausa']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'servizi'   => array(
@@ -144,6 +174,7 @@ function mo_blocks(): array {
 					'Trascinali per cambiare l’ordine.'
 				),
 				mo_p_anchor( $d['servizi']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'portfolio' => array(
@@ -155,6 +186,7 @@ function mo_blocks(): array {
 				mo_p_area( 'istruzioni', 'Testo d’istruzioni', '', 'Testi', $d['portfolio']['istruzioni'] ),
 				mo_p_drop( 'modalita', 'Modalità iniziale', array( 'Sul tavolo' => 'tavolo', 'In ordine' => 'ordine' ), $d['portfolio']['modalita'], 'Su telefono i lavori partono sempre «In ordine».' ),
 				mo_p_anchor( $d['portfolio']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'garanzie'  => array(
@@ -167,6 +199,7 @@ function mo_blocks(): array {
 				mo_p_text( 'sigillo', 'Scritta del sigillo', 'Gira intorno allo scudo, ripetuta 2 volte. Separa le parti con una virgola.', 'Testi', $d['garanzie']['sigillo'] ),
 				mo_p_group( 'garanzie', 'Garanzie', array( mo_p_text( 'titolo', 'Titolo', '', '' ), mo_p_area( 'testo', 'Testo', '', '' ) ), $d['garanzie']['garanzie'], 'Da 3 a 6. Solo impegni che puoi mantenere: sostituisci i «[N]» con i numeri reali.' ),
 				mo_p_anchor( $d['garanzie']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 		'contatti'  => array(
@@ -183,6 +216,7 @@ function mo_blocks(): array {
 				mo_p_img( 'foto', 'Foto (4:5)', 'Almeno 800 px di larghezza.' ),
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['contatti']['foto_pos'] ),
 				mo_p_anchor( $d['contatti']['anchor'] ),
+				...mo_p_sfondo(),
 			),
 		),
 	);
@@ -235,6 +269,7 @@ function mo_render_hero( $atts ): string {
 		'hero',
 		array(
 			'anchor'       => mo_anchor( $a['anchor'], 'top' ),
+			'sfondo'       => mo_sfondo_html( $a ),
 			'righe'        => $rows,
 			'titolo_piano' => implode( ' ', mo_lines( $a['titolo'] ) ),
 			'testo'        => mo_text( $a['testo'] ),
@@ -262,6 +297,7 @@ function mo_render_nastro( $atts ): string {
 		'nastro',
 		array(
 			'anchor'   => mo_anchor( $a['anchor'], 'parole' ),
+			'sfondo'   => mo_sfondo_html( $a ),
 			'foto_url' => $img ? $img['url'] : '',
 			'foto_pos' => implode( '% ', mo_focus( $a['foto_pos'], array( 30, 45 ) ) ) . '%',
 			'righe'    => $righe,
@@ -294,6 +330,7 @@ function mo_render_chi_siamo( $atts ): string {
 		'chi-siamo',
 		array(
 			'anchor'        => mo_anchor( $a['anchor'], 'chi-siamo' ),
+			'sfondo'        => mo_sfondo_html( $a ),
 			'etichetta'     => mo_text( $a['etichetta'] ),
 			'numero'        => mo_text( $a['numero'] ),
 			'foto_url'      => $img ? $img['url'] : '',
@@ -334,6 +371,7 @@ function mo_render_pausa( $atts ): string {
 		'pausa',
 		array(
 			'anchor'      => mo_anchor( $a['anchor'], 'pausa' ),
+			'sfondo'      => mo_sfondo_html( $a ),
 			'fx'          => $fx,
 			'fy'          => $fy,
 			'foto'        => $img,
@@ -367,6 +405,7 @@ function mo_render_servizi( $atts ): string {
 		'servizi',
 		array(
 			'anchor'       => mo_anchor( $a['anchor'], 'servizi' ),
+			'sfondo'       => mo_sfondo_html( $a ),
 			'etichetta'    => mo_text( $a['etichetta'] ),
 			'apertura'     => mo_text( $a['apertura'] ),
 			'servizi'      => $servizi,
@@ -415,6 +454,7 @@ function mo_render_portfolio( $atts ): string {
 		'portfolio',
 		array(
 			'anchor'     => mo_anchor( $a['anchor'], 'portfolio' ),
+			'sfondo'     => mo_sfondo_html( $a ),
 			'etichetta'  => mo_text( $a['etichetta'] ),
 			'titolo'     => mo_text( $a['titolo'] ),
 			'istruzioni' => mo_text( $a['istruzioni'] ),
@@ -438,6 +478,7 @@ function mo_render_garanzie( $atts ): string {
 		'garanzie',
 		array(
 			'anchor'      => mo_anchor( $a['anchor'], 'garanzie' ),
+			'sfondo'      => mo_sfondo_html( $a ),
 			'etichetta'   => mo_text( $a['etichetta'] ),
 			'titolo'      => mo_text( $a['titolo'] ),
 			'sottotitolo' => mo_text( $a['sottotitolo'] ),
@@ -459,6 +500,7 @@ function mo_render_contatti( $atts ): string {
 		'contatti',
 		array(
 			'anchor'          => mo_anchor( $a['anchor'], 'contatti' ),
+			'sfondo'          => mo_sfondo_html( $a ),
 			'etichetta'       => mo_text( $a['etichetta'] ),
 			'righe_titolo'    => mo_lines( $a['titolo'] ),
 			'testo'           => mo_text( $a['testo'] ),

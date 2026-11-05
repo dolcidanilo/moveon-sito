@@ -129,7 +129,13 @@ check( 'Motivo con icona personalizzata', false !== strpos( $html, 'mo-reason-im
 $html = do_shortcode( '[mo_chi_siamo idea_immagine="' . $sid . '"]' );
 check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $html, 'mo-idea-img' ) && false === strpos( $html, 'mo-box-svg' ) );
 
-/* 8) Telefono e WhatsApp */
+/* 8) Immagine di sfondo delle sezioni */
+$html = do_shortcode( '[mo_hero sfondo_img="' . $jpg . '" sfondo_opacita="15" sfondo_dimensione="auto" sfondo_posizione="100% 50%"]' );
+check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
+check( 'Sfondo: niente livello se non c’è l’immagine', false === strpos( do_shortcode( '[mo_hero]' ), 'mo-bg' ) );
+check( 'WPBakery: scheda Sfondo in tutti gli 8 elementi', 8 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
+
+/* 9) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
 check( 'WhatsApp da 0039', 'https://wa.me/393331234567' === mo_wa_href( '0039 333 1234567' ) );
 

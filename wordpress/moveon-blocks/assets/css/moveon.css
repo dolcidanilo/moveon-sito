@@ -615,3 +615,6 @@ img,svg{max-width:100%}
 /* Icona personalizzata dei motivi (immagine caricata) */
 .mo-reason-ico .mo-reason-img{display:block;width:32px;height:32px;object-fit:contain}
 @media (max-width:767px){ .mo-reason-ico .mo-reason-img{width:26px;height:26px} }
+/* Immagine di sfondo delle sezioni (scheda «Sfondo» degli elementi): sopra il colore della sezione, sotto i contenuti */
+.mo-block{position:relative;isolation:isolate}
+.mo-block > .mo-bg{position:absolute;inset:0;z-index:-1;background-repeat:no-repeat;pointer-events:none}

@@ -319,6 +319,35 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.close();
 }
 
+/* ---------------- Immagine di sfondo delle sezioni (pagina "prova-sfondo") ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, colorScheme: 'light' });
+  const res = await page.goto(new globalThis.URL('prova-sfondo/', URL).href, { waitUntil: 'load' });
+  if (res && res.ok()) {
+    await page.waitForTimeout(2000);
+    await smoothScroll(page, (await topOf(page, '.mo-gar')) + 100);
+    const r = await page.evaluate(() => {
+      const bg = document.querySelector('.mo-gar > .mo-bg');
+      const t = document.querySelector('.mo-gar .mo-statement').getBoundingClientRect();
+      const pila = document.elementsFromPoint(t.left + 20, t.top + t.height / 2);
+      const s = bg && getComputedStyle(bg);
+      const bg2 = document.querySelector('.mo-contact > .mo-bg');
+      return {
+        c: !!bg, opacita: s && s.opacity, size: s && s.backgroundSize, sopraTesto: pila.indexOf(bg) > -1 && pila.indexOf(bg) < pila.findIndex((e) => e.classList.contains('mo-statement')),
+        copre: bg && Math.round(bg.getBoundingClientRect().height) === Math.round(document.querySelector('.mo-gar').getBoundingClientRect().height),
+        contain: bg2 && getComputedStyle(bg2).backgroundSize, pos: bg2 && getComputedStyle(bg2).backgroundPosition,
+      };
+    });
+    check('Sfondo: immagine presente con l’opacità scelta (40%)', r.c && r.opacita === '0.4', `${r.opacita}`);
+    check('Sfondo: copre tutta la sezione e sta sotto i testi', r.size === 'cover' && r.copre && !r.sopraTesto);
+    check('Sfondo: «intera, senza tagli» e posizione in alto', r.contain === 'contain' && r.pos === '50% 0%', `${r.contain} ${r.pos}`);
+    await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
+  } else {
+    console.log('… pagina "prova-sfondo" assente: controlli sullo sfondo saltati');
+  }
+  await page.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

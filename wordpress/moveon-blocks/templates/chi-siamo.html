@@ -1,5 +1,6 @@
-{{! CHI SIAMO · anchor etichetta numero foto_url foto_pos frase_numero manifesto idea_titolo idea_testo passo_da passo_a motivi_titolo chiusura; idea_img (url, alt, w, h); motivi (tono, i, icona, titolo, testo, etichette); link (testo, resto, href) }}
+{{! CHI SIAMO · anchor etichetta numero foto_url foto_pos frase_numero manifesto idea_titolo idea_testo passo_da passo_a motivi_titolo chiusura; idea_img (url, alt, w, h); motivi (tono, i, icona, titolo, testo, etichette); link (testo, resto, href); sfondo = immagine di sfondo (scheda Sfondo) }}
 <section class="mo-block mo-about" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="chiSiamo">
+  {{{sfondo}}}
   <div class="mo-wrap">
     <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
     <div class="mo-about-top" style="--mo-img-fill:url('{{foto_url}}');--mo-img-pos:{{foto_pos}}">

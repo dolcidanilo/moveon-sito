@@ -83,4 +83,13 @@ if ( ! get_page_by_path("prova-classi") ) {
   echo "· Pagina prova-classi creata\n";
 }
 ' 2>/dev/null
+php wpcli.php '
+if ( ! get_page_by_path("prova-sfondo") ) {
+  $img = mo_importa_immagine("pausa-cuffie.jpg", "Foto di prova per lo sfondo");
+  $c = "[mo_garanzie sfondo_img=\"$img\" sfondo_opacita=\"40\"]\n[mo_contatti sfondo_img=\"$img\" sfondo_dimensione=\"contain\" sfondo_posizione=\"50% 0%\"]";
+  $id = wp_insert_post(["post_type"=>"page","post_status"=>"publish","post_title"=>"Prova sfondo","post_name"=>"prova-sfondo","post_content"=>$c]);
+  update_post_meta($id, "_wp_page_template", "moveon-pagina-intera");
+  echo "· Pagina prova-sfondo creata\n";
+}
+' 2>/dev/null
 echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1)"

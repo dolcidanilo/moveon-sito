@@ -1,5 +1,6 @@
-{{! NASTRO PAROLE CHIAVE · anchor foto_url foto_pos; righe → parole (testo, classe). Le parole sono già ripetute 3 volte per lo scorrimento continuo. }}
+{{! NASTRO PAROLE CHIAVE · anchor foto_url foto_pos; righe → parole (testo, classe). Le parole sono già ripetute 3 volte per lo scorrimento continuo.; sfondo = immagine di sfondo (scheda Sfondo) }}
 <section class="mo-block mo-marquee" id="{{anchor}}" aria-hidden="true" style="--mo-img-fill:url('{{foto_url}}');--mo-img-pos:{{foto_pos}}" data-mo-block="nastro">
+  {{{sfondo}}}
   {{#righe}}
   <div class="mo-mq-row"><div class="mo-mq-track">{{#parole}}<span class="mo-mq-item {{classe}}">{{testo}}</span>{{/parole}}</div></div>
   {{/righe}}

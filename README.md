@@ -30,8 +30,8 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 ```bash
 npm install                     # librerie sorgente (GSAP, Lenis, Montserrat)
 npm run wp:prova                # WordPress di prova in /tmp/moveon-wp, http://127.0.0.1:8080/nuovo/
-npm test                        # controlli nel browser (Playwright): 42 controlli, con un «tema ostile» che simula Porto
-npm run test:php                # controlli sul motore PHP: 28 controlli
+npm test                        # controlli nel browser (Playwright): 45 controlli, con un «tema ostile» che simula Porto
+npm run test:php                # controlli sul motore PHP: 31 controlli
 npm run zip                     # ricrea dist/moveon-blocks.zip
 ```
 
