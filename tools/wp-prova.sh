@@ -59,6 +59,7 @@ fi
 ln -sfn "$REPO/wordpress/moveon-blocks" wp/wp-content/plugins/moveon-blocks
 mkdir -p wp/wp-content/mu-plugins
 printf '%s\n' '<?php' "add_filter( 'moveon_limite_richieste_ora', function () { return 1000; } ); // prove automatiche" > wp/wp-content/mu-plugins/prova-limiti.php
+cp "$REPO/tests/tema-ostile.php" wp/wp-content/mu-plugins/tema-ostile.php   # simula le regole di Porto che interferivano
 
 cat > wpcli.php <<'PHP'
 <?php

@@ -242,6 +242,52 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Nastro: stessa velocità a 60 e a 120 Hz', ratio > 0.85 && ratio < 1.15, `${speed[60].toFixed(0)} vs ${speed[120].toFixed(0)} px/s`);
 }
 
+/* ---------------- Resistenza agli stili del tema (Porto, WPBakery): problemi segnalati sul sito vero ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, colorScheme: 'light' });
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2600);
+  const rgb = (s) => s.replace(/\s/g, '');
+  const r = await page.evaluate(() => {
+    const css = (sel, prop) => { const el = document.querySelector(sel); return el ? getComputedStyle(el)[prop] : null; };
+    const blocks = [...document.querySelectorAll('[data-mo-block]')].slice(0, 3).map((b) => b.getBoundingClientRect());
+    return {
+      portoFile: !!document.querySelector('link[id^="porto"]'),
+      colori: {
+        garSub: css('.mo-gar-sub', 'color'),
+        heroSub: css('.mo-hero-sub', 'color'),
+        aboutP: css('.mo-about-p', 'color'),
+        statement: css('.mo-gar .mo-statement', 'color'),
+        ctText: css('.mo-ct-text', 'color'),
+        reasonP: css('.mo-r-tint p', 'color'),
+      },
+      campi: [...document.querySelectorAll('.mo-ct-form .mo-fld :is(input,select,textarea)')].map((e) => getComputedStyle(e).backgroundColor),
+      spazi: blocks.slice(1).map((b, i) => Math.round(b.top - blocks[i].bottom)),
+      sfondoBody: getComputedStyle(document.body).backgroundColor,
+    };
+  });
+  check('Stili di Porto caricati come file: esclusi', !r.portoFile);
+  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(203,213,225)', aboutP: 'rgb(51,65,85)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', reasonP: 'rgb(51,65,85)' };
+  const sbagliati = Object.entries(atteso).filter(([k, v]) => rgb(r.colori[k] || '') !== v).map(([k]) => `${k}=${r.colori[k]}`);
+  check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
+  check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(30,41,59)'), [...new Set(r.campi)].join(' | '));
+  check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
+  check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
+  // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
+  await page.hover('.mo-header-cta');
+  await page.waitForTimeout(400);
+  const hov = await page.evaluate(() => { const s = getComputedStyle(document.querySelector('.mo-header-cta')); return { c: s.color, d: s.textDecorationLine }; });
+  check('Pulsante leggibile al passaggio del mouse', rgb(hov.c) === 'rgb(255,255,255)' && hov.d === 'none', JSON.stringify(hov));
+  // Schede dei motivi: restano ferme (sticky) mentre la successiva sale
+  const t0 = await topOf(page, '.mo-reasons');
+  await smoothScroll(page, t0 + 300);
+  const a = await page.evaluate(() => Math.round(document.querySelectorAll('.mo-reason')[0].getBoundingClientRect().top));
+  await smoothScroll(page, t0 + 600);
+  const b = await page.evaluate(() => Math.round(document.querySelectorAll('.mo-reason')[0].getBoundingClientRect().top));
+  check('Schede dei motivi ferme mentre scorri (si impilano)', Math.abs(a - b) <= 2, `${a} → ${b}`);
+  await page.close();
+}
+
 /* ---------------- Classi di animazione per le sezioni fatte con WPBakery (pagina "prova-classi") ---------------- */
 {
   const page = await browser.newPage({ viewport: { width: 1360, height: 860 } });

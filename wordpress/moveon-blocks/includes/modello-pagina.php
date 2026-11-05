@@ -6,7 +6,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?><!doctype html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?><?php echo empty( mo_settings()['tema_scuro'] ) ? ' data-theme="light"' : ''; ?>>
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -24,6 +24,11 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.0.1 =
+* Le pagine MoveOn non risentono più degli stili di Porto: colori dei testi, campi del modulo tutti scuri, pulsanti leggibili al passaggio del mouse, nessuno spazio tra le sezioni dopo il salvataggio in WPBakery, card dei motivi di nuovo impilate.
+* Esclusi anche gli stili dei componenti di Porto e quelli generati per pagina (uploads/porto_styles).
+* Nuova impostazione «Tema scuro automatico».
 
 = 1.0.0 =
 * Prima versione: ricostruzione del prototipo approvato come plugin per WPBakery.

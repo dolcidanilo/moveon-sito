@@ -178,13 +178,28 @@ function mo_dequeue_theme_assets(): void {
 	$roots = array_unique( array( get_template_directory_uri(), get_stylesheet_directory_uri() ) );
 	foreach ( array( wp_styles(), wp_scripts() ) as $deps ) {
 		foreach ( (array) $deps->queue as $handle ) {
+			if ( 0 === strpos( $handle, 'moveon' ) ) {
+				continue;
+			}
 			$src = isset( $deps->registered[ $handle ] ) ? (string) $deps->registered[ $handle ]->src : '';
+			$via = false;
 			foreach ( $roots as $root ) {
 				if ( '' !== $src && 0 === strpos( $src, $root ) ) {
-					$deps->dequeue( $handle );
+					$via = true; // file del tema (Porto o tema figlio)
 				}
 			}
+			// Stili e script dei componenti di Porto (es. Porto Functionality, stili generati per pagina in uploads/porto_styles)
+			if ( false !== stripos( $handle, 'porto' ) || false !== stripos( $src, 'porto' ) ) {
+				$via = true;
+			}
+			if ( $via ) {
+				$deps->dequeue( $handle );
+			}
 		}
+	}
+	// La griglia di WPBakery (colonne delle tue righe) deve restare: se Porto l'aveva sostituita, si ricarica quella originale
+	if ( wp_style_is( 'js_composer_front', 'registered' ) && ! wp_style_is( 'js_composer_front', 'enqueued' ) ) {
+		wp_enqueue_style( 'js_composer_front' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'mo_dequeue_theme_assets', 9999 );
@@ -199,15 +214,21 @@ add_action(
 		if ( defined( 'WPB_VC_VERSION' ) ) {
 			return;
 		}
-		foreach ( array( 'vc_row', 'vc_row_inner', 'vc_column', 'vc_column_inner' ) as $tag ) {
+		// Stessa struttura HTML di WPBakery, così le prove senza WPBakery sono realistiche
+		$classe = function ( $atts ) {
+			return is_array( $atts ) && ! empty( $atts['el_class'] ) ? ' ' . esc_attr( $atts['el_class'] ) : '';
+		};
+		$righe  = function ( $atts, $content = '' ) use ( $classe ) {
+			$full = is_array( $atts ) && ! empty( $atts['full_width'] );
+			$data = $full ? ' data-vc-full-width="true" data-vc-full-width-init="true" data-vc-stretch-content="true"' : '';
+			return '<div' . $data . ' class="vc_row wpb_row vc_row-fluid' . ( $full ? ' vc_row-no-padding' : '' ) . $classe( $atts ) . '">' . do_shortcode( $content ) . '</div>' . ( $full ? '<div class="vc_row-full-width vc_clearfix"></div>' : '' );
+		};
+		$colonne = function ( $atts, $content = '' ) use ( $classe ) {
+			return '<div class="wpb_column vc_column_container vc_col-sm-12' . $classe( $atts ) . '"><div class="vc_column-inner"><div class="wpb_wrapper">' . do_shortcode( $content ) . '</div></div></div>';
+		};
+		foreach ( array( 'vc_row' => $righe, 'vc_row_inner' => $righe, 'vc_column' => $colonne, 'vc_column_inner' => $colonne ) as $tag => $fn ) {
 			if ( ! shortcode_exists( $tag ) ) {
-				add_shortcode(
-					$tag,
-					function ( $atts, $content = '' ) use ( $tag ) {
-						$cls = trim( 'mo-' . str_replace( '_', '-', $tag ) . ' ' . ( is_array( $atts ) && ! empty( $atts['el_class'] ) ? sanitize_html_class( $atts['el_class'] ) : '' ) );
-						return '<div class="' . esc_attr( $cls ) . '">' . do_shortcode( $content ) . '</div>';
-					}
-				);
+				add_shortcode( $tag, $fn );
 			}
 		}
 		if ( ! shortcode_exists( 'vc_column_text' ) ) {

@@ -52,6 +52,15 @@ html.lenis, html.lenis body{height:auto}
 .lenis.lenis-stopped{overflow:hidden}
 .mo-modal-open{overflow:hidden}
 body{margin:0;background:var(--mo-surface);color:var(--mo-body);font:400 16px/26px var(--mo-font);-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip}
+/* Protezione dal tema: dentro le parti MoveOn colore, carattere e interlinea dei testi vengono dal sito.
+   (Vince sulle regole generiche del tema come p{color:#777}; le classi mo- qui sotto restano libere di cambiarli.) */
+body.mo-page{background:var(--mo-surface);color:var(--mo-body);font:400 16px/26px var(--mo-font)}
+.mo-block :where(h1,h2,h3,h4,h5,h6,p,ul,ol,li,span,strong,b,em,i,small,label,figure,blockquote,div),
+.mo-site-header :where(span,div,nav), .mo-mobile-menu :where(span,div), .mo-foot :where(p,span,div),
+.mo-mbar :where(span,div), .mo-pf-modal :where(h2,h3,p,span,div){color:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;text-transform:inherit}
+.mo-block :where(p), .mo-foot :where(p), .mo-pf-modal :where(p){margin:1em 0}
+.mo-block :where(ul,ol){margin:1em 0;padding-left:40px}
+.mo-block :where(li){margin:0}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--mo-navy);transition:background .3s}
 .mo-scrolled:not(.mo-menu-open) body::before{background:var(--mo-surface)}
 img,svg{max-width:100%}
@@ -518,19 +527,6 @@ img,svg{max-width:100%}
 .admin-bar .mo-mobile-menu{top:32px}
 @media screen and (max-width:782px){ .admin-bar .mo-site-header,.admin-bar .mo-mobile-menu{top:46px} }
 @media screen and (max-width:600px){ .admin-bar .mo-site-header{top:0} }
-/* Righe e colonne di WPBakery che contengono un blocco MoveOn: nessun margine o spazio interno,
-   così le sezioni restano a tutta larghezza come nel prototipo */
-.mo-page .vc_row:has(.mo-block){margin-left:0;margin-right:0;padding:0}
-.mo-page .vc_row:has(.mo-block) > .vc_column_container,
-.mo-page .vc_column_container:has(.mo-block) > .vc_column-inner{padding:0 !important}
-.mo-page .wpb_wrapper:has(> .mo-block) > *:not(.mo-block){margin-bottom:0}
-.mo-page .vc_row.vc_row-fluid:has(.mo-block){width:100%}
-.mo-page .mo-block{margin:0}
-/* Dentro i blocchi MoveOn titoli, testi e campi usano sempre il carattere del sito,
-   anche se il tema imposta caratteri diversi per h1, h2, p, pulsanti… */
-.mo-page, .mo-block, .mo-site-header, .mo-mobile-menu, .mo-foot, .mo-mbar, .mo-pf-modal{font-family:var(--mo-font)}
-.mo-block :is(h1,h2,h3,h4,h5,h6,p,a,button,li,label,input,select,textarea,figure,span),
-.mo-site-header :is(a,button,span), .mo-mobile-menu a, .mo-foot :is(p,a), .mo-mbar a, .mo-pf-modal :is(h2,h3,p,button,span){font-family:inherit}
 /* Contenuto della pagina */
 .mo-page .mo-content{display:block}
 
@@ -570,3 +566,46 @@ img,svg{max-width:100%}
 .mo-card:hover{box-shadow:var(--mo-shadow-hover);transform:translateY(-2px)}
 .mo-card--pad{padding:var(--mo-space-6)}
 
+/* =====================================================================
+   Protezione dal tema (Porto) e da WPBakery
+   Regole con classi "doppie" (es. .mo-btn-primary.mo-btn-primary): pesano più di quelle del tema.
+   ===================================================================== */
+/* Righe di WPBakery con un blocco MoveOn: niente margini, spazi interni o contenuto tagliato
+   (il contenuto tagliato impedirebbe alle card dei motivi di fermarsi e impilarsi) */
+.vc_row:has(.mo-block){margin:0 !important;padding:0 !important;overflow:visible !important;background:none !important}
+.vc_row:has(.mo-block) :is(.wpb_column,.vc_column_container,.vc_column-inner,.wpb_wrapper){margin:0 !important;padding:0 !important;overflow:visible !important}
+.wpb_wrapper > .mo-block{margin:0 !important}
+
+/* Campi del modulo: tutti uguali, scuri, qualunque sia il loro tipo */
+.mo-ct-form .mo-fld :is(input,select,textarea){width:100%;height:auto;min-height:48px;margin:0;padding:12px 14px;border:1px solid #475569;border-radius:8px;background:#1e293b;color:#fff;box-shadow:none;font:400 16px/24px var(--mo-font);letter-spacing:normal}
+.mo-ct-form .mo-fld textarea{min-height:140px}
+.mo-ct-form .mo-fld :is(input,select,textarea):focus{border-color:#93c5fd;background:#1e293b;color:#fff;box-shadow:none}
+.mo-ct-form .mo-fld :is(input,select,textarea):focus-visible{outline:3px solid #93c5fd;outline-offset:1px}
+.mo-ct-form .mo-fld [aria-invalid="true"]{border-color:#fcd34d}
+.mo-ct-form .mo-fld :is(input,textarea):-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #1e293b inset;-webkit-text-fill-color:#fff;caret-color:#fff}
+.mo-ct-form .mo-chk input{width:22px;height:22px;min-height:0;margin:0;padding:0}
+
+/* Link e pulsanti: stessi colori in ogni stato (passaggio del mouse, focus, già visitato) */
+.mo-btn.mo-btn:is(:link,:visited,:hover,:focus,:active){text-decoration:none}
+:is(.mo-btn-primary,.mo-btn--primary):is(.mo-btn-primary,.mo-btn--primary):is(:link,:visited,:focus,:active){color:#fff;background:var(--mo-brand)}
+:is(.mo-btn-primary,.mo-btn--primary):is(.mo-btn-primary,.mo-btn--primary):hover{color:#fff;background:var(--mo-brand-strong)}
+:is(.mo-btn-accent,.mo-btn--accent):is(.mo-btn-accent,.mo-btn--accent):is(:link,:visited,:hover,:focus,:active){color:var(--mo-on-accent);background:var(--mo-accent)}
+.mo-btn-outline-light.mo-btn-outline-light:is(:link,:visited,:focus,:active){color:#fff;background:transparent}
+.mo-btn-outline-light.mo-btn-outline-light:hover{color:#fff;background:rgba(255,255,255,.1)}
+.mo-btn--secondary.mo-btn--secondary:is(:link,:visited,:focus,:active){color:var(--mo-link);background:transparent}
+.mo-btn--secondary.mo-btn--secondary:hover{color:var(--mo-link);background:var(--mo-brand-tint)}
+.mo-mm-link.mo-mm-link:is(:link,:visited,:hover,:focus,:active), .mo-skip.mo-skip:is(:link,:visited,:hover,:focus,:active){color:#fff;text-decoration:none}
+.mo-nav.mo-nav a:is(:link,:visited,:hover,:focus,:active), .mo-logo.mo-logo:is(:link,:visited,:hover,:focus,:active),
+.mo-ct-item.mo-ct-item:is(:link,:visited,:hover,:focus,:active){color:inherit;text-decoration:none}
+.mo-icon-btn.mo-icon-btn:is(:link,:visited,:hover,:focus,:active){color:var(--mo-link);text-decoration:none}
+.mo-about-cta.mo-about-cta a:is(:link,:visited,:hover,:focus,:active){color:var(--mo-link)}
+.mo-chk.mo-chk a:is(:link,:visited,:hover,:focus,:active){color:#93c5fd}
+.mo-foot-link.mo-foot-link:is(:link,:visited){color:inherit}
+.mo-foot-link.mo-foot-link:is(:hover,:focus){color:#fff}
+/* Pulsanti (button): il tema non cambia sfondo e colore al passaggio del mouse */
+.mo-pf-card.mo-pf-card:is(:hover,:focus,:active){background:var(--mo-surface);color:inherit}
+.mo-bulb-wrap.mo-bulb-wrap:is(:hover,:focus,:active), .mo-menu-btn.mo-menu-btn:is(:hover,:focus,:active){background:transparent;color:inherit}
+.mo-seg.mo-seg button:is(:hover,:focus){background:transparent;color:var(--mo-ink)}
+.mo-seg.mo-seg button[aria-pressed="true"]{background:var(--mo-ink);color:var(--mo-surface)}
+.mo-pfm-btn.mo-pfm-btn:is(:focus,:active){background:transparent;color:var(--mo-link)}
+.mo-pfm-btn.mo-pfm-btn:hover{background:var(--mo-brand-tint);color:var(--mo-link)}

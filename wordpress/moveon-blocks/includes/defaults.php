@@ -28,6 +28,7 @@ function mo_defaults(): array {
 			'cookie_url'      => 'https://www.iubenda.com/privacy-policy/78862801/cookie-policy',
 			'carica_tema'     => 0,
 			'salva_richieste' => 1,
+			'tema_scuro'      => 1,
 		),
 		'hero'      => array(
 			'anchor'          => 'top',
