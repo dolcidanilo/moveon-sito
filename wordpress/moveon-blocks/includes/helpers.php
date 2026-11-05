@@ -18,14 +18,23 @@ function mo_settings(): array {
 function mo_image( $id, string $default_key = '', string $size = 'large' ): ?array {
 	$id = absint( $id );
 	if ( $id ) {
+		$alt = trim( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) );
+		$alt = '' !== $alt ? $alt : get_the_title( $id );
+		// SVG (caricati con un plugin come Safe SVG): WordPress spesso non ne conosce le misure
+		if ( 'image/svg+xml' === get_post_mime_type( $id ) ) {
+			$url = wp_get_attachment_url( $id );
+			if ( $url ) {
+				list( $w, $h ) = mo_svg_size( (string) get_attached_file( $id ) );
+				return array( 'url' => $url, 'alt' => $alt, 'w' => $w ?: '', 'h' => $h ?: '' );
+			}
+		}
 		$src = wp_get_attachment_image_src( $id, $size );
 		if ( $src ) {
-			$alt = trim( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) );
 			return array(
 				'url' => $src[0],
-				'alt' => '' !== $alt ? $alt : get_the_title( $id ),
-				'w'   => (int) $src[1],
-				'h'   => (int) $src[2],
+				'alt' => $alt,
+				'w'   => (int) $src[1] ?: '',
+				'h'   => (int) $src[2] ?: '',
 			);
 		}
 	}
@@ -39,6 +48,21 @@ function mo_image( $id, string $default_key = '', string $size = 'large' ): ?arr
 		'w'   => $def['w'],
 		'h'   => $def['h'],
 	);
+}
+
+/** Misure di un file SVG lette dagli attributi width/height o dal viewBox (0, 0 se non si trovano). */
+function mo_svg_size( string $file ): array {
+	if ( ! $file || ! is_readable( $file ) ) {
+		return array( 0, 0 );
+	}
+	$head = (string) file_get_contents( $file, false, null, 0, 4096 );
+	if ( preg_match( '/<svg[^>]*\swidth="([\d.]+)(?:px)?"[^>]*\sheight="([\d.]+)(?:px)?"/i', $head, $m ) ) {
+		return array( (int) round( (float) $m[1] ), (int) round( (float) $m[2] ) );
+	}
+	if ( preg_match( '/viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"/i', $head, $m ) ) {
+		return array( (int) round( (float) $m[1] ), (int) round( (float) $m[2] ) );
+	}
+	return array( 0, 0 );
 }
 
 /**

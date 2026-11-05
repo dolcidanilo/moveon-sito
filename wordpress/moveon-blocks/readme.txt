@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -24,6 +24,12 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.0.3 =
+* Icona personalizzata (immagine) per ogni motivo di «Chi siamo».
+* Immagini SVG supportate in tutti i campi immagine (caricate con un plugin come Safe SVG).
+* Riquadro della copertina sempre attivo nei Progetti portfolio, anche se il tema limita le immagini in evidenza.
+* Guida: nuova sezione «Immagini: dove si cambiano».
 
 = 1.0.2 =
 * Tolta la linea sotto il nastro di parole chiave.

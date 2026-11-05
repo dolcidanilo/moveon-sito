@@ -97,6 +97,7 @@ function mo_blocks(): array {
 						mo_p_text( 'titolo', 'Titolo', '', '' ),
 						mo_p_area( 'testo', 'Testo', '', '' ),
 						mo_p_drop( 'icona', 'Icona', $icone, 'stella', '', '' ),
+						mo_p_img( 'icona_img', 'Icona personalizzata (facoltativa)', 'Un’immagine tua al posto dell’icona scelta sopra: meglio SVG o PNG trasparente, quadrata, a tinta unita.', '' ),
 						mo_p_area( 'etichette', 'Etichette (facoltative)', 'Una per riga.', '' ),
 					),
 					$d['chi_siamo']['motivi'],
@@ -279,7 +280,7 @@ function mo_render_chi_siamo( $atts ): string {
 		$motivi[] = array(
 			'tono'          => $toni[ $i % 4 ],
 			'i'             => $i,
-			'icona'         => MO_Tpl::render( 'parti/icona-' . ( $icona ?: 'stella' ) ),
+			'icona'         => mo_icona_motivo( $m, $icona ),
 			'titolo'        => mo_text( $m['titolo'] ?? '' ),
 			'testo'         => mo_text( $m['testo'] ?? '' ),
 			'etichette'     => $et,
@@ -310,6 +311,15 @@ function mo_render_chi_siamo( $atts ): string {
 			'link'          => '' !== $link ? array( 'testo' => $link, 'resto' => mo_text( $a['link_resto'] ), 'href' => mo_href( $a['link_href'] ) ) : null,
 		)
 	);
+}
+
+/** Icona di un motivo: l'immagine caricata, se c'è, altrimenti l'icona scelta dall'elenco. */
+function mo_icona_motivo( array $m, string $icona ): string {
+	$img = absint( $m['icona_img'] ?? 0 ) ? mo_image( $m['icona_img'], '', 'thumbnail' ) : null;
+	if ( $img ) {
+		return '<img class="mo-reason-img" src="' . esc_url( $img['url'] ) . '" alt="">';
+	}
+	return MO_Tpl::render( 'parti/icona-' . ( $icona ?: 'stella' ) );
 }
 
 function mo_render_pausa( $atts ): string {

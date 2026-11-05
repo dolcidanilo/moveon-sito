@@ -612,3 +612,6 @@ img,svg{max-width:100%}
 /* Tra una riga e l'altra: niente spazi da elementi vuoti (paragrafi vuoti, separatore delle righe a tutta larghezza di WPBakery) */
 .mo-content > .vc_row-full-width{height:0 !important;margin:0 !important;padding:0 !important;border:0 !important}
 .mo-content > :is(p,br):empty{display:none}
+/* Icona personalizzata dei motivi (immagine caricata) */
+.mo-reason-ico .mo-reason-img{display:block;width:32px;height:32px;object-fit:contain}
+@media (max-width:767px){ .mo-reason-ico .mo-reason-img{width:26px;height:26px} }

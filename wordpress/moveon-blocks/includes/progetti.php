@@ -15,6 +15,15 @@ function mo_aree(): array {
 	return array( 'branding' => 'Branding', 'web' => 'Web', 'social' => 'Social', 'stampa' => 'Stampa' );
 }
 
+/* La copertina usa l'immagine in evidenza: si attiva per i progetti anche se il tema la limita ad articoli e pagine */
+add_action(
+	'after_setup_theme',
+	function () {
+		add_theme_support( 'post-thumbnails', array( MO_CPT ) );
+	},
+	99
+);
+
 add_action(
 	'init',
 	function () {

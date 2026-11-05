@@ -113,7 +113,23 @@ check( 'Hero: due righe e parola sottolineata', 2 === substr_count( $html, 'mo-h
 $pul = mo_pulisci_contenuto( '<div class="vc_row">A</div><p></p><p>&nbsp;</p><p> <br /> </p><p class="mo-form-msg"></p><p>testo</p>' );
 check( 'Paragrafi vuoti tolti, messaggio del modulo e testi conservati', '<div class="vc_row">A</div><p class="mo-form-msg"></p><p>testo</p>' === $pul, $pul );
 
-/* 7) Telefono e WhatsApp */
+/* 7) Immagini scelte dalla Libreria media */
+check( 'Progetti: riquadro della copertina (immagine in evidenza) attivo', current_theme_supports( 'post-thumbnails', MO_CPT ) && post_type_supports( MO_CPT, 'thumbnail' ) );
+$jpg = mo_importa_immagine( 'contatti-lettore.jpg', 'Foto di prova' );
+$html = do_shortcode( '[mo_servizi servizi="' . rawurlencode( wp_json_encode( array( array( 'nome' => 'Con foto', 'voci' => 'A', 'immagine' => (string) $jpg, 'illustrazione' => 'web' ) ) ) ) . '"]' );
+check( 'Servizio con foto: la foto prende il posto dell’illustrazione', $jpg && false !== strpos( $html, 'mo-svc-img' ) && false === strpos( $html, 'data-art="web"' ) && false !== strpos( $html, wp_basename( (string) wp_get_attachment_url( $jpg ) ) ) );
+$up  = wp_upload_dir();
+$svg = $up['path'] . '/mo-prova-icona.svg';
+file_put_contents( $svg, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32"><rect width="48" height="32" fill="#2563eb"/></svg>' );
+$sid = wp_insert_attachment( array( 'post_mime_type' => 'image/svg+xml', 'post_title' => 'Icona SVG di prova', 'post_status' => 'inherit' ), $svg );
+$si  = mo_image( $sid );
+check( 'Immagine SVG: indirizzo e misure lette dal file', $si && str_ends_with( $si['url'], '.svg' ) && 48 === $si['w'] && 32 === $si['h'], wp_json_encode( $si ) );
+$html = do_shortcode( '[mo_chi_siamo motivi="' . rawurlencode( wp_json_encode( array( array( 'titolo' => 'Uno', 'testo' => 'x', 'icona' => 'stella', 'icona_img' => (string) $sid ) ) ) ) . '"]' );
+check( 'Motivo con icona personalizzata', false !== strpos( $html, 'mo-reason-img' ) && false !== strpos( $html, 'mo-prova-icona.svg' ) );
+$html = do_shortcode( '[mo_chi_siamo idea_immagine="' . $sid . '"]' );
+check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $html, 'mo-idea-img' ) && false === strpos( $html, 'mo-box-svg' ) );
+
+/* 8) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
 check( 'WhatsApp da 0039', 'https://wa.me/393331234567' === mo_wa_href( '0039 333 1234567' ) );
 
