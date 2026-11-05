@@ -98,8 +98,19 @@ const browser = await chromium.launch();
   await smoothScroll(page, (await topOf(page, '.mo-pf')) + 100);
   await page.click('.mo-pf-mode [data-mode="grid"]');
   await page.waitForTimeout(1000);
+  // Durante l'animazione del filtro il tavolo non deve accorciarsi (la sezione sotto salirebbe)
+  const hPrima = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
+  const campioni = page.evaluate(() => new Promise((ok) => {
+    const b = document.querySelector('.mo-pf-board'); const hs = []; const t0 = performance.now();
+    const giro = () => { hs.push(b.getBoundingClientRect().height); if (performance.now() - t0 < 1100) requestAnimationFrame(giro); else ok(hs); };
+    requestAnimationFrame(giro);
+  }));
   await page.click('.mo-pf-filter [data-filter="web"]');
-  await page.waitForTimeout(1000);
+  const hs = await campioni;
+  await page.waitForTimeout(300);
+  const hDopo = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
+  const hMin = Math.round(Math.min(...hs));
+  check('Filtro: la sezione sotto non sale durante l’animazione', hMin >= Math.min(hPrima, hDopo) - 2, `${hPrima} → min ${hMin} → ${hDopo}px`);
   const shown = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-card')].filter((c) => !c.classList.contains('mo-is-out')).map((c) => c.dataset.cat));
   check('Filtro “Web” mostra solo i lavori web', shown.length > 0 && shown.every((c) => c === 'web'), shown.join(','));
   await page.locator('.mo-pf-card:not(.mo-is-out)').first().click();

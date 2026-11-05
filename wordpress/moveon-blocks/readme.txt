@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -24,6 +24,10 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.0.8 =
+* Hero: il bagliore della lampadina sfuma su tutti i lati, senza il taglio in alto.
+* Portfolio: usando i filtri o cambiando modo, la sezione sotto non sale più per un attimo; l'altezza passa morbida dalla vecchia alla nuova.
 
 = 1.0.7 =
 * Colori dei testi scelti a mano: valgono solo per i testi sullo sfondo della sezione. Pulsanti selezionati («Sul tavolo», «Tutti»…), card e pannelli tengono i loro colori e restano leggibili.

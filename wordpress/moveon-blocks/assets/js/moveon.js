@@ -486,6 +486,7 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
   const initial = sec.getAttribute('data-mode') === 'grid' ? 'grid' : 'chaos';
   let mode = mobileQ.matches || reduce ? 'grid' : initial;
   let filter = 'all';
+  let flipAnim = null;
   const drags = [];
   let justDragged = false;
   const modeBtns = $$('.mo-pf-mode button', sec);
@@ -506,6 +507,10 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
   }
   function applyLayout(animate) {
     const state = animate && !reduce ? Flip.getState(cards) : null;
+    // Un'animazione ancora in corso (clic veloci) va chiusa prima di misurare: lascerebbe le card fuori dal flusso
+    if (flipAnim) { flipAnim.progress(1); flipAnim = null; }
+    const h0 = state ? board.offsetHeight : 0;
+    if (state) G.killTweensOf(board);
     board.classList.toggle('mo-is-chaos', mode === 'chaos');
     board.classList.toggle('mo-is-grid', mode === 'grid');
     cards.forEach((c) => {
@@ -526,10 +531,16 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
     modeBtns.forEach((b) => b.setAttribute('aria-pressed', b.getAttribute('data-mode') === mode ? 'true' : 'false'));
     filterBtns.forEach((b) => b.setAttribute('aria-pressed', b.getAttribute('data-filter') === filter ? 'true' : 'false'));
     if (state) {
-      Flip.from(state, {
+      // Durante Flip le card escono dal flusso (absolute): senza bloccare l'altezza il tavolo
+      // si azzererebbe per un attimo e la sezione sotto salirebbe. L'altezza va dalla vecchia alla nuova.
+      const hFinale = board.style.height;
+      const h1 = board.offsetHeight;
+      G.set(board, { height: h0 });
+      G.to(board, { height: h1, duration: 0.85, ease: 'power3.inOut' });
+      flipAnim = Flip.from(state, {
         duration: 0.85, ease: 'power3.inOut', stagger: 0.025, absolute: true,
         onEnter: (els) => G.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, clearProps: 'opacity' }),
-        onComplete: () => { ST.refresh(); drags.forEach((dr) => dr.update()); },
+        onComplete: () => { G.killTweensOf(board); board.style.height = hFinale; ST.refresh(); drags.forEach((dr) => dr.update()); },
       });
     } else {
       ST.refresh();
