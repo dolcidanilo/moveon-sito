@@ -1,0 +1,16 @@
+{{! FOOTER E BARRA MOBILE · logo_scuro logo_chiaro (url, w, h) claim anno legali privacy_url cookie_url; cta (href) mobile_testo tel_href wa_href }}
+<footer class="mo-foot" data-dark>
+  <div class="mo-wrap mo-foot-in">
+    <span class="mo-logo" role="img" aria-label="MoveOn Studio">
+      {{#logo_scuro}}<img class="mo-logo-d" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_scuro}}
+      {{#logo_chiaro}}<img class="mo-logo-l" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_chiaro}}
+    </span>
+    <p class="mo-foot-claim">{{claim}}</p>
+    <p>© {{anno}} {{legali}}{{#privacy_url}} · <a class="mo-foot-link" href="{{privacy_url}}" target="_blank" rel="noopener">Privacy Policy</a>{{/privacy_url}}{{#cookie_url}} · <a class="mo-foot-link" href="{{cookie_url}}" target="_blank" rel="noopener">Cookie Policy</a>{{/cookie_url}}</p>
+  </div>
+</footer>
+<nav class="mo-mbar" aria-label="Contatto rapido">
+  {{#cta}}<a class="mo-btn mo-btn-accent" href="{{href}}">{{mobile_testo}}</a>{{/cta}}
+  {{#tel_href}}<a class="mo-icon-btn" href="{{tel_href}}" aria-label="Chiama">{{> icona-telefono}}</a>{{/tel_href}}
+  {{#wa_href}}<a class="mo-icon-btn" href="{{wa_href}}" target="_blank" rel="noopener" aria-label="Scrivi su WhatsApp">{{> icona-whatsapp}}</a>{{/wa_href}}
+</nav>

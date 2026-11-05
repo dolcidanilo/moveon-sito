@@ -1,0 +1,27 @@
+{{! HERO · Segnaposto: anchor titolo_piano testo bulb; righe → parole (testo, evidenziata, spazio); pulsante (testo, href) }}
+<section class="mo-block mo-hero" id="{{anchor}}" data-dark data-mo-block="hero">
+  <div class="mo-hero-deco" aria-hidden="true">
+    <div class="mo-dots"></div>
+    <div class="mo-ring"></div>
+    <div class="mo-sq2"></div>
+    <div class="mo-sq"></div>
+  </div>
+  <div class="mo-hero-inner">
+    <div class="mo-hero-copy">
+      <h1 class="mo-hero-title" aria-label="{{titolo_piano}}">{{#righe}}<span class="mo-hl-line" aria-hidden="true">{{#parole}}{{#evidenziata}}<span class="mo-hw-mark"><span class="mo-hw"><span class="mo-hw-in">{{testo}}</span></span>{{> evidenziatore}}</span>{{/evidenziata}}{{^evidenziata}}<span class="mo-hw"><span class="mo-hw-in">{{testo}}</span></span>{{/evidenziata}}{{#spazio}} {{/spazio}}{{/parole}}</span>{{/righe}}</h1>
+      <p class="mo-hero-sub">{{testo}}</p>
+      {{#pulsante}}
+      <div class="mo-hero-actions">
+        <a href="{{href}}" class="mo-btn mo-btn-outline-light mo-magnetic">{{testo}}</a>
+      </div>
+      {{/pulsante}}
+    </div>
+    <div class="mo-hero-art">
+      <button class="mo-bulb-wrap" type="button" data-cursor="Ricomponi" aria-label="Dai forma all’idea">
+        <span class="mo-bulb-glow"></span>
+        {{{bulb}}}
+      </button>
+    </div>
+  </div>
+  <div class="mo-scroll-cue" aria-hidden="true"><span>Scorri</span><i></i></div>
+</section>

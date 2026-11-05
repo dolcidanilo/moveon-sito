@@ -1,0 +1,20 @@
+{{! HEADER · home_url logo_scuro logo_chiaro (url, w, h); menu (testo, href, nav); cta (testo, href) }}
+<a class="mo-skip" href="#mo-main">Vai al contenuto</a>
+<header class="mo-site-header">
+  <div class="mo-header-inner">
+    <a href="#top" class="mo-logo" aria-label="MoveOn Studio, torna all’inizio">
+      {{#logo_scuro}}<img class="mo-logo-d" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_scuro}}
+      {{#logo_chiaro}}<img class="mo-logo-l" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_chiaro}}
+    </a>
+    <nav class="mo-nav" aria-label="Principale">
+      {{#menu}}<a href="{{href}}"{{#nav}} data-nav="{{nav}}"{{/nav}}>{{testo}}</a>{{/menu}}
+    </nav>
+    {{#cta}}<a href="{{href}}" class="mo-btn mo-btn-primary mo-magnetic mo-header-cta">{{testo}}</a>{{/cta}}
+    <button class="mo-menu-btn" type="button" aria-expanded="false" aria-controls="mo-mobile-menu" aria-label="Apri il menu"><span></span><span></span></button>
+  </div>
+  <div class="mo-progress"></div>
+</header>
+<div class="mo-mobile-menu" id="mo-mobile-menu" data-dark data-lenis-prevent hidden>
+  {{#menu}}<a class="mo-mm-item mo-mm-link" href="{{href}}">{{testo}}</a>{{/menu}}
+  {{#cta}}<a class="mo-mm-item mo-btn mo-btn-primary" href="{{href}}">{{testo}}</a>{{/cta}}
+</div>

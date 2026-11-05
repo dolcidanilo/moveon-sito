@@ -1,0 +1,21 @@
+{{! LE NOSTRE GARANZIE · anchor etichetta titolo sottotitolo sigillo shield; garanzie (titolo, testo) }}
+<section class="mo-block mo-gar" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="garanzie">
+  <div class="mo-wrap">
+    <div class="mo-gar-head">
+      <div class="mo-gar-copy">
+        <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
+        <p class="mo-statement">{{titolo}}</p>
+        <p class="mo-gar-sub">{{sottotitolo}}</p>
+      </div>
+      <div class="mo-gar-art" aria-hidden="true">
+        <svg class="mo-gar-ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80"/><defs><path id="mo-gar-circle" d="M100,100 m-92,0 a92,92 0 1,1 184,0 a92,92 0 1,1 -184,0"/></defs><text font-family="Montserrat,Arial,sans-serif" font-weight="700" font-size="10" letter-spacing="1.5"><textPath href="#mo-gar-circle" textLength="572" lengthAdjust="spacing">{{sigillo}}</textPath></text></svg>
+        {{{shield}}}
+      </div>
+    </div>
+    <ul class="mo-gar-grid">
+      {{#garanzie}}
+      <li class="mo-gar-card"><span class="mo-gar-stamp" aria-hidden="true">{{> timbro}}</span><h3>{{titolo}}</h3><p>{{testo}}</p></li>
+      {{/garanzie}}
+    </ul>
+  </div>
+</section>

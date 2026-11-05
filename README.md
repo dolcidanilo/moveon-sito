@@ -1,43 +1,38 @@
-# MoveOn Studio · sito one-page
+# MoveOn Studio · sito WordPress
 
-Il sito definitivo di MoveOn Studio, ricostruito dal prototipo approvato, con il pannello contenuti Sanity in italiano su `/studio`.
+Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni del prototipo approvato diventano elementi WPBakery, con header, footer e animazioni del prototipo.
+
+**Il file da installare** è [`dist/moveon-blocks.zip`](dist/moveon-blocks.zip): in WordPress vai su **Plugin → Aggiungi nuovo → Carica plugin**.
 
 ## Dove sono le cose
 
 | Cartella | Contenuto |
 | --- | --- |
 | `materiali/` | Brief di consegna, Design System v2, prototipo HTML e foto originali (solo riferimento) |
-| `app/(site)/` | Pagina, impostazioni generali e foglio di stile del sito (ripreso dal prototipo) |
-| `app/(studio)/` | Il pannello contenuti su `/studio` |
-| `sanity/` | Campi del pannello (`schemaTypes/`), menu (`structure.ts`), importazione dei contenuti iniziali (`import/`) |
-| `components/blocks/` | Gli 8 blocchi della pagina: Hero, Nastro, Chi siamo, Pausa, Servizi, Portfolio, Garanzie, Contatti |
-| `components/site/` | Header, footer, menu, illustrazioni e lo script delle animazioni (`site-motion.js`) |
-| `lib/content/` | Modello dei contenuti (`types.ts`), contenuti iniziali del prototipo (`seed.ts`), lettura dal pannello (`fromSanity.ts`) |
-| `public/seed/` | Foto, logo e copertine di esempio usati dai contenuti iniziali |
-| `tests/check.mjs` | Controlli automatici sui comportamenti e sui bug già risolti |
-| `tests/schema-check.mts` | Controlli sul pannello: schema valido, importazione coerente con i campi |
+| `wordpress/moveon-blocks/` | Il plugin |
+| `…/templates/` | **Modelli HTML** delle sezioni e delle parti fisse (modificabili anche da WordPress → MoveOn → Modelli HTML) |
+| `…/assets/css/moveon.css` | Stile del prototipo, con le **variabili** `--mo-…` per colori, carattere e misure |
+| `…/assets/js/moveon.js` | Animazioni (GSAP, Lenis), divise per sezione, più le classi `mo-reveal`, `mo-words`… |
+| `…/includes/` | Il motore PHP: elementi WPBakery, impostazioni, progetti, modulo contatti |
+| `…/guida.html` | La guida mostrata in WordPress → MoveOn → Guida |
+| `dist/moveon-blocks.zip` | Il plugin pronto da caricare |
+| `tests/`, `tools/` | Controlli automatici e strumenti (zip, WordPress di prova) |
 
 ## Stato dei lavori
 
-- [x] **Fase 1:** sito identico al prototipo, con i contenuti presi da `lib/content/seed.ts`.
-- [x] **Fase 2:** pannello Sanity in italiano su `/studio`, con il pulsante «Importa contenuti iniziali».
-- [x] **Fase 3:** il sito legge i contenuti da Sanity (aggiornamento entro circa un minuto dalla pubblicazione), con anteprima delle bozze nel pannello (voce «Anteprima»).
-- [ ] **Fase 4:** il modulo contatti invia le email (Resend), più SEO e rifiniture.
-- [ ] **Fase 5:** pubblicazione su moveonstudio.it.
+- [x] **W1:** plugin con gli 8 elementi, modello di pagina, impostazioni, progetti portfolio, modelli HTML modificabili, classi di animazione, modulo contatti con antispam, pagina demo, guida.
+- [ ] **W2:** installazione su moveonstudio.it/nuovo e correzioni dopo la prova dentro WPBakery e Porto.
+- [ ] **W3:** invio email affidabile (plugin SMTP con la casella Aruba), SEO, iubenda.
+- [ ] **W4:** spostamento da /nuovo al sito principale.
 
-Il modulo contatti **non invia ancora email**: mostra la conferma ma non spedisce nulla, fino alla Fase 4.
-
-## Comandi (per lo sviluppo)
+## Per lo sviluppo
 
 ```bash
-npm install
-npm run build && npm start      # sito su http://localhost:3000
-npm run test:e2e                # controlli automatici sul sito (serve Playwright con Chromium)
-npm run test:schema             # controlli sul pannello, senza rete
+npm install                     # librerie sorgente (GSAP, Lenis, Montserrat)
+npm run wp:prova                # WordPress di prova in /tmp/moveon-wp, http://127.0.0.1:8080/nuovo/
+npm test                        # controlli nel browser (Playwright): 34 controlli
+npm run test:php                # controlli sul motore PHP: 22 controlli
+npm run zip                     # ricrea dist/moveon-blocks.zip
 ```
 
-Vercel riconosce il progetto da solo. L'unica variabile d'ambiente necessaria è `SANITY_API_READ_TOKEN`
-(chiave Sanity di sola lettura, ruolo Viewer), che serve all'anteprima delle bozze. Project ID e dataset sono in `sanity/env.ts`.
-
-Senza accesso a Sanity (per esempio in locale senza rete) il sito usa i contenuti iniziali di `lib/content/seed.ts`;
-su Vercel invece, se Sanity non risponde, la costruzione si ferma e resta online la versione precedente.
+Il WordPress di prova non contiene WPBakery (è a pagamento): senza WPBakery il plugin mostra comunque righe e colonne, così le sezioni si possono provare. Il lavoro precedente con Next.js e Sanity resta nello storico Git (commit `4ff408e`).

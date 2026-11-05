@@ -1,0 +1,48 @@
+{{! CONTATTI · anchor etichetta testo bollino titolo_pulsanti conferma privacy_url endpoint tel_href wa_href email_href; foto (url, alt, w, h, pos); righe_titolo; opzioni }}
+<section class="mo-block mo-contact" id="{{anchor}}" data-dark aria-labelledby="{{anchor}}-titolo" data-mo-block="contatti">
+  <div class="mo-wrap">
+    <div class="mo-ct-top">
+      <figure class="mo-ct-figure">
+        <div class="mo-ct-img-wrap">{{#foto}}<img class="mo-ct-img" src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" style="object-position:{{pos}}" loading="lazy">{{/foto}}</div>
+        <span class="mo-ct-badge" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="98" fill="#2563eb"/><defs><path id="mo-badge-circle" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs><g class="mo-ring-text"><text fill="#fff" font-family="Montserrat,Arial,sans-serif" font-weight="700" font-size="15" letter-spacing="2"><textPath href="#mo-badge-circle" textLength="458" lengthAdjust="spacing">{{bollino}}</textPath></text></g><circle cx="100" cy="100" r="34" fill="#f59e0b"/><path d="M88 112l24-24M94 88h18v18" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </figure>
+      <div class="mo-ct-head">
+        <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
+        <p class="mo-ct-big">{{#righe_titolo}}<span class="mo-ct-line"><span class="mo-ct-line-in">{{.}}</span></span>{{/righe_titolo}}</p>
+        <p class="mo-ct-text">{{testo}}</p>
+      </div>
+    </div>
+    <div class="mo-ct-layout">
+      <div class="mo-ct-main">
+        <form class="mo-ct-form" novalidate data-endpoint="{{endpoint}}">
+          <div class="mo-fld-row">
+            <div class="mo-fld"><label for="mo-f-nome">Nome e cognome</label><input id="mo-f-nome" name="nome" autocomplete="name" required></div>
+            <div class="mo-fld"><label for="mo-f-email">Email</label><input id="mo-f-email" name="email" type="email" autocomplete="email" required></div>
+          </div>
+          <div class="mo-fld-row">
+            <div class="mo-fld"><label for="mo-f-tel">Telefono <span class="mo-opt">(facoltativo)</span></label><input id="mo-f-tel" name="telefono" type="tel" autocomplete="tel"></div>
+            <div class="mo-fld"><label for="mo-f-area">Di cosa hai bisogno?</label><select id="mo-f-area" name="area">{{#opzioni}}<option>{{.}}</option>{{/opzioni}}</select></div>
+          </div>
+          <div class="mo-fld"><label for="mo-f-msg">Raccontaci la tua idea</label><textarea id="mo-f-msg" name="messaggio" rows="5" required></textarea></div>
+          <div class="mo-hp" aria-hidden="true"><label for="mo-f-sito">Sito web</label><input id="mo-f-sito" name="sito" tabindex="-1" autocomplete="off"></div>
+          <input type="hidden" name="t" value="{{ts}}">
+          <label class="mo-chk"><input type="checkbox" name="privacy" value="1" required><span>Ho letto la <a href="{{privacy_url}}" target="_blank" rel="noopener">Privacy Policy</a> e acconsento al trattamento dei miei dati.</span></label>
+          <div class="mo-form-actions"><button class="mo-btn mo-btn-accent mo-magnetic" type="submit">Invia Richiesta</button><p class="mo-form-msg" role="status" aria-live="polite"></p></div>
+        </form>
+        <div class="mo-form-done" tabindex="-1" hidden>
+          <span class="mo-ok-badge">Richiesta inviata</span>
+          <h3 class="mo-form-done-title">Grazie!</h3>
+          <p>{{conferma}}</p>
+        </div>
+      </div>
+      <div class="mo-ct-side">
+        <p class="mo-ct-side-title">{{titolo_pulsanti}}</p>
+        <div class="mo-ct-list">
+          {{#tel_href}}<a class="mo-ct-item" href="{{tel_href}}" aria-label="Chiamaci al telefono"><span class="mo-ct-ico" aria-hidden="true">{{> icona-telefono}}</span><span class="mo-ct-label">Chiamaci</span></a>{{/tel_href}}
+          {{#wa_href}}<a class="mo-ct-item" href="{{wa_href}}" target="_blank" rel="noopener" aria-label="Chatta con noi su WhatsApp"><span class="mo-ct-ico" aria-hidden="true">{{> icona-whatsapp}}</span><span class="mo-ct-label">Chatta</span></a>{{/wa_href}}
+          {{#email_href}}<a class="mo-ct-item" href="{{email_href}}" aria-label="Scrivici un’email"><span class="mo-ct-ico" aria-hidden="true">{{> icona-email}}</span><span class="mo-ct-label">Scrivici</span></a>{{/email_href}}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

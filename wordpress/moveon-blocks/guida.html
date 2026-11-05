@@ -1,0 +1,113 @@
+<h2>Come è fatto il sito</h2>
+<ul>
+	<li>La home è una <strong>pagina normale</strong> con il modello <strong>«MoveOn · pagina intera»</strong> (Pagine → modifica → Attributi pagina → Template). Il modello mette header, footer, menu mobile, barra contatti in basso e animazione di caricamento del prototipo, e ignora quelli di Porto.</li>
+	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
+	<li>Accanto puoi mettere <strong>righe ed elementi standard</strong> di WPBakery (testo, immagini, pulsanti…) e dar loro lo stile del sito con le <strong>classi pronte</strong> (più sotto).</li>
+	<li>I <strong>progetti del portfolio</strong> sono nel menu <strong>Progetti portfolio</strong>; le <strong>richieste</strong> arrivate dal modulo in <strong>Richieste dal sito</strong>.</li>
+</ul>
+
+<h2>Primi passi</h2>
+<ol>
+	<li><strong>MoveOn → Strumenti → Crea la pagina demo</strong>: crea «Home MoveOn» con tutte le sezioni già compilate, i progetti di esempio e il menu. Spunta «Imposta la pagina come home» se vuoi vederla subito all’indirizzo principale.</li>
+	<li><strong>MoveOn → Impostazioni</strong>: logo, telefono, WhatsApp, email, testi dei pulsanti, footer, link privacy.</li>
+	<li><strong>Aspetto → Menu</strong>: il menu «MoveOn · menu principale» (posizione «MoveOn · menu principale»). Le voci sono <em>link personalizzati</em> alle ancore delle sezioni, es. <code>#servizi</code>.</li>
+	<li>In alternativa alla pagina demo: in una pagina nuova, nell’editor WPBakery apri <strong>Modelli → Modelli predefiniti → «MoveOn · home completa»</strong>.</li>
+</ol>
+
+<h2>Modificare i contenuti</h2>
+<ul>
+	<li>Apri l’elemento in WPBakery: i campi sono divisi nelle schede <strong>Testi</strong>, <strong>Immagini</strong>, <strong>Elenchi</strong>, <strong>Avanzate</strong>. Sotto ogni campo c’è una spiegazione.</li>
+	<li><strong>Andare a capo</strong> nei titoli: premi Invio, oppure scrivi <code>|</code> dove vuoi andare a capo.</li>
+	<li><strong>Nascondere</strong> un pulsante, un link o la sottolineatura gialla: scrivi un trattino <code>-</code> nel suo testo.</li>
+	<li><strong>Immagini</strong>: se un campo immagine è vuoto si usa quella del prototipo. Il <strong>testo alternativo</strong> è quello della Libreria media (campo «Testo alternativo»): compilalo sempre. Il <strong>punto focale</strong> si scrive in percentuale: <code>50% 50%</code> è il centro, <code>30% 40%</code> un po’ a sinistra e in alto.</li>
+	<li><strong>Ancore</strong> (scheda Avanzate): il nome della sezione nei link, es. <code>servizi</code> → <code>#servizi</code>. Se lo cambi, aggiorna anche il menu.</li>
+	<li><strong>Pausa emozionale</strong> e <strong>Servizi</strong> si bloccano durante lo scroll e occupano tutto lo schermo. Nelle pagine MoveOn le righe che contengono un elemento MoveOn sono già a tutta larghezza e senza spazi; se una di queste sezioni non arriva ai bordi, apri le impostazioni della riga e scegli l’allungamento della riga «con contenuto e senza spazi» (in inglese <em>Stretch row and content (no paddings)</em>). La pagina demo è già impostata così.</li>
+	<li>Dentro l’editor di WPBakery le animazioni pesanti sono spente apposta: le vedi nella pagina vera.</li>
+</ul>
+
+<h2>Progetti del portfolio</h2>
+<ul>
+	<li><strong>Titolo</strong> = nome del progetto. <strong>Copertina</strong> = immagine in evidenza (4:3, almeno 1200 px): senza copertina il progetto non compare.</li>
+	<li>Nel riquadro <strong>Dettagli del progetto</strong>: area (decide il filtro), tipo di lavoro, la richiesta, il nostro lavoro, il risultato, galleria, «In evidenza».</li>
+	<li><strong>Ordine</strong>: Attributi → Ordine (numeri più bassi prima).</li>
+</ul>
+
+<h2>Modulo contatti</h2>
+<ul>
+	<li>Le richieste arrivano all’<strong>email</strong> di MoveOn → Impostazioni, con «Rispondi» già indirizzato a chi ha scritto.</li>
+	<li>Per un recapito affidabile su Aruba installa un plugin SMTP (es. <strong>WP Mail SMTP</strong>) e collegalo alla casella del dominio. Una copia di ogni richiesta resta comunque in <strong>Richieste dal sito</strong> (si può disattivare nelle Impostazioni).</li>
+	<li>Antispam già incluso: campo trappola invisibile, controllo del tempo di compilazione, massimo 5 richieste all’ora dallo stesso indirizzo.</li>
+</ul>
+
+<h2>Colori, caratteri, misure</h2>
+<p>Tutto lo stile usa delle <strong>variabili CSS</strong> che iniziano con <code>--mo-</code>. Per cambiarle senza toccare i file del plugin vai in <strong>Aspetto → Personalizza → CSS aggiuntivo</strong> e scrivi, per esempio:</p>
+<pre><code>:root{
+  --mo-brand: #1e40af;        /* blu dei pulsanti e dei dettagli */
+  --mo-link: #1e40af;         /* blu di link, numeri, etichette */
+  --mo-accent: #f97316;       /* colore d'accento (giallo/arancio) */
+  --mo-navy: #0b1220;         /* sfondi scuri */
+}</code></pre>
+<table>
+	<tr><th>Variabile</th><th>Cosa cambia</th></tr>
+	<tr><td><code>--mo-brand</code>, <code>--mo-brand-strong</code>, <code>--mo-brand-tint</code></td><td>Blu principale, blu al passaggio del mouse, azzurro chiarissimo dei badge</td></tr>
+	<tr><td><code>--mo-link</code>, <code>--mo-tone-b</code></td><td>Blu di testi e link, blu chiaro del nastro</td></tr>
+	<tr><td><code>--mo-accent</code>, <code>--mo-on-accent</code></td><td>Colore d’accento e testo sopra di esso</td></tr>
+	<tr><td><code>--mo-ink</code>, <code>--mo-body</code>, <code>--mo-muted</code></td><td>Titoli, testo, note</td></tr>
+	<tr><td><code>--mo-surface</code>, <code>--mo-surface-alt</code>, <code>--mo-navy</code>, <code>--mo-border</code></td><td>Sfondi chiari, grigio delle sezioni alternate, sfondi scuri, bordi</td></tr>
+	<tr><td><code>--mo-font</code></td><td>Carattere di tutto il sito</td></tr>
+	<tr><td><code>--mo-header-h</code>, <code>--mo-margin</code>, <code>--mo-gutter</code></td><td>Altezza dell’header, margini laterali, spazio tra colonne</td></tr>
+</table>
+<p><strong>Cambiare carattere</strong>: carica il nuovo font (es. con un plugin per Google Fonts, oppure con <code>@import</code> in cima al CSS aggiuntivo) e poi scrivi <code>:root{ --mo-font: "Nome Font", Arial, sans-serif; }</code>. Montserrat è incluso nel plugin e non fa richieste a Google.</p>
+<p>Alcuni colori dentro le illustrazioni (lampadina, scudo, bollino) sono scritti nei disegni: si cambiano da <strong>Modelli HTML</strong> (vedi sotto).</p>
+
+<h2>Modelli HTML</h2>
+<p>In <strong>MoveOn → Modelli HTML</strong> modifichi l’HTML di ogni sezione e delle parti fisse (header, footer, menu mobile, scheda progetto), e di illustrazioni e icone (cartella «parti»). Le modifiche restano anche quando aggiorni il plugin; «Ripristina originale» annulla tutto.</p>
+<table>
+	<tr><th>Scrivi</th><th>Diventa</th></tr>
+	<tr><td><code>{{titolo}}</code></td><td>il testo del campo (reso sicuro)</td></tr>
+	<tr><td><code>{{#motivi}} … {{/motivi}}</code></td><td>il pezzo ripetuto per ogni voce dell’elenco; se il valore è un sì/no, il pezzo compare solo se «sì»</td></tr>
+	<tr><td><code>{{^idea_img}} … {{/idea_img}}</code></td><td>il pezzo compare solo se il valore è vuoto</td></tr>
+	<tr><td><code>{{.}}</code></td><td>la voce corrente in un elenco di testi (es. le etichette)</td></tr>
+	<tr><td><code>{{&gt; icona-telefono}}</code></td><td>un altro modello (es. un’icona della cartella «parti»)</td></tr>
+	<tr><td><code>{{{bulb}}}</code></td><td>HTML già pronto (illustrazioni, pixel)</td></tr>
+	<tr><td><code>{{! nota }}</code></td><td>un commento che non compare nel sito</td></tr>
+</table>
+<p>In cima a ogni modello un commento elenca i segnaposto disponibili. <strong>Da non togliere</strong>: le classi che iniziano con <code>mo-</code> e gli attributi <code>data-mo-block</code>, <code>data-mo-pin</code>, <code>data-name</code>, <code>data-art</code>, <code>data-mode</code>, <code>data-cursor</code>. Se ne togli uno quella parte perde stile o animazione, ma resta leggibile.</p>
+<p>Esempio: per aggiungere una frase sotto il pulsante della hero, apri il modello <em>hero</em> e dopo <code>&lt;/div&gt;</code> del pulsante scrivi <code>&lt;p class="mo-caption"&gt;Preventivo gratuito in 24 ore&lt;/p&gt;</code>.</p>
+<p>Per sviluppatori: un modello si può anche mettere come file in <code>wp-content/themes/&lt;tema-figlio&gt;/moveon/&lt;nome&gt;.html</code>.</p>
+
+<h2>Le tue sezioni: classi pronte</h2>
+<p>Scrivile nel campo <strong>«Nome classe extra»</strong> di una riga o di un elemento WPBakery (più classi separate da spazio).</p>
+<table>
+	<tr><th>Classe</th><th>Effetto</th></tr>
+	<tr><td><code>mo-section</code></td><td>sezione con lo spazio verticale del prototipo e contenuto centrato a 1200 px</td></tr>
+	<tr><td><code>mo-section--alt</code> · <code>mo-section--navy</code> · <code>mo-section--blu</code></td><td>sfondo grigio chiaro, navy o blu (con testi chiari)</td></tr>
+	<tr><td><code>mo-overline</code></td><td>piccolo titolo blu in maiuscolo (come «CHI SIAMO»)</td></tr>
+	<tr><td><code>mo-statement</code> · <code>mo-h1</code> · <code>mo-h3</code></td><td>frase grande · titolo di pagina · titolo di card</td></tr>
+	<tr><td><code>mo-lead</code> · <code>mo-caption</code></td><td>paragrafo introduttivo · nota piccola</td></tr>
+	<tr><td><code>mo-btn mo-btn--primary</code> · <code>mo-btn--secondary</code> · <code>mo-btn--accent</code></td><td>pulsanti blu, contorno, giallo (su un link)</td></tr>
+	<tr><td><code>mo-card</code> · <code>mo-card--pad</code></td><td>card bianca con bordo e ombra · con spazio interno</td></tr>
+	<tr><td><code>mo-badge</code> · <code>mo-badge--accent</code> · <code>mo-badge--success</code></td><td>etichetta a pillola</td></tr>
+	<tr><td><code>mo-chips</code></td><td>(su un elenco puntato) voci come etichette azzurre</td></tr>
+</table>
+
+<h2>Animazioni con le classi</h2>
+<table>
+	<tr><th>Classe</th><th>Animazione</th></tr>
+	<tr><td><code>mo-reveal</code></td><td>entra dal basso quando arriva nello schermo</td></tr>
+	<tr><td><code>mo-reveal-left</code> · <code>mo-reveal-right</code> · <code>mo-zoom</code></td><td>entra da sinistra · da destra · ingrandendosi</td></tr>
+	<tr><td><code>mo-delay-1</code> … <code>mo-delay-5</code></td><td>ritardo, da aggiungere alle precedenti (es. <code>mo-reveal mo-delay-2</code>)</td></tr>
+	<tr><td><code>mo-stagger</code></td><td>(su una riga o colonna) gli elementi interni entrano uno dopo l’altro</td></tr>
+	<tr><td><code>mo-words</code></td><td>il testo si accende parola per parola mentre scorri (come il manifesto)</td></tr>
+	<tr><td><code>mo-parallax</code> · <code>mo-parallax-forte</code></td><td>si muove più lentamente della pagina</td></tr>
+	<tr><td><code>mo-tilt</code></td><td>si inclina seguendo il mouse (come le card delle garanzie)</td></tr>
+	<tr><td><code>mo-magnetic</code></td><td>pulsante che segue il mouse</td></tr>
+</table>
+<p>Con «riduci movimento» attivo sul dispositivo le animazioni non partono e tutto resta visibile. Su telefono e tablet <code>mo-tilt</code> e <code>mo-magnetic</code> non fanno nulla (servono il mouse); le altre funzionano.</p>
+
+<h2>Opzioni e aggiornamenti</h2>
+<ul>
+	<li>Di serie, sulle pagine MoveOn <strong>stili e script di Porto non vengono caricati</strong>, così niente interferisce. Se in quelle pagine usi elementi propri di Porto, attiva «Carica anche stili e script del tema» in MoveOn → Impostazioni.</li>
+	<li><strong>Aggiornare il plugin</strong>: Plugin → Aggiungi nuovo → Carica plugin → scegli il nuovo file .zip → «Sostituisci quello installato». Contenuti, impostazioni e modelli modificati restano.</li>
+	<li>Il codice PHP del plugin è il «motore»: non serve modificarlo. Per nuove sezioni speciali o animazioni nuove basta chiederle.</li>
+</ul>

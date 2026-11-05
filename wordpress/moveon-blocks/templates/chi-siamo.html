@@ -1,0 +1,43 @@
+{{! CHI SIAMO · anchor etichetta numero foto_url foto_pos frase_numero manifesto idea_titolo idea_testo passo_da passo_a motivi_titolo chiusura; idea_img (url, alt, w, h); motivi (tono, i, icona, titolo, testo, etichette); link (testo, resto, href) }}
+<section class="mo-block mo-about" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="chiSiamo">
+  <div class="mo-wrap">
+    <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
+    <div class="mo-about-top" style="--mo-img-fill:url('{{foto_url}}');--mo-img-pos:{{foto_pos}}">
+      <div class="mo-big25" aria-hidden="true"><span class="mo-o">{{numero}}</span><span class="mo-fl">{{numero}}</span></div>
+      <p class="mo-about-headline"><span class="mo-sr-only">MoveOn Studio, {{numero}} </span>{{frase_numero}}</p>
+    </div>
+
+    <p class="mo-manifesto mo-js-words">{{manifesto}}</p>
+
+    <div class="mo-idea">
+      <div class="mo-idea-text">
+        <h3 class="mo-about-h3">{{idea_titolo}}</h3>
+        <p class="mo-about-p">{{idea_testo}}</p>
+        <div class="mo-idea-steps" aria-hidden="true"><span>{{passo_da}}</span><span class="mo-idea-line"><i></i></span><span>{{passo_a}}</span></div>
+      </div>
+      {{#idea_img}}
+      <div class="mo-idea-art"><img class="mo-idea-img" src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" loading="lazy"></div>
+      {{/idea_img}}
+      {{^idea_img}}
+      <div class="mo-idea-art" aria-hidden="true">{{> cubo}}</div>
+      {{/idea_img}}
+    </div>
+
+    <h3 class="mo-reasons-title">{{motivi_titolo}}</h3>
+    <ul class="mo-reasons">
+      {{#motivi}}
+      <li class="mo-reason {{tono}}" style="--mo-i:{{i}}">
+        <span class="mo-reason-ico" aria-hidden="true">{{{icona}}}</span>
+        <div>
+          <h4>{{titolo}}</h4>
+          <p>{{testo}}</p>
+          {{#ha_etichette}}<ul class="mo-chips">{{#etichette}}<li>{{.}}</li>{{/etichette}}</ul>{{/ha_etichette}}
+        </div>
+      </li>
+      {{/motivi}}
+    </ul>
+
+    <p class="mo-about-close mo-js-words">{{chiusura}}</p>
+    {{#link}}<p class="mo-about-cta"><a href="{{href}}">{{testo}}</a> {{resto}}</p>{{/link}}
+  </div>
+</section>

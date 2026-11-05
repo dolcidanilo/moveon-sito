@@ -1,0 +1,30 @@
+{{! SERVIZI · anchor etichetta apertura totale primo_nome finale_frase; servizi (nome, beneficio, voci, tono, immagine (url, alt, w, h), art_key, art, parola_sfondo); pulsante (testo, href) }}
+<section class="mo-block mo-svc" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="servizi" data-mo-pin="h">
+  <div class="mo-svc-track">
+    <div class="mo-svc-panel mo-svc-intro">
+      <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
+      <p class="mo-statement">{{apertura}}</p>
+      <p class="mo-svc-hint"><span class="mo-hint-desk">Scorri per scoprirle</span><span class="mo-hint-mob">Scorri di lato</span>{{> icona-freccia}}</p>
+    </div>
+
+    {{#servizi}}
+    <article class="mo-svc-panel {{tono}}" data-name="{{nome}}" data-cursor="Scorri">
+      <div class="mo-svc-text">
+        <h3 class="mo-svc-title">{{nome}}</h3>
+        <p class="mo-svc-lead">{{beneficio}}</p>
+        <ul class="mo-chips">{{#voci}}<li>{{.}}</li>{{/voci}}</ul>
+      </div>
+      {{#immagine}}<div class="mo-svc-art"><img class="mo-svc-img" src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" loading="lazy"></div>{{/immagine}}
+      {{^immagine}}<div class="mo-svc-art" aria-hidden="true" data-art="{{art_key}}">{{{art}}}</div>{{/immagine}}
+      <span class="mo-svc-ghost" aria-hidden="true">{{parola_sfondo}}</span>
+    </article>
+    {{/servizi}}
+
+    <div class="mo-svc-panel mo-t-alt mo-svc-end">
+      <p class="mo-statement">{{finale_frase}}</p>
+      {{#pulsante}}<a class="mo-btn mo-btn-accent mo-magnetic" href="{{href}}">{{testo}}</a>{{/pulsante}}
+    </div>
+  </div>
+  <div class="mo-svc-hud" aria-hidden="true"><span class="mo-hud-count">1 / {{totale}}</span><span class="mo-hud-name">{{primo_nome}}</span><span class="mo-hud-bar"><i></i></span></div>
+  <div class="mo-svc-dots" aria-hidden="true"></div>
+</section>
