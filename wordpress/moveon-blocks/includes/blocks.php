@@ -47,23 +47,46 @@ function mo_p_sfondo(): array {
 		$opacita[ $n . '%' ] = (string) $n;
 	}
 	return array(
-		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore della sezione e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
-		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore della sezione.', 'Sfondo' ),
-		mo_p_drop( 'sfondo_dimensione', 'Dimensione', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
-		mo_p_text( 'sfondo_posizione', 'Posizione', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra.', 'Sfondo', '50% 50%' ),
+		mo_p( 'colorpicker', 'sfondo_colore', 'Colore di sfondo (facoltativo)', 'Sostituisce il colore della sezione. Colori del sito: blu #2563eb, navy #0f172a, grigio chiaro #f8fafc, azzurro chiaro #eff6ff, giallo #f59e0b. Lascia vuoto per il colore originale.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_testi', 'Stile dei testi e delle card', array( 'Automatico (come la sezione)' => '', 'Chiari, per sfondi scuri' => 'chiari', 'Scuri, per sfondi chiari' => 'scuri' ), '', 'Se cambi il colore di sfondo, scegli i testi adatti perché restino leggibili. Funziona sulle sezioni chiare (Nastro, Chi siamo, Servizi, Portfolio, Garanzie); Hero, Pausa e Contatti hanno già testi chiari.', 'Sfondo' ),
+		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore di sfondo.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_dimensione', 'Dimensione dell’immagine', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
+		mo_p_text( 'sfondo_posizione', 'Posizione dell’immagine', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra.', 'Sfondo', '50% 50%' ),
 	);
 }
 
-/** Livello con l'immagine di sfondo della sezione (vuoto se non c'è un'immagine). */
-function mo_sfondo_html( array $a ): string {
-	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
-	if ( ! $img ) {
-		return '';
+/** Colore sicuro: #rgb, #rrggbb(aa), rgb() o rgba(); altrimenti vuoto. */
+function mo_colore( $v ): string {
+	$v = trim( (string) $v );
+	if ( preg_match( '/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i', $v ) ) {
+		return $v;
 	}
-	$op  = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
-	$dim = in_array( $a['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $a['sfondo_dimensione'] : 'cover';
-	list( $x, $y ) = mo_focus( $a['sfondo_posizione'] ?? '50% 50%' );
-	return '<div class="mo-bg" aria-hidden="true" style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . '"></div>';
+	if ( preg_match( '/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*(?:0|1|0?\.\d+)\s*)?\)$/i', $v ) ) {
+		return $v;
+	}
+	return '';
+}
+
+/**
+ * Livelli di sfondo della sezione: colore (sotto) e immagine (sopra), entrambi sotto i contenuti.
+ * Vuoto se nella scheda Sfondo non è stato scelto niente.
+ */
+function mo_sfondo_html( array $a ): string {
+	$out   = '';
+	$col   = mo_colore( $a['sfondo_colore'] ?? '' );
+	$testi = in_array( $a['sfondo_testi'] ?? '', array( 'chiari', 'scuri' ), true ) ? $a['sfondo_testi'] : '';
+	if ( $col || $testi ) {
+		$out .= '<div class="mo-bg mo-bg--colore" aria-hidden="true"' . ( $testi ? ' data-testi="' . $testi . '"' : '' ) . ( $col ? ' style="background-color:' . esc_attr( $col ) . '"' : '' ) . '></div>';
+	}
+	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
+	if ( $img ) {
+		$op  = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
+		$dim = in_array( $a['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $a['sfondo_dimensione'] : 'cover';
+		list( $x, $y ) = mo_focus( $a['sfondo_posizione'] ?? '50% 50%' );
+		$out .= '<div class="mo-bg mo-bg--foto" aria-hidden="true" style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . '"></div>';
+	}
+	return $out;
 }
 
 /** Definizioni degli elementi: nome, descrizione, campi. */

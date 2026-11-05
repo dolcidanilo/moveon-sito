@@ -250,7 +250,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const rgb = (s) => s.replace(/\s/g, '');
   const r = await page.evaluate(() => {
     const css = (sel, prop) => { const el = document.querySelector(sel); return el ? getComputedStyle(el)[prop] : null; };
-    const blocks = [...document.querySelectorAll('[data-mo-block]')].slice(0, 3).map((b) => b.getBoundingClientRect());
+    // Righe di WPBakery che contengono un blocco MoveOn, una dopo l'altra (comprese quelle con le sezioni bloccate)
+    const blocks = [...document.querySelectorAll('.mo-content .vc_row')].filter((r) => r.querySelector('.mo-block') && !r.parentElement.closest('.vc_row')).map((b) => b.getBoundingClientRect());
     return {
       portoFile: !!document.querySelector('link[id^="porto"]'),
       colori: {
@@ -273,6 +274,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
   check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(30,41,59)'), [...new Set(r.campi)].join(' | '));
   check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
+  const pin = await page.evaluate(() => { const sp = document.querySelector('.mo-svc')?.parentElement; return sp && sp.classList.contains('pin-spacer') ? parseFloat(getComputedStyle(sp).paddingBottom) : -1; });
+  check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
   check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
   check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
   // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
@@ -341,6 +344,21 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     check('Sfondo: immagine presente con l’opacità scelta (40%)', r.c && r.opacita === '0.4', `${r.opacita}`);
     check('Sfondo: copre tutta la sezione e sta sotto i testi', r.size === 'cover' && r.copre && !r.sopraTesto);
     check('Sfondo: «intera, senza tagli» e posizione in alto', r.contain === 'contain' && r.pos === '50% 0%', `${r.contain} ${r.pos}`);
+    const c = await page.evaluate(() => {
+      const pf = document.querySelector('.mo-pf'), gar2 = document.querySelectorAll('.mo-gar')[1];
+      const st = (el, p) => getComputedStyle(el)[p];
+      return {
+        coloreLivello: st(pf.querySelector(':scope > .mo-bg--colore'), 'backgroundColor'),
+        titoloPf: st(pf.querySelector('.mo-statement'), 'color'),
+        istruzioniPf: st(pf.querySelector('.mo-pf-sub'), 'color'),
+        cardGar: gar2 && st(gar2.querySelector('.mo-gar-card'), 'backgroundColor'),
+        titoloCard: gar2 && st(gar2.querySelector('.mo-gar-card h3'), 'color'),
+      };
+    });
+    const rgb = (x) => (x || '').replace(/\s/g, '');
+    check('Colore di sfondo della sezione (blu)', rgb(c.coloreLivello) === 'rgb(37,99,235)', c.coloreLivello);
+    check('Testi chiari su sfondo scuro', rgb(c.titoloPf) === 'rgb(248,250,252)' && rgb(c.istruzioniPf) === 'rgb(148,163,184)', `${c.titoloPf} ${c.istruzioniPf}`);
+    check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(15,23,42)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {
     console.log('… pagina "prova-sfondo" assente: controlli sullo sfondo saltati');

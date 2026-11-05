@@ -618,3 +618,12 @@ img,svg{max-width:100%}
 /* Immagine di sfondo delle sezioni (scheda «Sfondo» degli elementi): sopra il colore della sezione, sotto i contenuti */
 .mo-block{position:relative;isolation:isolate}
 .mo-block > .mo-bg{position:absolute;inset:0;z-index:-1;background-repeat:no-repeat;pointer-events:none}
+.mo-block > .mo-bg--colore{z-index:-2}
+/* Stile dei testi e delle card scelto nella scheda Sfondo */
+.mo-block:has(> .mo-bg[data-testi="chiari"]){--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;--mo-tone-b:#93c5fd;--mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color:var(--mo-body)}
+.mo-block:has(> .mo-bg[data-testi="scuri"]){--mo-surface:#ffffff;--mo-surface-alt:#f8fafc;--mo-ink:#0f172a;--mo-body:#334155;--mo-muted:#64748b;--mo-border:#e2e8f0;--mo-link:#2563eb;--mo-brand-tint:#eff6ff;--mo-chip-ink:#1d4ed8;--mo-tone-b:#60a5fa;--mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08);color:var(--mo-body)}
+/* Nessuno spazio attorno ai blocchi MoveOn, qualunque contenitore il tema aggiunga */
+.mo-block.mo-block{margin:0 !important}
+/* (tutti i contenitori tra la riga e il blocco, tranne il "pin-spacer" che serve allo scorrimento bloccato) */
+.vc_row:has(.mo-block) *:has(.mo-block):not(.pin-spacer){margin:0 !important;padding:0 !important}
+.mo-content .vc_row-full-width{height:0 !important;margin:0 !important;padding:0 !important;border:0 !important}

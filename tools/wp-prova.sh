@@ -84,9 +84,10 @@ if ( ! get_page_by_path("prova-classi") ) {
 }
 ' 2>/dev/null
 php wpcli.php '
-if ( ! get_page_by_path("prova-sfondo") ) {
+$vecchia = get_page_by_path("prova-sfondo"); if ( $vecchia && false === strpos( $vecchia->post_content, "sfondo_testi" ) ) { wp_delete_post( $vecchia->ID, true ); $vecchia = null; }
+if ( ! $vecchia ) {
   $img = mo_importa_immagine("pausa-cuffie.jpg", "Foto di prova per lo sfondo");
-  $c = "[mo_garanzie sfondo_img=\"$img\" sfondo_opacita=\"40\"]\n[mo_contatti sfondo_img=\"$img\" sfondo_dimensione=\"contain\" sfondo_posizione=\"50% 0%\"]";
+  $c = "[mo_garanzie sfondo_img=\"$img\" sfondo_opacita=\"40\"]\n[mo_contatti sfondo_img=\"$img\" sfondo_dimensione=\"contain\" sfondo_posizione=\"50% 0%\"]\n[mo_portfolio sfondo_colore=\"#2563eb\" sfondo_testi=\"chiari\" anchor=\"pf2\"]\n[mo_garanzie sfondo_colore=\"#0f172a\" sfondo_testi=\"chiari\" anchor=\"gar2\"]";
   $id = wp_insert_post(["post_type"=>"page","post_status"=>"publish","post_title"=>"Prova sfondo","post_name"=>"prova-sfondo","post_content"=>$c]);
   update_post_meta($id, "_wp_page_template", "moveon-pagina-intera");
   echo "· Pagina prova-sfondo creata\n";

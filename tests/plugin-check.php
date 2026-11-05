@@ -44,7 +44,7 @@ if ( ! function_exists( 'mo_blocks' ) ) {
 /* 1) Campi per WPBakery */
 do_action( 'vc_before_init' );
 check( 'WPBakery: registrati 8 elementi', 8 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
-$tipi = array( 'textfield', 'textarea', 'attach_image', 'dropdown', 'param_group' );
+$tipi = array( 'textfield', 'textarea', 'attach_image', 'dropdown', 'param_group', 'colorpicker' );
 $err  = array();
 foreach ( $GLOBALS['mo_vc'] as $el ) {
 	if ( empty( $el['base'] ) || empty( $el['name'] ) || 'MoveOn' !== ( $el['category'] ?? '' ) ) {
@@ -131,7 +131,7 @@ check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $
 
 /* 8) Immagine di sfondo delle sezioni */
 $html = do_shortcode( '[mo_hero sfondo_img="' . $jpg . '" sfondo_opacita="15" sfondo_dimensione="auto" sfondo_posizione="100% 50%"]' );
-check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
+check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg mo-bg--foto"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
 check( 'Sfondo: niente livello se non c’è l’immagine', false === strpos( do_shortcode( '[mo_hero]' ), 'mo-bg' ) );
 check( 'WPBakery: scheda Sfondo in tutti gli 8 elementi', 8 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
 

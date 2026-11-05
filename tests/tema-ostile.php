@@ -36,3 +36,10 @@ add_filter( 'the_content', function ( $html ) {
 	return str_replace( '<div class="vc_row-full-width vc_clearfix"></div>', '<div class="vc_row-full-width vc_clearfix"></div><p>&nbsp;</p><p></p>', $html );
 }, 50 );
 
+// 4) Un contenitore del tema attorno a ogni blocco, con margine sotto (possibile causa di fasce vuote)
+add_filter( 'the_content', function ( $html ) {
+	return preg_replace( '#(<section class="mo-block.*?</section>)#s', '<div class="porto-wrap-prova">$1</div>', $html );
+}, 60 );
+add_action( 'wp_head', function () {
+	echo '<style id="tema-ostile-2">.porto-wrap-prova{margin-bottom:35px;padding-bottom:10px}</style>';
+}, 1000 );
