@@ -487,6 +487,7 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
   let mode = mobileQ.matches || reduce ? 'grid' : initial;
   let filter = 'all';
   let flipAnim = null;
+  let uscite = [];
   const drags = [];
   let justDragged = false;
   const modeBtns = $$('.mo-pf-mode button', sec);
@@ -510,6 +511,7 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
     // Un'animazione ancora in corso (clic veloci) va chiusa prima di misurare: lascerebbe le card fuori dal flusso
     if (flipAnim) { flipAnim.progress(1); flipAnim = null; }
     const h0 = state ? board.offsetHeight : 0;
+    const larghezze = new Map(state ? cards.map((c) => [c, c.offsetWidth]) : []);
     if (state) G.killTweensOf(board);
     board.classList.toggle('mo-is-chaos', mode === 'chaos');
     board.classList.toggle('mo-is-grid', mode === 'grid');
@@ -540,7 +542,16 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
       flipAnim = Flip.from(state, {
         duration: 0.85, ease: 'power3.inOut', stagger: 0.025, absolute: true,
         onEnter: (els) => G.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, clearProps: 'opacity' }),
-        onComplete: () => { G.killTweensOf(board); board.style.height = hFinale; ST.refresh(); drags.forEach((dr) => dr.update()); },
+        // Le card che escono (filtro, «In ordine») tengono la loro larghezza e sfumano:
+        // fuori dal flusso la larghezza 100% varrebbe per tutto il tavolo.
+        onLeave: (els) => {
+          uscite = els;
+          els.forEach((el) => G.set(el, { width: larghezze.get(el) || '' }));
+          return G.to(els, { opacity: 0, scale: 0.85, duration: 0.35, ease: 'power2.in' });
+        },
+        onComplete: () => {
+          if (uscite.length) { G.killTweensOf(uscite); G.set(uscite, { clearProps: 'width,opacity,scale' }); uscite = []; }
+          G.killTweensOf(board); board.style.height = hFinale; ST.refresh(); drags.forEach((dr) => dr.update()); },
       });
     } else {
       ST.refresh();

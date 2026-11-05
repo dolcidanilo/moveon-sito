@@ -102,7 +102,12 @@ const browser = await chromium.launch();
   const hPrima = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
   const campioni = page.evaluate(() => new Promise((ok) => {
     const b = document.querySelector('.mo-pf-board'); const hs = []; const t0 = performance.now();
-    const giro = () => { hs.push(b.getBoundingClientRect().height); if (performance.now() - t0 < 1100) requestAnimationFrame(giro); else ok(hs); };
+    window.__moLarghezzaMax = 0;
+    const giro = () => {
+      hs.push(b.getBoundingClientRect().height);
+      document.querySelectorAll('.mo-pf-card').forEach((c) => { window.__moLarghezzaMax = Math.max(window.__moLarghezzaMax, c.getBoundingClientRect().width); });
+      if (performance.now() - t0 < 1100) requestAnimationFrame(giro); else ok(hs);
+    };
     requestAnimationFrame(giro);
   }));
   await page.click('.mo-pf-filter [data-filter="web"]');
@@ -111,6 +116,8 @@ const browser = await chromium.launch();
   const hDopo = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
   const hMin = Math.round(Math.min(...hs));
   check('Filtro: la sezione sotto non sale durante l’animazione', hMin >= Math.min(hPrima, hDopo) - 2, `${hPrima} → min ${hMin} → ${hDopo}px`);
+  const larg = await page.evaluate(() => ({ max: Math.round(window.__moLarghezzaMax), col: Math.round(document.querySelector('.mo-pf-card:not(.mo-is-out)').offsetWidth) }));
+  check('Filtro: le card che escono non si allargano', larg.max <= larg.col + 4, `max ${larg.max}px, colonna ${larg.col}px`);
   const shown = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-card')].filter((c) => !c.classList.contains('mo-is-out')).map((c) => c.dataset.cat));
   check('Filtro “Web” mostra solo i lavori web', shown.length > 0 && shown.every((c) => c === 'web'), shown.join(','));
   await page.locator('.mo-pf-card:not(.mo-is-out)').first().click();
@@ -124,6 +131,10 @@ const browser = await chromium.launch();
   await page.keyboard.press('Escape');
   await page.waitForTimeout(1200);
   check('Esc chiude la scheda progetto', await page.evaluate(() => document.querySelector('.mo-pf-modal').hidden));
+  await page.click('.mo-pf-filter [data-filter="all"]');
+  await page.waitForTimeout(1500);
+  const resti = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-card')].filter((c) => c.style.width || c.style.opacity || getComputedStyle(c).opacity !== '1').length);
+  check('Filtro «Tutti»: le card tornano tutte, senza resti dell’animazione', resti === 0, `${resti} con stili rimasti`);
 
   // Modulo contatti: errori e conferma
   await smoothScroll(page, (await topOf(page, '.mo-ct-form')) - 200);
