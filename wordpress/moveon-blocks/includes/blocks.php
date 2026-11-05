@@ -92,7 +92,11 @@ function mo_sfondo_html( array $a ): string {
 	}
 	if ( $vars ) {
 		$id   = 'mo-s' . substr( md5( implode( ';', $vars ) . wp_json_encode( $a ) ), 0, 10 );
-		$out .= '<style>.mo-block.mo-block:has(> .mo-bg-stile[data-mo-stile="' . $id . '"]){' . implode( ';', $vars ) . ';color:var(--mo-body)}</style><span hidden data-mo-stile="' . $id . '" class="mo-bg-stile"></span>';
+		// I colori valgono per i contenuti della sezione (i figli), così la sezione conserva quelli
+		// automatici in --mo-…-base: pulsanti e card, che hanno un loro sfondo, li riprendono (vedi moveon.css).
+		$sel  = '.mo-block.mo-block:has(> .mo-bg-stile[data-mo-stile="' . $id . '"])';
+		$testo = mo_colore( $a['colore_testi'] ?? '' );
+		$out .= '<style>' . ( $testo ? $sel . '{color:' . $testo . '}' : '' ) . $sel . ' > *{' . implode( ';', $vars ) . '}</style><span hidden data-mo-stile="' . $id . '" class="mo-bg-stile"></span>';
 	}
 	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
 	if ( $img ) {

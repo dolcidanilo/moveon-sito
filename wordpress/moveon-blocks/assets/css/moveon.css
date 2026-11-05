@@ -630,3 +630,8 @@ img,svg{max-width:100%}
 /* Righe di WPBakery rimaste senza contenuto (es. elementi Testo vuoti tolti): niente spazio */
 .mo-content .vc_row:not(:has(.mo-block)):not(:has(.wpb_wrapper > *)){display:none}
 .mo-content .wpb_text_column:not(:has(> .wpb_wrapper > :not(p:empty, br))){display:none}
+
+/* Colori dei testi scelti a mano (scheda Sfondo): valgono per i testi sullo sfondo della sezione.
+   Pulsanti, card e pannelli hanno un loro sfondo e tengono i colori automatici. */
+.mo-block{--mo-ink-base:var(--mo-ink);--mo-body-base:var(--mo-body);--mo-muted-base:var(--mo-muted);--mo-link-base:var(--mo-link);--mo-chip-ink-base:var(--mo-chip-ink)}
+.mo-block.mo-block.mo-block.mo-block :is(.mo-seg,.mo-card,.mo-pf-card,.mo-gar-card,.mo-r-light,.mo-r-tint,.mo-chips li,.mo-svc-hud,.mo-t-light,.mo-t-alt,.mo-btn,.mo-fld){--mo-ink:var(--mo-ink-base);--mo-body:var(--mo-body-base);--mo-muted:var(--mo-muted-base);--mo-link:var(--mo-link-base);--mo-chip-ink:var(--mo-chip-ink-base)}

@@ -362,9 +362,11 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     check('Testi chiari su sfondo scuro (anche la frase sotto il titolo)', rgb(c.titoloPf) === 'rgb(248,250,252)' && rgb(c.istruzioniPf) === 'rgb(226,232,240)', `${c.titoloPf} ${c.istruzioniPf}`);
     const m = await page.evaluate(() => {
       const pf = document.getElementById('pf3'); const st = (sel) => getComputedStyle(pf.querySelector(sel)).color;
-      return { titolo: st('.mo-statement'), testo: st('.mo-pf-sub'), etichetta: st('.mo-overline-h2') };
+      const att = pf.querySelector('.mo-seg button[aria-pressed="true"]'); const cs = getComputedStyle(att);
+      return { titolo: st('.mo-statement'), testo: st('.mo-pf-sub'), etichetta: st('.mo-overline-h2'), attivoFondo: cs.backgroundColor, attivoTesto: cs.color, nomeCard: st('.mo-pf-name') };
     });
     check('Colori dei testi scelti a mano (titoli, testi, etichette)', rgb(m.titolo) === 'rgb(124,45,18)' && rgb(m.testo) === 'rgb(67,20,7)' && rgb(m.etichetta) === 'rgb(29,78,216)', JSON.stringify(m));
+    check('Colori a mano: pulsanti selezionati e card restano leggibili', rgb(m.attivoFondo) === 'rgb(15,23,42)' && rgb(m.attivoTesto) === 'rgb(255,255,255)' && rgb(m.nomeCard) === 'rgb(15,23,42)', `${m.attivoFondo} ${m.attivoTesto} ${m.nomeCard}`);
     check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(15,23,42)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {
