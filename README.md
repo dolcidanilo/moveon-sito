@@ -17,13 +17,15 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 | `…/guida.html` | La guida mostrata in WordPress → MoveOn → Guida |
 | `dist/moveon-blocks.zip` | Il plugin pronto da caricare |
 | `tests/`, `tools/` | Controlli automatici e strumenti (zip, WordPress di prova) |
+| `docs/` | Piani delle prossime fasi |
 
 ## Stato dei lavori
 
 - [x] **W1:** plugin con gli 8 elementi, modello di pagina, impostazioni, progetti portfolio, modelli HTML modificabili, classi di animazione, modulo contatti con antispam, pagina demo, guida.
 - [ ] **W2:** installazione su moveonstudio.it/nuovo e correzioni dopo la prova dentro WPBakery e Porto.
-- [ ] **W3:** invio email affidabile (plugin SMTP con la casella Aruba), SEO, iubenda.
+- [ ] **W3:** invio email affidabile (plugin SMTP con la casella Aruba), SEO locale su Pescara, Google Analytics, LegalBlink al posto di iubenda: vedi il [piano W3](docs/piano-W3-seo-analytics-legalblink.md).
 - [ ] **W4:** spostamento da /nuovo al sito principale.
+- [ ] **Dopo:** profili social (Facebook, Instagram, LinkedIn).
 
 ## Per lo sviluppo
 
