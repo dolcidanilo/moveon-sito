@@ -511,7 +511,8 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
     // Un'animazione ancora in corso (clic veloci) va chiusa prima di misurare: lascerebbe le card fuori dal flusso
     if (flipAnim) { flipAnim.progress(1); flipAnim = null; }
     const h0 = state ? board.offsetHeight : 0;
-    const larghezze = new Map(state ? cards.map((c) => [c, c.offsetWidth]) : []);
+    // Misura e trasparenza di partenza delle card: servono a quelle che escono (vedi onLeave)
+    const prima = new Map(state ? cards.map((c) => [c, { w: c.offsetWidth, o: parseFloat(getComputedStyle(c).opacity) || 0 }]) : []);
     if (state) G.killTweensOf(board);
     board.classList.toggle('mo-is-chaos', mode === 'chaos');
     board.classList.toggle('mo-is-grid', mode === 'grid');
@@ -535,24 +536,30 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
     if (state) {
       // Durante Flip le card escono dal flusso (absolute): senza bloccare l'altezza il tavolo
       // si azzererebbe per un attimo e la sezione sotto salirebbe. L'altezza va dalla vecchia alla nuova.
+      // Flip.from legge subito la posizione finale delle card: l'altezza va bloccata solo dopo,
+      // altrimenti la griglia si stirerebbe sull'altezza vecchia e le card diventerebbero altissime.
       const hFinale = board.style.height;
       const h1 = board.offsetHeight;
-      G.set(board, { height: h0 });
-      G.to(board, { height: h1, duration: 0.85, ease: 'power3.inOut' });
       flipAnim = Flip.from(state, {
         duration: 0.85, ease: 'power3.inOut', stagger: 0.025, absolute: true,
-        onEnter: (els) => G.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, clearProps: 'opacity' }),
+        // Le card che entrano arrivano alla loro trasparenza finale (sul tavolo le escluse restano velate)
+        onEnter: (els) => {
+          const fine = els.map((el) => { const o = parseFloat(getComputedStyle(el).opacity); return Number.isNaN(o) ? 1 : o; });
+          return G.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: (i) => fine[i], scale: 1, duration: 0.5, clearProps: 'opacity' });
+        },
         // Le card che escono (filtro, «In ordine») tengono la loro larghezza e sfumano:
         // fuori dal flusso la larghezza 100% varrebbe per tutto il tavolo.
         onLeave: (els) => {
           uscite = els;
-          els.forEach((el) => G.set(el, { width: larghezze.get(el) || '' }));
+          els.forEach((el) => G.set(el, { width: prima.get(el)?.w || '', opacity: prima.get(el)?.o ?? 1 }));
           return G.to(els, { opacity: 0, scale: 0.85, duration: 0.35, ease: 'power2.in' });
         },
         onComplete: () => {
           if (uscite.length) { G.killTweensOf(uscite); G.set(uscite, { clearProps: 'width,opacity,scale' }); uscite = []; }
           G.killTweensOf(board); board.style.height = hFinale; ST.refresh(); drags.forEach((dr) => dr.update()); },
       });
+      G.set(board, { height: h0 });
+      G.to(board, { height: h1, duration: 0.85, ease: 'power3.inOut' });
     } else {
       ST.refresh();
     }
@@ -645,7 +652,11 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
     }
   }
   function stepProject(dir) {
-    const i = (openIdx + dir + PROJECTS.length) % PROJECTS.length;
+    // Con un filtro attivo le frecce passano solo tra i progetti visibili
+    const giro = cards.map((c, k) => k).filter((k) => !cards[k].classList.contains('mo-is-out'));
+    if (!giro.length) return;
+    const pos = giro.indexOf(openIdx);
+    const i = giro[((pos < 0 ? 0 : pos + dir) + giro.length) % giro.length];
     openIdx = i;
     lastFocus = cards[i];
     fillModal(i);

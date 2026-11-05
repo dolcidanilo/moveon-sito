@@ -397,6 +397,101 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.close();
 }
 
+/* ---------------- Portfolio: tutte le combinazioni di modo e filtro ---------------- */
+// Ogni passaggio è osservato fotogramma per fotogramma: nessuna card deve allargarsi, allungarsi
+// o lampeggiare, il tavolo non deve accorciarsi sotto la misura finale, e alla fine non restano stili.
+async function provaPortfolio(page, nome, passi) {
+  await page.evaluate(() => document.querySelector('.mo-pf-board').scrollIntoView({ block: 'start' }));
+  await page.waitForTimeout(2800); // i lavori «cadono sul tavolo» quando compare la sezione
+  const problemi = [];
+  const sel = (a) => (a === 'grid' || a === 'chaos' ? `.mo-pf-mode [data-mode="${a}"]` : `.mo-pf-filter [data-filter="${a}"]`);
+  const foto = () => page.evaluate(() => {
+    const b = document.querySelector('.mo-pf-board');
+    return { h: b.offsetHeight, cards: [...b.querySelectorAll('.mo-pf-card')].map((c) => { const cs = getComputedStyle(c); const vis = cs.display !== 'none'; return { vis, w: c.offsetWidth, h: c.offsetHeight, o: vis ? +cs.opacity : 0 }; }) };
+  });
+  for (const passo of passi) {
+    const rapidi = Array.isArray(passo);
+    if (rapidi) {
+      for (const a of passo) { await page.click(sel(a)); await page.waitForTimeout(90); }
+    } else {
+      const prima = await foto();
+      const campioni = page.evaluate(() => new Promise((ok) => {
+        const b = document.querySelector('.mo-pf-board'); const out = []; const t0 = performance.now();
+        const giro = () => {
+          out.push({ h: b.getBoundingClientRect().height, cards: [...b.querySelectorAll('.mo-pf-card')].map((c) => { const cs = getComputedStyle(c); return cs.display === 'none' ? null : { w: c.offsetWidth, h: c.offsetHeight, o: +cs.opacity }; }) });
+          if (performance.now() - t0 < 1300) requestAnimationFrame(giro); else ok(out);
+        };
+        requestAnimationFrame(giro);
+      }));
+      await page.click(sel(passo));
+      const fr = await campioni;
+      await page.waitForTimeout(250);
+      const dopo = await foto();
+      const bw = await page.evaluate(() => document.querySelector('.mo-pf-board').clientWidth);
+      const maxW = Math.max(...prima.cards.concat(dopo.cards).filter((c) => c.vis).map((c) => c.w)) * 1.05;
+      const maxH = Math.max(...prima.cards.concat(dopo.cards).filter((c) => c.vis).map((c) => c.h)) * 1.1;
+      const hMin = Math.min(prima.h, dopo.h) - 2;
+      fr.forEach((f, k) => {
+        if (f.h < hMin) problemi.push(`${passo}: tavolo ${Math.round(f.h)}px (min ${hMin})`);
+        f.cards.forEach((c, i) => {
+          if (!c) return;
+          if (c.w > maxW) problemi.push(`${passo}: card ${i} larga ${c.w}px (max ${Math.round(maxW)}, tavolo ${bw})`);
+          if (c.h > maxH) problemi.push(`${passo}: card ${i} alta ${c.h}px (max ${Math.round(maxH)})`);
+          const oMax = Math.max(prima.cards[i].o, dopo.cards[i].o) + 0.03;
+          if (c.o > oMax) problemi.push(`${passo}: card ${i} lampeggia (opacità ${c.o.toFixed(2)}, max ${oMax.toFixed(2)})`);
+        });
+      });
+    }
+    await page.waitForTimeout(rapidi ? 1600 : 0);
+    // Stato finale coerente con modo e filtro scelti
+    const fine = await page.evaluate(() => {
+      const b = document.querySelector('.mo-pf-board');
+      const modo = b.classList.contains('mo-is-grid') ? 'grid' : 'chaos';
+      const filtro = document.querySelector('.mo-pf-filter [aria-pressed="true"]').dataset.filter;
+      const err = [];
+      if (b.style.height && b.querySelectorAll('.mo-pf-card').length <= 8) err.push(`altezza del tavolo rimasta ${b.style.height}`);
+      b.querySelectorAll('.mo-pf-card').forEach((c, i) => {
+        const cs = getComputedStyle(c); const ok = filtro === 'all' || c.dataset.cat === filtro;
+        if (c.style.width || c.style.height || c.style.opacity) err.push(`card ${i}: stili rimasti`);
+        if (modo === 'grid' && ok && (cs.display === 'none' || +cs.opacity < 0.99)) err.push(`card ${i}: dovrebbe vedersi`);
+        if (modo === 'grid' && !ok && cs.display !== 'none') err.push(`card ${i}: dovrebbe essere nascosta`);
+        const m = cs.transform === 'none' ? [1, 0, 0, 1, 0, 0] : cs.transform.replace(/^matrix\(|\)$/g, '').split(',').map(Number);
+        const dritta = Math.abs(m[0] - 1) < 0.01 && Math.abs(m[1]) < 0.01 && Math.abs(m[2]) < 0.01 && Math.abs(m[3] - 1) < 0.01 && Math.abs(m[4]) < 1 && Math.abs(m[5]) < 1;
+        if (modo === 'grid' && ok && !dritta) err.push(`card ${i}: ruotata o spostata (${cs.transform})`);
+        if (modo === 'chaos' && Math.abs(+cs.opacity - (ok ? 1 : 0.14)) > 0.02) err.push(`card ${i}: opacità ${cs.opacity}`);
+      });
+      return err;
+    });
+    fine.forEach((e) => problemi.push(`${rapidi ? passo.join('+') : passo} → ${e}`));
+  }
+  check(`Portfolio ${nome}: nessuna card allargata, allungata o lampeggiante, stato finale giusto`, problemi.length === 0, problemi.slice(0, 4).join(' · ') || `${passi.length} passaggi`);
+}
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2500);
+  await provaPortfolio(page, 'desktop', ['branding', 'grid', 'web', 'all', 'social', 'chaos', 'stampa', 'all', 'grid', 'chaos', 'web', 'grid', ['chaos', 'branding', 'grid', 'all', 'chaos', 'social']]);
+  // Frecce della scheda progetto: con un filtro passano solo tra i progetti visibili
+  await page.click('.mo-pf-mode [data-mode="grid"]'); await page.waitForTimeout(1300);
+  await page.click('.mo-pf-filter [data-filter="web"]'); await page.waitForTimeout(1300);
+  const visti = [];
+  await page.locator('.mo-pf-card:not(.mo-is-out)').first().click(); await page.waitForTimeout(1000);
+  for (let k = 0; k < 3; k++) { visti.push(await page.evaluate(() => document.querySelector('.mo-pfm-cat').textContent)); await page.keyboard.press('ArrowRight'); await page.waitForTimeout(600); }
+  await page.keyboard.press('Escape'); await page.waitForTimeout(1200);
+  check('Scheda progetto: con il filtro «Web» le frecce restano sui lavori web', visti.every((t) => /^Web/.test(t)), visti.join(' | '));
+  check('Portfolio: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
+}
+{
+  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+  const page = await ctx.newPage();
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2500);
+  await provaPortfolio(page, 'mobile', ['web', 'all', 'chaos', 'branding', 'grid', 'all']);
+  await ctx.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

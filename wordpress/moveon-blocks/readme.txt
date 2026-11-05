@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -24,6 +24,12 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.0.10 =
+* Portfolio controllato per intero, in tutte le combinazioni di modo e filtro, su computer e telefono:
+* passando da «Sul tavolo» a «In ordine» con un filtro attivo le card non si allungano più;
+* le card escluse dal filtro non lampeggiano più quando cambi modo;
+* nella scheda progetto le frecce passano solo tra i lavori del filtro scelto.
 
 = 1.0.9 =
 * Portfolio «In ordine»: cambiando filtro, le card che escono non si allargano più a tutta la larghezza; restano della loro misura e sfumano.
