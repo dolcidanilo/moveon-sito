@@ -79,6 +79,15 @@ Cosa manca:
 
 La SEO dà risultati in qualche mese; la scheda Google con le recensioni è la parte che dà frutti prima.
 
-## Dopo la messa online
+## Dopo la messa online: social
 
-Social: Facebook e Instagram (qualità alta) e valutazione di LinkedIn.
+Facebook e Instagram (qualità alta), LinkedIn (profilo personale curato + pagina aziendale, 1–2 post a settimana).
+
+Idee già discusse per Instagram:
+- Le Storie parlano a chi già segue; il feed è la **vetrina** per chi arriva dal sito o da Google.
+- **In evidenza** per non perdere le Storie: Progetti, Servizi, Recensioni, Dietro le quinte, Chi siamo, Contatti, con copertine coerenti con il marchio.
+- **Dalle Storie al feed, ogni settimana**: il contenuto migliore diventa un carosello, un Reel breve (bozza → finito, porta persone nuove) o una foto curata. 1–2 post a settimana bastano.
+- **3 post fissati in alto**: progetto migliore, «chi siamo e cosa facciamo a Pescara», recensione o caso studio.
+- Griglia pensata nell'insieme; nelle Storie adesivi link, sondaggi, domande.
+- Meta Business Suite: pubblicazione anche su Facebook e programmazione.
+- Da preparare: struttura degli In evidenza e calendario mensile.
