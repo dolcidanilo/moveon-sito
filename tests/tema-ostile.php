@@ -16,6 +16,7 @@ strong{color:#222}
 .vc_row[data-vc-full-width]{overflow:hidden;transition:opacity .5s}
 .vc_column_container>.vc_column-inner{padding-left:15px;padding-right:15px;padding-top:35px}
 .wpb_wrapper>*{margin-bottom:35px}
+.wpb_content_element{margin-bottom:35px}
 button:hover{background:#0088cc;color:#fff}
 .vc_row-full-width{margin-bottom:35px;height:1px}
 p:empty{min-height:24px}
@@ -33,7 +34,9 @@ add_action( 'wp_head', function () use ( $mo_ostile ) {
 }, 999 );
 // 3) Paragrafi vuoti tra una riga e l'altra (come può succedere dopo il salvataggio in WPBakery)
 add_filter( 'the_content', function ( $html ) {
-	return str_replace( '<div class="vc_row-full-width vc_clearfix"></div>', '<div class="vc_row-full-width vc_clearfix"></div><p>&nbsp;</p><p></p>', $html );
+	// come sul sito vero (Porto + WPBakery): paragrafi vuoti e righe con un elemento "Testo" vuoto tra una sezione e l'altra
+	$vuota = '<div class="vc_row wpb_row row top-row wpb_custom_prova"><div class="vc_column_container col-md-12"><div class="wpb_wrapper vc_column-inner"><div class="wpb_text_column wpb_content_element wpb_custom_prova2" >' . "\n\t\t" . '<div class="wpb_wrapper">' . "\n\t\t\t\n\t\t" . '</div>' . "\n\t" . '</div></div></div></div>';
+	return str_replace( '<div class="vc_row-full-width vc_clearfix"></div>', '<div class="vc_row-full-width vc_clearfix"></div><p>&nbsp;</p><p></p>' . $vuota, $html );
 }, 50 );
 
 // 4) Un contenitore del tema attorno a ogni blocco, con margine sotto (possibile causa di fasce vuote)

@@ -276,6 +276,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
   const pin = await page.evaluate(() => { const sp = document.querySelector('.mo-svc')?.parentElement; return sp && sp.classList.contains('pin-spacer') ? parseFloat(getComputedStyle(sp).paddingBottom) : -1; });
   check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
+  const allinea = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-controls .mo-seg')].map((e) => Math.round(e.getBoundingClientRect().left)));
+  check('Portfolio: «Sul tavolo / In ordine» allineato a sinistra', allinea.length === 2 && allinea[0] === allinea[1], allinea.join(' / '));
   check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
   check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
   // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
@@ -357,7 +359,12 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     });
     const rgb = (x) => (x || '').replace(/\s/g, '');
     check('Colore di sfondo della sezione (blu)', rgb(c.coloreLivello) === 'rgb(37,99,235)', c.coloreLivello);
-    check('Testi chiari su sfondo scuro', rgb(c.titoloPf) === 'rgb(248,250,252)' && rgb(c.istruzioniPf) === 'rgb(148,163,184)', `${c.titoloPf} ${c.istruzioniPf}`);
+    check('Testi chiari su sfondo scuro (anche la frase sotto il titolo)', rgb(c.titoloPf) === 'rgb(248,250,252)' && rgb(c.istruzioniPf) === 'rgb(226,232,240)', `${c.titoloPf} ${c.istruzioniPf}`);
+    const m = await page.evaluate(() => {
+      const pf = document.getElementById('pf3'); const st = (sel) => getComputedStyle(pf.querySelector(sel)).color;
+      return { titolo: st('.mo-statement'), testo: st('.mo-pf-sub'), etichetta: st('.mo-overline-h2') };
+    });
+    check('Colori dei testi scelti a mano (titoli, testi, etichette)', rgb(m.titolo) === 'rgb(124,45,18)' && rgb(m.testo) === 'rgb(67,20,7)' && rgb(m.etichetta) === 'rgb(29,78,216)', JSON.stringify(m));
     check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(15,23,42)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {

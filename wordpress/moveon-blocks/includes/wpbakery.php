@@ -32,7 +32,7 @@ add_action(
 function mo_home_shortcodes(): string {
 	$out = '';
 	foreach ( array_keys( mo_blocks() ) as $key ) {
-		$out .= '[vc_row full_width="stretch_row_content_no_spaces" el_class="mo-riga"][vc_column][mo_' . $key . '][/vc_column][/vc_row]' . "\n";
+		$out .= '[vc_row full_width="stretch_row_content_no_spaces" el_class="mo-riga"][vc_column][mo_' . $key . '][/vc_column][/vc_row]'; // niente "a capo": WPBakery li trasformerebbe in elementi Testo vuoti
 	}
 	return $out;
 }

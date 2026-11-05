@@ -52,11 +52,14 @@ add_action(
 );
 
 /**
- * Toglie i paragrafi vuoti che WordPress, WPBakery o il tema possono lasciare tra una riga e l'altra (creano spazi).
+ * Toglie i paragrafi vuoti e gli elementi Testo vuoti che WordPress, WPBakery o il tema possono lasciare
+ * tra una riga e l'altra (creano spazi).
  * Solo i <p> senza attributi: quelli con una classe (es. il messaggio del modulo) servono anche se vuoti.
  */
 function mo_pulisci_contenuto( string $html ): string {
-	return (string) preg_replace( '#<p>(?:\s|&nbsp;|&\#160;|\xC2\xA0|<br\s*/?>)*</p>#i', '', $html );
+	$html = (string) preg_replace( '#<p>(?:\s|&nbsp;|&\#160;|\xC2\xA0|<br\s*/?>)*</p>#i', '', $html );
+	// Elementi "Testo" di WPBakery rimasti vuoti (es. creati dall'editor con gli "a capo" tra le righe): hanno 35 px di margine
+	return (string) preg_replace( '#<div class="wpb_text_column[^"]*"[^>]*>\s*<div class="wpb_wrapper">\s*</div>\s*</div>#i', '', $html );
 }
 
 add_filter(

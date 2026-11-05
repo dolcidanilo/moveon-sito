@@ -49,6 +49,9 @@ function mo_p_sfondo(): array {
 	return array(
 		mo_p( 'colorpicker', 'sfondo_colore', 'Colore di sfondo (facoltativo)', 'Sostituisce il colore della sezione. Colori del sito: blu #2563eb, navy #0f172a, grigio chiaro #f8fafc, azzurro chiaro #eff6ff, giallo #f59e0b. Lascia vuoto per il colore originale.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_testi', 'Stile dei testi e delle card', array( 'Automatico (come la sezione)' => '', 'Chiari, per sfondi scuri' => 'chiari', 'Scuri, per sfondi chiari' => 'scuri' ), '', 'Se cambi il colore di sfondo, scegli i testi adatti perché restino leggibili. Funziona sulle sezioni chiare (Nastro, Chi siamo, Servizi, Portfolio, Garanzie); Hero, Pausa e Contatti hanno già testi chiari.', 'Sfondo' ),
+		mo_p( 'colorpicker', 'colore_titoli', 'Colore dei titoli (facoltativo)', 'Titoli e frasi grandi della sezione. Lascia vuoto per il colore automatico.', 'Sfondo' ),
+		mo_p( 'colorpicker', 'colore_testi', 'Colore dei testi (facoltativo)', 'Paragrafi, frasi sotto i titoli, note. Lascia vuoto per il colore automatico.', 'Sfondo' ),
+		mo_p( 'colorpicker', 'colore_etichette', 'Colore di etichette e link (facoltativo)', 'Il piccolo titolo in maiuscolo sopra la sezione, i link e i numeri. Lascia vuoto per il blu del sito.', 'Sfondo' ),
 		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore di sfondo.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_dimensione', 'Dimensione dell’immagine', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
@@ -78,6 +81,18 @@ function mo_sfondo_html( array $a ): string {
 	$testi = in_array( $a['sfondo_testi'] ?? '', array( 'chiari', 'scuri' ), true ) ? $a['sfondo_testi'] : '';
 	if ( $col || $testi ) {
 		$out .= '<div class="mo-bg mo-bg--colore" aria-hidden="true"' . ( $testi ? ' data-testi="' . $testi . '"' : '' ) . ( $col ? ' style="background-color:' . esc_attr( $col ) . '"' : '' ) . '></div>';
+	}
+	// Colori dei testi scelti a mano: valgono solo per questa sezione
+	$vars = array();
+	foreach ( array( 'colore_titoli' => array( '--mo-ink' ), 'colore_testi' => array( '--mo-body', '--mo-muted' ), 'colore_etichette' => array( '--mo-link', '--mo-chip-ink' ) ) as $campo => $nomi ) {
+		$c = mo_colore( $a[ $campo ] ?? '' );
+		foreach ( $c ? $nomi : array() as $n ) {
+			$vars[] = $n . ':' . $c;
+		}
+	}
+	if ( $vars ) {
+		$id   = 'mo-s' . substr( md5( implode( ';', $vars ) . wp_json_encode( $a ) ), 0, 10 );
+		$out .= '<style>.mo-block.mo-block:has(> .mo-bg-stile[data-mo-stile="' . $id . '"]){' . implode( ';', $vars ) . ';color:var(--mo-body)}</style><span hidden data-mo-stile="' . $id . '" class="mo-bg-stile"></span>';
 	}
 	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
 	if ( $img ) {

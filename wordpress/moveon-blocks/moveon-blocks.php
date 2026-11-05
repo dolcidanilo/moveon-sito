@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       MoveOn Blocks
  * Description:       Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo. Contenuti nei campi, HTML modificabile da MoveOn → Modelli HTML, stile con variabili CSS.
- * Version:           1.0.5
+ * Version:           1.0.6
  * Requires at least: 6.2
  * Requires PHP:      8.1
  * Author:            MoveOn Studio
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MOVEON_VERSION', '1.0.5' );
+define( 'MOVEON_VERSION', '1.0.6' );
 define( 'MOVEON_FILE', __FILE__ );
 define( 'MOVEON_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MOVEON_URL', plugin_dir_url( __FILE__ ) );
