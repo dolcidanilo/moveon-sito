@@ -17,6 +17,7 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 | `…/guida.html` | La guida mostrata in WordPress → MoveOn → Guida |
 | `dist/moveon-blocks.zip` | Il plugin pronto da caricare |
 | `tests/`, `tools/` | Controlli automatici e strumenti (zip, WordPress di prova) |
+| `CLAUDE.md` | Memoria del progetto per Claude |
 | `docs/` | Piani delle prossime fasi |
 
 ## Stato dei lavori
@@ -26,6 +27,10 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 - [ ] **W3:** invio email affidabile (plugin SMTP con la casella Aruba), SEO locale su Pescara, Google Analytics, LegalBlink al posto di iubenda: vedi il [piano W3](docs/piano-W3-seo-analytics-legalblink.md).
 - [ ] **W4:** spostamento da /nuovo al sito principale.
 - [ ] **Dopo:** profili social (Facebook, Instagram, LinkedIn).
+
+## Riprendere il lavoro con Claude
+
+Il file [`CLAUDE.md`](CLAUDE.md) è la memoria del progetto: Claude Code lo legge da solo all'inizio di ogni sessione su questo repository (chi è il cliente, come è fatto il plugin, decisioni prese, procedimento, cose in sospeso). Basta aprire una nuova sessione su `dolcidanilo/moveon-sito`, branch `materiali`, e chiedere la modifica.
 
 ## Per lo sviluppo
 
