@@ -92,3 +92,9 @@ Inciampi già visti:
 - **W4** — spostamento da /nuovo al sito principale.
 - **Dopo**: social (Instagram, Facebook, LinkedIn): idee nel piano W3, in fondo.
 - Idea futura: un **e-commerce** con lo stesso metodo (WooCommerce + plugin di design proprio).
+- **Promemoria da dare al cliente alla fine del progetto** (dopo la W4, prima di chiudere): scrivere insieme il suo **profilo professionale** (chi è, come lavora e decide, gusti estetici, qualità richiesta, vincoli) da usare in ogni lavoro futuro (siti, social, grafica). Piano già concordato:
+  1. Claude scrive una bozza partendo da tutto il progetto; il cliente la corregge (sui gusti l'ultima parola è sua).
+  2. Tre versioni/posti: **breve** (~10 righe) nelle *preferenze personali* di claude.ai; **completa** nelle istruzioni di un *Progetto* claude.ai («Lavori MoveOn Studio») per social/grafica/testi; **file** in un repository GitHub **privato** da collegare al `CLAUDE.md` dei progetti di codice.
+  3. Verificare insieme che Progetti e preferenze personali siano disponibili sul suo piano.
+  4. Aggiornarlo a fine di ogni lavoro («aggiorna il mio profilo con quello che hai imparato»).
+  Il profilo riguarda solo la sua parte **lavorativa**.
