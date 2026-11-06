@@ -717,7 +717,8 @@ img,svg{max-width:100%}
 .mo-block .mo-prj-img{margin:0}
 .mo-prj-img:nth-child(3n+1){grid-column:1 / -1}
 .mo-prj-img img{display:block;width:100%;height:auto;border-radius:14px;background:var(--mo-surface-alt)}
-.mo-prj-nav{padding:88px 0 0}
+.mo-prj-nav{margin-top:88px;padding:48px 0;background:rgba(255,255,255,.3)} /* fascia che separa i progetti vicini dal contenuto e dall'invito finale, su qualsiasi sfondo */
+.mo-block.mo-prj-body:has(> .mo-prj-nav){padding-bottom:0}
 .mo-prj-body .mo-wrap > :last-child{margin-bottom:0} /* niente spazio doppio se mancano testo o immagini */
 .mo-prj-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .mo-block .mo-prj-near{display:flex;align-items:center;gap:20px;padding:16px;border:1px solid var(--mo-link);border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card);color:var(--mo-ink);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
@@ -729,7 +730,7 @@ img,svg{max-width:100%}
 .mo-prj-near-dir{display:inline-flex;align-items:center;gap:6px;font:700 12px/16px var(--mo-font);letter-spacing:.1em;text-transform:uppercase;color:var(--mo-muted)}
 .mo-prj-near--succ .mo-prj-near-dir{justify-content:flex-end}
 .mo-prj-near-nome{font:800 22px/1.2 var(--mo-font);letter-spacing:-.01em}
-.mo-prj-cta{padding:120px 0;background:var(--mo-navy);text-align:center}
+.mo-prj-cta{padding:96px 0 120px;background:var(--mo-navy);text-align:center}
 .mo-block.mo-prj-cta .mo-statement{max-width:none;margin:0 auto 32px;color:#fff}
 .mo-prjs-body{padding:72px 0 120px;background:var(--mo-surface)}
 .mo-prjs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 32px}
@@ -758,7 +759,8 @@ img,svg{max-width:100%}
   .mo-prj-near-img{width:88px}
   .mo-prj-near-nome{font-size:18px}
   .mo-prjs-grid{grid-template-columns:1fr}
-  .mo-prj-cta{padding:88px 0}
+  .mo-prj-cta{padding:72px 0 88px}
+  .mo-prj-nav{margin-top:56px;padding:32px 0}
 }
 /* Pagine dei progetti con la parte alta chiara (Impostazioni → testi scuri): header con logo e testi scuri finché non scorri */
 .mo-testa-chiara:not(.mo-scrolled):not(.mo-menu-open) .mo-site-header{color:#0f172a}
