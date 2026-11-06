@@ -731,6 +731,7 @@ img,svg{max-width:100%}
 .mo-prj-near--succ .mo-prj-near-dir{justify-content:flex-end}
 .mo-prj-near-nome{font:800 22px/1.2 var(--mo-font);letter-spacing:-.01em}
 .mo-prj-cta{padding:96px 0 120px;background:var(--mo-navy);text-align:center}
+.mo-block.mo-prjs .mo-prj-cta,.mo-prjs .mo-block.mo-prj-cta{background:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2)),var(--mo-navy)} /* pagina Progetti: nero al 20% per staccare l'invito dall'elenco */
 .mo-block.mo-prj-cta .mo-statement{max-width:none;margin:0 auto 32px;color:#fff}
 .mo-prjs-body{padding:72px 0 120px;background:var(--mo-surface)}
 .mo-prjs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 32px}

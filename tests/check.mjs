@@ -576,6 +576,8 @@ async function provaPortfolio(page, nome, passi) {
     return { sposta: Math.round(y1 - y0), giu, maschera };
   });
   check('Sfumatura: la parte alta prosegue 200 px sotto il contenuto, che non si sposta', sf.sposta === 0 && sf.giu === -200 && /gradient/.test(sf.maschera), JSON.stringify({ sposta: sf.sposta, giu: sf.giu, maschera: sf.maschera.slice(0, 30) }));
+  const ctaP = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-prjs .mo-prj-cta')).backgroundImage);
+  check('Pagina Progetti: invito finale con nero al 20% sopra il blu', /rgba\(0, 0, 0, 0\.2\)/.test(ctaP), ctaP.slice(0, 60));
   await page.locator('.mo-prjs-card:visible').first().click(); await page.waitForTimeout(1200);
   check('Pagina Progetti: la card apre il progetto', /\/progetti\/[^/]+\/$/.test(new globalThis.URL(page.url()).pathname), page.url());
   check('Carosello e pagine dei progetti: nessun errore nella console', errori.length === 0, errori.join(' | '));
