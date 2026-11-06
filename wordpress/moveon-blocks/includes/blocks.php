@@ -231,6 +231,19 @@ function mo_blocks(): array {
 				...mo_p_sfondo(),
 			),
 		),
+		'carosello' => array(
+			'name'   => 'MoveOn · Carosello progetti',
+			'desc'   => 'Progetti in un carosello 3D da trascinare; ogni progetto apre la sua pagina. I progetti si gestiscono da "Progetti portfolio".',
+			'params' => array(
+				mo_p_text( 'etichetta', 'Etichetta in alto', '', 'Testi', $d['carosello']['etichetta'] ),
+				mo_p_text( 'titolo', 'Titolo', 'Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['carosello']['titolo'] ),
+				mo_p_area( 'testo', 'Testo', 'Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['carosello']['testo'] ),
+				mo_p_drop( 'filtri', 'Filtri per area', array( 'Mostra' => 'si', 'Nascondi' => 'no' ), $d['carosello']['filtri'], 'I pulsanti Tutti, Branding, Web… sopra il carosello.' ),
+				mo_p_text( 'pulsante', 'Pulsante verso la pagina Progetti', 'Porta alla pagina con tutti i lavori. Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['carosello']['pulsante'] ),
+				mo_p_anchor( $d['carosello']['anchor'] ),
+				...mo_p_sfondo(),
+			),
+		),
 		'garanzie'  => array(
 			'name'   => 'MoveOn · Le nostre garanzie',
 			'desc'   => 'Scudo in pixel che si compone, sigillo rotante, timbri sulle card.',
@@ -464,7 +477,8 @@ function mo_render_portfolio( $atts ): string {
 	$aree     = mo_aree();
 	$progetti = array();
 	$dati     = array();
-	foreach ( mo_progetti_in_evidenza() as $i => $p ) {
+	$lista    = array_values( array_filter( mo_progetti_in_evidenza(), fn( $p ) => ! empty( $p['copertina'] ) ) ); // il Portfolio usa la copertina orizzontale
+	foreach ( $lista as $i => $p ) {
 		$progetti[] = array(
 			'i'         => $i,
 			'nome'      => $p['nome'],
@@ -506,6 +520,52 @@ function mo_render_portfolio( $atts ): string {
 			'progetti'   => $progetti,
 			// JSON sicuro dentro <script>: niente "</" che potrebbe chiudere il tag
 			'dati_json'  => wp_json_encode( $dati, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE ),
+		)
+	);
+}
+
+function mo_render_carosello( $atts ): string {
+	$a        = mo_atts( 'carosello', $atts );
+	$progetti = array();
+	foreach ( mo_progetti_in_evidenza() as $i => $p ) {
+		if ( empty( $p['carosello'] ) ) {
+			continue;
+		}
+		$progetti[] = array(
+			'i'         => count( $progetti ),
+			'url'       => $p['url'],
+			'nome'      => $p['nome'],
+			'tipo'      => $p['tipo'],
+			'area'      => $p['area'],
+			'area_nome' => $p['area_nome'],
+			'immagine'  => $p['carosello'],
+		);
+	}
+	$filtri = array();
+	if ( 'no' !== mo_text( $a['filtri'] ) ) {
+		$presenti = array_unique( array_column( $progetti, 'area' ) );
+		foreach ( mo_aree() as $k => $nome ) {
+			if ( in_array( $k, $presenti, true ) ) {
+				$filtri[] = array( 'valore' => $k, 'nome' => $nome );
+			}
+		}
+	}
+	$pulsante = mo_text( $a['pulsante'] );
+	$totale   = count( $progetti );
+	return MO_Tpl::render(
+		'carosello',
+		array(
+			'anchor'    => mo_anchor( $a['anchor'], 'progetti' ),
+			'sfondo'    => mo_sfondo_html( $a ),
+			'etichetta' => mo_text( $a['etichetta'] ),
+			'titolo'    => '-' === mo_text( $a['titolo'] ) ? '' : mo_text( $a['titolo'] ),
+			'testo'     => '-' === mo_text( $a['testo'] ) ? '' : mo_text( $a['testo'] ),
+			'filtri'    => $filtri,
+			'ha_filtri' => count( $filtri ) > 1,
+			'progetti'  => $progetti,
+			'primo'     => $progetti[0] ?? null,
+			'totale'    => sprintf( '%02d', $totale ),
+			'pulsante'  => '' !== $pulsante && '-' !== $pulsante ? array( 'testo' => $pulsante, 'href' => mo_progetti_url() ) : null,
 		)
 	);
 }

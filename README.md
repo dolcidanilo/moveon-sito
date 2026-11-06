@@ -13,7 +13,7 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 | `…/templates/` | **Modelli HTML** delle sezioni e delle parti fisse (modificabili anche da WordPress → MoveOn → Modelli HTML) |
 | `…/assets/css/moveon.css` | Stile del prototipo, con le **variabili** `--mo-…` per colori, carattere e misure |
 | `…/assets/js/moveon.js` | Animazioni (GSAP, Lenis), divise per sezione, più le classi `mo-reveal`, `mo-words`… |
-| `…/includes/` | Il motore PHP: elementi WPBakery, impostazioni, progetti, modulo contatti |
+| `…/includes/` | Il motore PHP: elementi WPBakery, impostazioni, progetti e loro pagine, modulo contatti |
 | `…/guida.html` | La guida mostrata in WordPress → MoveOn → Guida |
 | `dist/moveon-blocks.zip` | Il plugin pronto da caricare |
 | `tests/`, `tools/` | Controlli automatici e strumenti (zip, WordPress di prova) |
@@ -32,8 +32,8 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 ```bash
 npm install                     # librerie sorgente (GSAP, Lenis, Montserrat)
 npm run wp:prova                # WordPress di prova in /tmp/moveon-wp, http://127.0.0.1:8080/nuovo/
-npm test                        # controlli nel browser (Playwright): 60 controlli, con un «tema ostile» che simula Porto
-npm run test:php                # controlli sul motore PHP: 31 controlli
+npm test                        # controlli nel browser (Playwright): 76 controlli, con un «tema ostile» che simula Porto
+npm run test:php                # controlli sul motore PHP: 47 controlli
 npm run zip                     # ricrea dist/moveon-blocks.zip
 ```
 

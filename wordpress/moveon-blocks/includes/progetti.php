@@ -2,7 +2,10 @@
 /**
  * Progetti del portfolio: ogni lavoro è una scheda a sé (menu "Progetti portfolio").
  * - Titolo = nome del progetto / cliente
- * - Immagine in evidenza = copertina (4:3)
+ * - Immagine in evidenza = copertina (4:3): card del Portfolio e grande immagine in cima alla pagina del progetto
+ * - Immagine del carosello (verticale 3:4): card del Carosello progetti (se manca si usa la copertina)
+ * - Galleria: le immagini della pagina del progetto
+ * - Testo (editor): racconto facoltativo nella pagina del progetto; Riassunto = descrizione breve
  * - Attributi → Ordine = posizione nel sito (numeri più bassi prima)
  * - Riquadro "Dettagli del progetto": area, tipo, testi, galleria, in evidenza
  */
@@ -43,17 +46,20 @@ add_action(
 					'not_found_in_trash' => 'Nessun progetto nel cestino',
 					'all_items'          => 'Tutti i progetti',
 					'menu_name'          => 'Progetti portfolio',
-					'featured_image'     => 'Copertina (4:3, almeno 1200 px)',
+					'featured_image'     => 'Copertina (orizzontale 4:3, almeno 1600 px)',
 					'set_featured_image' => 'Scegli la copertina',
 					'remove_featured_image' => 'Rimuovi la copertina',
 					'use_featured_image' => 'Usa come copertina',
 				),
-				'public'          => false,
+				// Ogni progetto ha la sua pagina (/progetti/nome-progetto/) e c'è la pagina con tutti i lavori (/progetti/)
+				'public'          => true,
+				'has_archive'     => 'progetti',
+				'rewrite'         => array( 'slug' => 'progetti', 'with_front' => false ),
 				'show_ui'         => true,
 				'show_in_menu'    => true,
 				'menu_position'   => 21,
 				'menu_icon'       => 'dashicons-portfolio',
-				'supports'        => array( 'title', 'thumbnail', 'page-attributes' ),
+				'supports'        => array( 'title', 'editor', 'thumbnail', 'page-attributes', 'excerpt' ),
 				'hierarchical'    => false,
 				'show_in_rest'    => false,
 			)
@@ -61,9 +67,46 @@ add_action(
 	}
 );
 
-/** Progetti da mostrare nel sito: solo "in evidenza", nell'ordine scelto. */
-function mo_progetti_in_evidenza(): array {
-	$posts = get_posts(
+/** ID delle immagini della galleria, nell'ordine scelto. */
+function mo_galleria_ids( int $post_id ): array {
+	return array_values( array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $post_id, '_mo_galleria', true ) ) ) ) );
+}
+
+/** Tutti i dati di un progetto, per il Portfolio, il Carosello e la sua pagina. */
+function mo_progetto_dati( WP_Post $p ): array {
+	$cover    = mo_image( get_post_thumbnail_id( $p ), '', 'large' );
+	$cover_xl = mo_image( get_post_thumbnail_id( $p ), '', '2048x2048' );
+	$car_id   = absint( get_post_meta( $p->ID, '_mo_carosello_img', true ) );
+	$car      = $car_id ? mo_image( $car_id, '', 'large' ) : null;
+	$galleria = array();
+	foreach ( mo_galleria_ids( $p->ID ) as $gid ) {
+		$g = mo_image( $gid, '', '2048x2048' );
+		if ( $g ) {
+			$galleria[] = array( 'url' => $g['url'], 'alt' => $g['alt'], 'width' => $g['w'], 'height' => $g['h'] );
+		}
+	}
+	$area = (string) get_post_meta( $p->ID, '_mo_area', true ) ?: 'branding';
+	return array(
+		'id'        => $p->ID,
+		'url'       => get_permalink( $p ),
+		'nome'      => get_the_title( $p ),
+		'area'      => $area,
+		'area_nome' => mo_aree()[ $area ] ?? $area,
+		'tipo'      => (string) get_post_meta( $p->ID, '_mo_tipo', true ),
+		'richiesta' => (string) get_post_meta( $p->ID, '_mo_richiesta', true ),
+		'lavoro'    => (string) get_post_meta( $p->ID, '_mo_lavoro', true ),
+		'risultato' => (string) get_post_meta( $p->ID, '_mo_risultato', true ),
+		'copertina' => $cover ? array( 'url' => $cover['url'], 'alt' => $cover['alt'], 'pos' => '50% 50%', 'w' => $cover['w'], 'h' => $cover['h'] ) : null,
+		'cover_xl'  => $cover_xl,
+		// Card del carosello: l'immagine verticale scelta, altrimenti la copertina ritagliata al centro
+		'carosello' => $car ?: $cover,
+		'galleria'  => $galleria,
+	);
+}
+
+/** Progetti visibili nel sito ("Mostra questo progetto nel sito" attivo), nell'ordine scelto. */
+function mo_progetti_visibili(): array {
+	return get_posts(
 		array(
 			'post_type'      => MO_CPT,
 			'post_status'    => 'publish',
@@ -76,29 +119,16 @@ function mo_progetti_in_evidenza(): array {
 			),
 		)
 	);
+}
+
+/** Progetti per Portfolio e Carosello: solo quelli con un'immagine (le card ne hanno bisogno). */
+function mo_progetti_in_evidenza(): array {
 	$out = array();
-	foreach ( $posts as $p ) {
-		$cover = mo_image( get_post_thumbnail_id( $p ), '', 'large' );
-		if ( ! $cover ) {
-			continue; // senza copertina il progetto non compare: il tavolo ha bisogno delle immagini
+	foreach ( mo_progetti_visibili() as $p ) {
+		$dati = mo_progetto_dati( $p );
+		if ( $dati['copertina'] || $dati['carosello'] ) {
+			$out[] = $dati;
 		}
-		$galleria = array();
-		foreach ( array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $p->ID, '_mo_galleria', true ) ) ) ) as $gid ) {
-			$g = mo_image( $gid, '', 'large' );
-			if ( $g ) {
-				$galleria[] = array( 'url' => $g['url'], 'alt' => $g['alt'], 'width' => $g['w'], 'height' => $g['h'] );
-			}
-		}
-		$out[] = array(
-			'nome'      => get_the_title( $p ),
-			'area'      => (string) get_post_meta( $p->ID, '_mo_area', true ) ?: 'branding',
-			'tipo'      => (string) get_post_meta( $p->ID, '_mo_tipo', true ),
-			'richiesta' => (string) get_post_meta( $p->ID, '_mo_richiesta', true ),
-			'lavoro'    => (string) get_post_meta( $p->ID, '_mo_lavoro', true ),
-			'risultato' => (string) get_post_meta( $p->ID, '_mo_risultato', true ),
-			'copertina' => array( 'url' => $cover['url'], 'alt' => $cover['alt'], 'pos' => '50% 50%' ),
-			'galleria'  => $galleria,
-		);
 	}
 	return $out;
 }
@@ -112,6 +142,17 @@ add_action(
 	}
 );
 
+/** Una miniatura della galleria nel pannello, con Sostituisci e ×. */
+function mo_galleria_voce( int $id ): string {
+	$img = wp_get_attachment_image( $id, 'thumbnail' );
+	if ( ! $img ) {
+		return '';
+	}
+	return '<li class="mo-galleria-voce" data-id="' . (int) $id . '">' . $img
+		. '<button type="button" class="mo-galleria-sostituisci">Sostituisci</button>'
+		. '<button type="button" class="mo-galleria-togli" aria-label="Togli questa immagine">×</button></li>';
+}
+
 function mo_progetto_metabox( WP_Post $post ): void {
 	wp_nonce_field( 'mo_progetto_salva', 'mo_progetto_nonce' );
 	$m = function ( $k ) use ( $post ) {
@@ -119,8 +160,9 @@ function mo_progetto_metabox( WP_Post $post ): void {
 	};
 	$evid     = metadata_exists( 'post', $post->ID, '_mo_evidenza' ) ? $m( '_mo_evidenza' ) : '1';
 	$galleria = $m( '_mo_galleria' );
+	$car_id   = absint( $m( '_mo_carosello_img' ) );
 	?>
-	<p class="description">Il <strong>titolo</strong> qui sopra è il nome del progetto. La <strong>copertina</strong> si sceglie nel riquadro «Copertina» a destra. L’<strong>ordine</strong> nel sito si imposta in «Attributi → Ordine» (numeri più bassi prima).</p>
+	<p class="description">Il <strong>titolo</strong> qui sopra è il nome del progetto. La <strong>copertina</strong> si sceglie nel riquadro «Copertina» a destra. L’<strong>ordine</strong> nel sito si imposta in «Attributi → Ordine» (numeri più bassi prima). Il <strong>testo</strong> nell’editor è facoltativo: compare nella pagina del progetto, utile per Google.</p>
 	<table class="form-table" role="presentation">
 		<tr>
 			<th><label for="mo_area">Area</label></th>
@@ -147,22 +189,32 @@ function mo_progetto_metabox( WP_Post $post ): void {
 			<td><textarea class="large-text" rows="3" name="mo_risultato" id="mo_risultato"><?php echo esc_textarea( $m( '_mo_risultato' ) ); ?></textarea><p class="description">Con dati reali, es. «+40% di prenotazioni nei primi tre mesi».</p></td>
 		</tr>
 		<tr>
-			<th>Galleria</th>
+			<th>Immagine del carosello</th>
+			<td>
+				<input type="hidden" name="mo_carosello_img" id="mo_carosello_img" value="<?php echo $car_id ? (int) $car_id : ''; ?>">
+				<div id="mo_carosello_img-anteprima" class="mo-car-anteprima"><?php echo $car_id ? wp_get_attachment_image( $car_id, 'medium' ) : ''; ?></div>
+				<button type="button" class="button mo-scegli-immagine" data-target="mo_carosello_img"><?php echo $car_id ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
+				<button type="button" class="button-link mo-togli-immagine" data-target="mo_carosello_img">Rimuovi</button>
+				<p class="description">Verticale (3:4, almeno 900×1200 px). È la card del «Carosello progetti». Se manca si usa la copertina, ritagliata al centro.</p>
+			</td>
+		</tr>
+		<tr>
+			<th>Immagini del progetto</th>
 			<td>
 				<input type="hidden" name="mo_galleria" id="mo_galleria" value="<?php echo esc_attr( $galleria ); ?>">
-				<div class="mo-galleria-anteprima" data-target="mo_galleria"><?php
+				<ul class="mo-galleria" data-target="mo_galleria"><?php
 				foreach ( array_filter( array_map( 'absint', explode( ',', $galleria ) ) ) as $gid ) {
-					echo wp_get_attachment_image( $gid, array( 80, 80 ) );
+					echo mo_galleria_voce( $gid ); // phpcs:ignore WordPress.Security.EscapeOutput
 				}
-				?></div>
-				<button type="button" class="button mo-scegli-galleria" data-target="mo_galleria">Scegli le immagini</button>
-				<button type="button" class="button-link mo-svuota-galleria" data-target="mo_galleria">Svuota</button>
-				<p class="description">Facoltativa: compare in fondo alla scheda del progetto.</p>
+				?></ul>
+				<button type="button" class="button mo-aggiungi-galleria" data-target="mo_galleria">Aggiungi immagini</button>
+				<button type="button" class="button-link mo-svuota-galleria" data-target="mo_galleria">Togli tutte</button>
+				<p class="description">Compaiono nella pagina del progetto (e nella sua scheda nel Portfolio). <strong>Trascinale</strong> per cambiare l’ordine; su ogni immagine: <strong>Sostituisci</strong> o <strong>×</strong> per toglierla. Le immagini restano comunque nella Libreria media.</p>
 			</td>
 		</tr>
 		<tr>
 			<th>In evidenza</th>
-			<td><label><input type="checkbox" name="mo_evidenza" value="1" <?php checked( $evid, '1' ); ?>> Mostra questo progetto nel sito</label></td>
+			<td><label><input type="checkbox" name="mo_evidenza" value="1" <?php checked( $evid, '1' ); ?>> Mostra questo progetto nel sito</label><p class="description">Spento: il progetto sparisce da Portfolio, Carosello e pagina Progetti, e la sua pagina non si apre.</p></td>
 		</tr>
 	</table>
 	<?php
@@ -188,6 +240,12 @@ add_action(
 		}
 		$ids = implode( ',', array_filter( array_map( 'absint', explode( ',', (string) wp_unslash( $_POST['mo_galleria'] ?? '' ) ) ) ) );
 		update_post_meta( $post_id, '_mo_galleria', $ids );
+		$car = absint( wp_unslash( $_POST['mo_carosello_img'] ?? 0 ) );
+		if ( $car && wp_attachment_is_image( $car ) ) {
+			update_post_meta( $post_id, '_mo_carosello_img', $car );
+		} else {
+			delete_post_meta( $post_id, '_mo_carosello_img' );
+		}
 		update_post_meta( $post_id, '_mo_evidenza', empty( $_POST['mo_evidenza'] ) ? '0' : '1' );
 	}
 );

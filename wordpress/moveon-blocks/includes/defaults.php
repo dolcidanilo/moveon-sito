@@ -29,6 +29,8 @@ function mo_defaults(): array {
 			'carica_tema'     => 0,
 			'salva_richieste' => 1,
 			'tema_scuro'      => 1,
+			'progetti_titolo' => 'Progetti',
+			'progetti_testo'  => 'Identità visive, siti, social e stampa: una selezione dei lavori che abbiamo realizzato. Apri un progetto per vedere com’è nato.',
 		),
 		'hero'      => array(
 			'anchor'          => 'top',
@@ -121,6 +123,14 @@ function mo_defaults(): array {
 			'titolo'     => 'Ogni progetto nasce sul tavolo da lavoro.',
 			'istruzioni' => 'Sposta i lavori come fogli sul tavolo, oppure mettili in ordine e filtrali per area. Sono progetti di esempio, da sostituire con quelli reali.',
 			'modalita'   => 'tavolo',
+		),
+		'carosello' => array(
+			'anchor'    => 'progetti',
+			'etichetta' => 'Progetti',
+			'titolo'    => 'Lavori che lasciano il segno.',
+			'testo'     => 'Trascina per sfogliarli, oppure usa le frecce. Apri un progetto per vedere com’è nato.',
+			'filtri'    => 'si',
+			'pulsante'  => 'Tutti i progetti',
 		),
 		'garanzie'  => array(
 			'anchor'      => 'garanzie',

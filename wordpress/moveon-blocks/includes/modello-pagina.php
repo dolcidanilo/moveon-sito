@@ -12,8 +12,8 @@ defined( 'ABSPATH' ) || exit;
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
 /* Prima che la pagina compaia: classe "mo-js" e breve caricamento iniziale
-   (non con "riduci movimento" e non dentro l'editor di WPBakery). Si chiude da solo entro 2,4 s. */
-(function(){var d=document.documentElement;d.classList.add('mo-js');if(!/[?&]vc_editable=true/.test(location.search)&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('mo-is-loading');setTimeout(function(){d.classList.remove('mo-is-loading')},2400)}})();
+   (non con "riduci movimento", non dentro l'editor di WPBakery, non nelle pagine dei progetti). Si chiude da solo entro 2,4 s. */
+(function(){var d=document.documentElement;d.classList.add('mo-js');if(<?php echo mo_is_progetti_view() ? 'false&&' : ''; ?>!/[?&]vc_editable=true/.test(location.search)&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('mo-is-loading');setTimeout(function(){d.classList.remove('mo-is-loading')},2400)}})();
 </script>
 <?php wp_head(); ?>
 </head>
@@ -25,9 +25,15 @@ echo mo_header_html(); // phpcs:ignore WordPress.Security.EscapeOutput
 ?>
 <main id="mo-main" class="mo-content">
 <?php
-while ( have_posts() ) {
-	the_post();
-	the_content();
+if ( is_post_type_archive( MO_CPT ) ) {
+	echo mo_progetti_archivio_html(); // phpcs:ignore WordPress.Security.EscapeOutput -- modello HTML
+} elseif ( is_singular( MO_CPT ) ) {
+	echo mo_progetto_pagina_html( get_queried_object() ); // phpcs:ignore WordPress.Security.EscapeOutput -- modello HTML
+} else {
+	while ( have_posts() ) {
+		the_post();
+		the_content();
+	}
 }
 ?>
 </main>

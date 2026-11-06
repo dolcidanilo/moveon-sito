@@ -1,0 +1,31 @@
+{{! CAROSELLO PROGETTI · anchor etichetta titolo testo; filtri (valore, nome), ha_filtri; progetti (i, url, nome, tipo, area, area_nome, immagine (url, alt, w, h)); primo = primo progetto; totale; pulsante (testo, href); sfondo = livelli della scheda Sfondo }}
+<section class="mo-block mo-car" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="carosello" data-dark>
+  {{{sfondo}}}
+  <div class="mo-wrap mo-car-head">
+    <h2 class="mo-overline-h2" id="{{anchor}}-titolo">{{etichetta}}</h2>
+    {{#titolo}}<p class="mo-statement">{{titolo}}</p>{{/titolo}}
+    {{#testo}}<p class="mo-car-sub">{{testo}}</p>{{/testo}}
+    {{#ha_filtri}}<div class="mo-seg mo-car-filter" role="group" aria-label="Filtra per area"><button type="button" data-filter="all" aria-pressed="true">Tutti</button>{{#filtri}}<button type="button" data-filter="{{valore}}" aria-pressed="false">{{nome}}</button>{{/filtri}}</div>{{/ha_filtri}}
+  </div>
+  <div class="mo-car-stage" data-cursor="Trascina" role="region" aria-roledescription="carosello" aria-label="{{etichetta}}">
+    <div class="mo-car-track">
+      {{#progetti}}
+      <a class="mo-car-card" href="{{url}}" draggable="false" data-i="{{i}}" data-cat="{{area}}" data-nome="{{nome}}" data-tipo="{{tipo}}" data-area="{{area_nome}}" aria-label="{{nome}}, {{tipo}}. Apri il progetto">
+        <img src="{{immagine.url}}" alt="{{immagine.alt}}"{{#immagine.w}} width="{{immagine.w}}" height="{{immagine.h}}"{{/immagine.w}} loading="lazy" decoding="async" draggable="false">
+      </a>
+      {{/progetti}}
+    </div>
+  </div>
+  {{#primo}}
+  <div class="mo-wrap mo-car-foot">
+    <button type="button" class="mo-car-btn mo-car-prev" aria-label="Progetto precedente">{{> icona-prec}}</button>
+    <div class="mo-car-info" aria-live="polite">
+      <span class="mo-car-count"><span class="mo-car-num">01</span> / <span class="mo-car-tot">{{totale}}</span></span>
+      <a class="mo-car-name" href="{{url}}">{{nome}}</a>
+      <span class="mo-car-cat">{{area_nome}}{{#tipo}}, {{tipo}}{{/tipo}}</span>
+    </div>
+    <button type="button" class="mo-car-btn mo-car-next" aria-label="Progetto successivo">{{> icona-succ}}</button>
+  </div>
+  {{/primo}}
+  {{#pulsante}}<div class="mo-wrap mo-car-all"><a class="mo-btn mo-car-allbtn mo-magnetic" href="{{href}}">{{testo}}</a></div>{{/pulsante}}
+</section>

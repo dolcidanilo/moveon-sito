@@ -114,7 +114,7 @@ function initSite() {
   const env = { G, ST, reduce, fine, mobileQ, d, data, setMenu, getLenis: () => lenis, setHeroPlay: (f) => { heroPlay = f; } };
 
   /* ---------- Blocchi, nell'ordine in cui compaiono nella pagina ---------- */
-  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, portfolio: initPortfolio, garanzie: initGaranzie, contatti: initContatti };
+  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, portfolio: initPortfolio, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti };
   $$('[data-mo-block]').forEach((sec) => {
     const fn = INIT[sec.getAttribute('data-mo-block')];
     if (fn) fn(sec, env);
@@ -700,6 +700,222 @@ function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
       },
     });
   }
+}
+
+/* =================== CAROSELLO PROGETTI =================== */
+// Card in fila su un'elica 3D: quella al centro è in primo piano, le altre ruotano, si allontanano e sfumano.
+// Si trascina (mouse o dito), si usano le frecce o la tastiera; un clic sulla card al centro apre la pagina del progetto.
+function initCarosello(sec, { G, ST, reduce, mobileQ }) {
+  const stage = $('.mo-car-stage', sec);
+  const track = $('.mo-car-track', sec);
+  const all = $$('.mo-car-card', sec);
+  if (!stage || !track || !all.length) return;
+  const numEl = $('.mo-car-num', sec), totEl = $('.mo-car-tot', sec);
+  const nameEl = $('.mo-car-name', sec), catEl = $('.mo-car-cat', sec);
+  const prevBtn = $('.mo-car-prev', sec), nextBtn = $('.mo-car-next', sec);
+  const filterBtns = $$('.mo-car-filter button', sec);
+  const pad = (n) => String(n).padStart(2, '0');
+  const wrap = (v, n) => ((v % n) + n) % n;
+  let list = all.slice();
+
+  function setInfo(k) {
+    const c = list[k];
+    if (!c) return;
+    if (numEl) numEl.textContent = pad(k + 1);
+    if (totEl) totEl.textContent = pad(list.length);
+    if (nameEl) { nameEl.textContent = c.dataset.nome; nameEl.href = c.href; }
+    if (catEl) catEl.textContent = c.dataset.area + (c.dataset.tipo ? `, ${c.dataset.tipo}` : '');
+  }
+  function applyFilter(f) {
+    filterBtns.forEach((b) => b.setAttribute('aria-pressed', b.dataset.filter === f ? 'true' : 'false'));
+    list = all.filter((c) => f === 'all' || c.dataset.cat === f);
+    all.forEach((c) => { c.hidden = !list.includes(c); });
+  }
+
+  // Movimento ridotto (o editor): una fila semplice da scorrere, con frecce e filtri
+  if (reduce) {
+    const passo = () => (list[0]?.offsetWidth || 300) + 20;
+    filterBtns.forEach((b) => b.addEventListener('click', () => { applyFilter(b.dataset.filter); track.scrollLeft = 0; setInfo(0); }));
+    prevBtn?.addEventListener('click', () => track.scrollBy({ left: -passo() }));
+    nextBtn?.addEventListener('click', () => track.scrollBy({ left: passo() }));
+    track.addEventListener('scroll', () => setInfo(Math.min(list.length - 1, Math.round(track.scrollLeft / passo()))), { passive: true });
+    return;
+  }
+
+  sec.classList.add('mo-car--3d');
+  const st = { pos: 0 };
+  let goal = 0, active = -1, spacing = 240;
+  const anello = () => list.length >= 5; // con pochi progetti niente giro continuo
+  const measure = () => { spacing = (all[0].offsetWidth || 300) * (mobileQ.matches ? 0.66 : 0.78); };
+  const limita = (p) => {
+    if (anello()) return p;
+    const max = list.length - 1;
+    return p < 0 ? p * 0.3 : p > max ? max + (p - max) * 0.3 : p;
+  };
+
+  function render() {
+    const n = list.length;
+    if (!n) return;
+    const m = mobileQ.matches;
+    list.forEach((c, i) => {
+      let d = i - st.pos;
+      if (anello()) d = wrap(d + n / 2, n) - n / 2;
+      const a = Math.abs(d);
+      const limite = m ? 2.7 : 3.6; // oltre, la card è sparita (sfuma fino a qui)
+      if (a > limite) { c.style.visibility = 'hidden'; return; }
+      c.style.visibility = '';
+      const sg = Math.sign(d);
+      const x = sg * (a <= 1 ? a * spacing : spacing + (a - 1) * spacing * 0.68);
+      const z = -a * (m ? 150 : 240);
+      const ry = Math.max(-1.5, Math.min(1.5, d)) * (m ? 14 : 20);
+      const rz = Math.sin(d * 1.75) * (m ? 3 : 5);
+      const y = Math.sin(d * 1.15) * (m ? 6 : 14);
+      c.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
+      c.style.opacity = Math.max(0, Math.min(1, a < 0.5 ? 1 : 1 - (a - 0.5) / (limite - 0.4))).toFixed(3);
+      c.style.setProperty('--mo-car-dim', Math.min(0.5, a * 0.17).toFixed(3));
+      c.style.zIndex = String(1000 - Math.round(a * 100));
+    });
+    const k = wrap(Math.round(st.pos), n);
+    if (k !== active) {
+      const focusDentro = stage.contains(document.activeElement);
+      active = k;
+      list.forEach((c, i) => { c.classList.toggle('mo-is-active', i === k); c.tabIndex = i === k ? 0 : -1; });
+      all.forEach((c) => { if (!list.includes(c)) c.tabIndex = -1; });
+      setInfo(k);
+      if (focusDentro) list[k].focus({ preventScroll: true });
+    }
+  }
+  const normalizza = () => { if (anello()) { st.pos = wrap(st.pos, list.length); goal = wrap(goal, list.length); render(); } };
+  function vai(target, dur = 0.8, ease = 'power3.inOut') {
+    goal = anello() ? target : G.utils.clamp(0, list.length - 1, target);
+    G.killTweensOf(st);
+    G.to(st, { pos: goal, duration: dur, ease, onUpdate: render, onComplete: normalizza });
+  }
+  const passo = (dir) => vai((G.isTweening(st) ? goal : Math.round(st.pos)) + dir, 0.7, 'power3.out');
+  function vaiA(i) {
+    const n = list.length;
+    let delta = i - wrap(Math.round(st.pos), n);
+    if (anello()) delta = wrap(delta + n / 2, n) - n / 2;
+    vai(Math.round(st.pos) + delta);
+  }
+
+  // Trascinamento (mouse e dito); in verticale la pagina scorre normalmente
+  let drag = null, mosso = false, vel = 0, lastX = 0, lastT = 0;
+  stage.addEventListener('dragstart', (e) => e.preventDefault());
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || !list.length) return;
+    drag = { x: e.clientX, y: e.clientY, pos: st.pos, id: e.pointerId, asse: null };
+    mosso = false; vel = 0; lastX = e.clientX; lastT = performance.now();
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.asse) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      drag.asse = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (drag.asse === 'x') { mosso = true; G.killTweensOf(st); drag.pos = st.pos + dx / spacing; stage.classList.add('mo-is-dragging'); }
+    }
+    if (drag.asse !== 'x') return;
+    st.pos = limita(drag.pos - dx / spacing);
+    render();
+    const now = performance.now();
+    vel = 0.75 * ((e.clientX - lastX) / Math.max(1, now - lastT)) + 0.25 * vel;
+    lastX = e.clientX; lastT = now;
+  });
+  const fine = (e) => {
+    if (!drag || (e && e.pointerId !== drag.id)) return;
+    const eraX = drag.asse === 'x';
+    drag = null;
+    stage.classList.remove('mo-is-dragging');
+    if (eraX) vai(Math.round(st.pos - G.utils.clamp(-3, 3, (vel * 240) / spacing)), 0.8, 'power3.out');
+  };
+  window.addEventListener('pointerup', fine);
+  window.addEventListener('pointercancel', fine);
+
+  // Clic: sulla card al centro apre il progetto, su un'altra la porta al centro
+  stage.addEventListener('click', (e) => {
+    const c = e.target.closest('.mo-car-card');
+    if (!c) return;
+    if (mosso) { e.preventDefault(); mosso = false; return; }
+    const i = list.indexOf(c);
+    if (i !== active) { e.preventDefault(); vaiA(i); return; }
+    const img = $('img', c);
+    if (img) img.style.viewTransitionName = 'mo-progetto-img'; // l'immagine «vola» nella pagina del progetto
+  });
+  // Tornando indietro dalla pagina del progetto (pagina rimasta in memoria) il nome si toglie
+  window.addEventListener('pageshow', () => all.forEach((c) => { const img = $('img', c); if (img) img.style.viewTransitionName = ''; }));
+
+  // Frecce, tastiera, trackpad (scorrimento orizzontale)
+  prevBtn?.addEventListener('click', () => passo(-1));
+  nextBtn?.addEventListener('click', () => passo(1));
+  stage.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); passo(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); passo(1); }
+  });
+  let rotella = 0;
+  stage.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 2) return;
+    e.preventDefault();
+    G.killTweensOf(st);
+    st.pos = limita(st.pos + e.deltaX / spacing);
+    render();
+    clearTimeout(rotella);
+    rotella = setTimeout(() => vai(Math.round(st.pos), 0.5, 'power3.out'), 140);
+  }, { passive: false });
+
+  // Filtri
+  filterBtns.forEach((b) => b.addEventListener('click', () => {
+    if (b.getAttribute('aria-pressed') === 'true') return;
+    G.killTweensOf([st, track]);
+    G.to(track, {
+      opacity: 0, duration: 0.2, onComplete: () => {
+        applyFilter(b.dataset.filter);
+        active = -1; st.pos = -1.4; goal = 0;
+        render();
+        G.to(track, { opacity: 1, duration: 0.35 });
+        G.to(st, { pos: 0, duration: 1, ease: 'power3.out', onUpdate: render, onComplete: normalizza });
+      },
+    });
+  }));
+
+  measure();
+  render();
+  window.addEventListener('resize', () => { measure(); render(); });
+  // Entrata: le card arrivano girando quando la sezione compare
+  ST.create({
+    trigger: sec, start: 'top 70%', once: true,
+    onEnter: () => {
+      st.pos = anello() ? -2.6 : -1.6;
+      render();
+      G.fromTo(track, { opacity: 0 }, { opacity: 1, duration: 0.6 });
+      G.to(st, { pos: 0, duration: 1.7, ease: 'expo.out', onUpdate: render, onComplete: normalizza });
+    },
+  });
+}
+
+/* =================== PAGINE DEI PROGETTI =================== */
+function entrataTesta(sec, G) {
+  const els = $$('.mo-prj-head .mo-wrap > *', sec);
+  if (els.length) G.from(els, { y: 30, opacity: 0, duration: 0.8, stagger: 0.07, ease: 'power3.out', clearProps: 'opacity,transform' });
+}
+function initProgetto(sec, { G, reduce }) {
+  if (!reduce) entrataTesta(sec, G);
+}
+function initProgetti(sec, { G, reduce }) {
+  const btns = $$('.mo-prjs-filter button', sec);
+  const cards = $$('.mo-prjs-card', sec);
+  if (!reduce) {
+    entrataTesta(sec, G);
+    G.from(cards, { y: 40, opacity: 0, duration: 0.8, stagger: 0.06, delay: 0.15, ease: 'power3.out', clearProps: 'opacity,transform' });
+  }
+  btns.forEach((b) => b.addEventListener('click', () => {
+    const f = b.dataset.filter;
+    btns.forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    const vis = cards.filter((c) => f === 'all' || c.dataset.cat === f);
+    cards.forEach((c) => c.classList.toggle('mo-is-out', !vis.includes(c)));
+    if (!reduce) G.fromTo(vis, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out', clearProps: 'opacity,transform' });
+    ScrollTrigger.refresh();
+  }));
 }
 
 /* =================== GARANZIE =================== */

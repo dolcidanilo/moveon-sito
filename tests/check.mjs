@@ -493,6 +493,96 @@ async function provaPortfolio(page, nome, passi) {
   await ctx.close();
 }
 
+/* ---------------- Carosello progetti e pagine dei progetti ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2000);
+  const vai = async () => { await page.evaluate(() => document.querySelector('.mo-car-stage').scrollIntoView({ block: 'center' })); await page.waitForTimeout(2600); };
+  await vai();
+  const stato = () => page.evaluate(() => {
+    const st = document.querySelector('.mo-car-stage').getBoundingClientRect();
+    const att = document.querySelector('.mo-car-card.mo-is-active');
+    const r = att.getBoundingClientRect();
+    const larghe = [...document.querySelectorAll('.mo-car-card:not([hidden])')].map((c) => c.getBoundingClientRect().width);
+    return { treD: document.querySelector('.mo-car').classList.contains('mo-car--3d'), nome: att.dataset.nome, info: document.querySelector('.mo-car-name').textContent, num: document.querySelector('.mo-car-count').textContent.replace(/\s/g, ''), centro: Math.round(r.left + r.width / 2 - (st.left + st.width / 2)), piuGrande: Math.max(...larghe) <= r.width + 1, url: location.pathname, trans: getComputedStyle(att).transitionDuration };
+  });
+  const s0 = await stato();
+  check('Carosello: 3D, la card attiva è al centro e in primo piano', s0.treD && Math.abs(s0.centro) <= 2 && s0.piuGrande && s0.info === s0.nome && s0.num === '01/08', JSON.stringify(s0));
+  check('Carosello: le regole del tema non rallentano le card', s0.trans === '0s', s0.trans);
+  await page.click('.mo-car-next'); await page.waitForTimeout(900);
+  const s1 = await stato();
+  check('Carosello: freccia → passa al progetto successivo', s1.nome !== s0.nome && s1.num === '02/08' && Math.abs(s1.centro) <= 2, `${s0.nome} → ${s1.nome} ${s1.num}`);
+  // Trascinamento verso sinistra: avanza di uno o due, senza aprire la pagina
+  const box = await page.locator('.mo-car-stage').boundingBox();
+  await page.mouse.move(box.x + box.width / 2 + 150, box.y + box.height / 2);
+  await page.mouse.down();
+  for (let k = 1; k <= 12; k++) { await page.mouse.move(box.x + box.width / 2 + 150 - k * 22, box.y + box.height / 2); await page.waitForTimeout(16); }
+  await page.mouse.up();
+  await page.waitForTimeout(1100);
+  const s2 = await stato();
+  check('Carosello: trascinando cambia progetto e non apre la pagina', s2.nome !== s1.nome && s2.url === s1.url && Math.abs(s2.centro) <= 2, `${s1.nome} → ${s2.nome}`);
+  // Clic su una card laterale: viene al centro
+  const laterale = await page.evaluate(() => { const a = document.querySelector('.mo-car-card.mo-is-active'); const cs = [...document.querySelectorAll('.mo-car-card:not([hidden])')]; const i = cs.indexOf(a); const c = cs[(i + 1) % cs.length]; const r = c.getBoundingClientRect(); return { nome: c.dataset.nome, x: r.right - 30, y: r.top + r.height / 2 }; });
+  await page.mouse.click(laterale.x, laterale.y); await page.waitForTimeout(1100);
+  const s3 = await stato();
+  check('Carosello: clic su una card di lato la porta al centro', s3.nome === laterale.nome && s3.url === s2.url, `${s3.nome} (atteso ${laterale.nome})`);
+  // Tastiera
+  await page.focus('.mo-car-card.mo-is-active');
+  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(900);
+  const s4 = await stato();
+  const fuoco = await page.evaluate(() => document.activeElement.classList.contains('mo-is-active'));
+  check('Carosello: con la tastiera (frecce) e il fuoco segue la card', s4.nome !== s3.nome && fuoco, s4.nome);
+  // Filtro Web
+  await page.click('.mo-car-filter [data-filter="web"]'); await page.waitForTimeout(1500);
+  const f = await page.evaluate(() => ({ vis: [...document.querySelectorAll('.mo-car-card:not([hidden])')].map((c) => c.dataset.cat), num: document.querySelector('.mo-car-count').textContent.replace(/\s/g, '') }));
+  check('Carosello: filtro «Web» mostra solo i lavori web', f.vis.length > 0 && f.vis.every((c) => c === 'web') && f.num === `01/${String(f.vis.length).padStart(2, '0')}`, `${f.vis.join(',')} ${f.num}`);
+  await page.click('.mo-car-filter [data-filter="all"]'); await page.waitForTimeout(1500);
+  // Clic sulla card al centro: apre la pagina del progetto
+  const atteso = (await stato()).nome;
+  await page.locator('.mo-car-card.mo-is-active').click();
+  await page.waitForURL(/\/progetti\/[^/]+\/$/, { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(1200);
+  const pg = await page.evaluate(() => ({
+    url: location.pathname, h1: document.querySelector('h1')?.textContent.trim(), cover: !!document.querySelector('.mo-prj-cover img'),
+    menu: [...document.querySelectorAll('.mo-nav a')].map((a) => a.getAttribute('href')), logo: document.querySelector('.mo-logo').getAttribute('href'),
+    cta: document.querySelector('.mo-prj-cta .mo-btn').getAttribute('href'), loader: document.documentElement.classList.contains('mo-is-loading'),
+    back: document.querySelector('.mo-prj-back').getAttribute('href'),
+  }));
+  check('Clic sul progetto al centro: si apre la sua pagina', /\/progetti\/[^/]+\/$/.test(pg.url) && pg.h1 === atteso && pg.cover, `${pg.url} · ${pg.h1}`);
+  check('Pagina progetto: menu, logo e pulsante portano alla home', pg.menu.length > 0 && pg.menu.every((h) => /\/nuovo\/#/.test(h)) && /\/nuovo\/$/.test(pg.logo) && /\/nuovo\/#contatti$/.test(pg.cta) && /\/progetti\/$/.test(pg.back), JSON.stringify({ menu: pg.menu[0], logo: pg.logo, cta: pg.cta }));
+  check('Pagina progetto: niente schermata di caricamento', !pg.loader);
+  // Pagina Progetti: filtri e link
+  await page.goto(URL + 'progetti/', { waitUntil: 'load' }); await page.waitForTimeout(1500);
+  const tutte = await page.locator('.mo-prjs-card').count();
+  await page.click('.mo-prjs-filter [data-filter="branding"]'); await page.waitForTimeout(800);
+  const br = await page.evaluate(() => [...document.querySelectorAll('.mo-prjs-card')].filter((c) => getComputedStyle(c).display !== 'none').map((c) => c.dataset.cat));
+  check('Pagina Progetti: tutti i lavori e filtro «Branding»', tutte === 8 && br.length > 0 && br.every((c) => c === 'branding'), `${tutte} · ${br.join(',')}`);
+  await page.locator('.mo-prjs-card:visible').first().click(); await page.waitForTimeout(1200);
+  check('Pagina Progetti: la card apre il progetto', /\/progetti\/[^/]+\/$/.test(new globalThis.URL(page.url()).pathname), page.url());
+  check('Carosello e pagine dei progetti: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
+}
+{
+  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+  const page = await ctx.newPage();
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2000);
+  await page.evaluate(() => document.querySelector('.mo-car-stage').scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(2600);
+  const m = await page.evaluate(() => {
+    const r = document.querySelector('.mo-car-card.mo-is-active').getBoundingClientRect();
+    const b = [document.querySelector('.mo-car-prev'), document.querySelector('.mo-car-next')].map((x) => x.getBoundingClientRect());
+    return { centro: Math.round(r.left + r.width / 2 - innerWidth / 2), dentro: r.left >= 0 && r.right <= innerWidth, frecce: b.every((x) => x.left >= 0 && x.right <= innerWidth && x.width >= 44), scroll: document.documentElement.scrollWidth <= innerWidth };
+  });
+  check('Carosello su telefono: card al centro, frecce comode, niente scorrimento laterale', Math.abs(m.centro) <= 2 && m.dentro && m.frecce && m.scroll, JSON.stringify(m));
+  await page.goto(URL + 'progetti/forno-aurora/', { waitUntil: 'load' }); await page.waitForTimeout(1000);
+  const w = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  check('Pagina progetto su telefono: niente scorrimento laterale', w);
+  await ctx.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
@@ -506,6 +596,8 @@ async function provaPortfolio(page, nome, passi) {
     gar: getComputedStyle(document.querySelector('.mo-gar-card')).opacity,
   }));
   check('Movimento ridotto: niente caricamento, contenuti visibili, niente scorrimento bloccato', !r.loading && !r.hscroll && r.sub === '1' && r.gar === '1', JSON.stringify(r));
+  const car = await page.evaluate(() => ({ treD: document.querySelector('.mo-car').classList.contains('mo-car--3d'), scorre: getComputedStyle(document.querySelector('.mo-car-track')).overflowX, op: getComputedStyle(document.querySelector('.mo-car-card')).opacity }));
+  check('Movimento ridotto: il carosello diventa una fila da scorrere', !car.treD && car.scorre === 'auto' && car.op === '1', JSON.stringify(car));
   await ctx.close();
 }
 

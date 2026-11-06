@@ -1,0 +1,43 @@
+{{! PAGINA DI UN PROGETTO · nome area_nome tipo; copertina (url, alt, w, h); blocchi (titolo, testo), ha_blocchi; racconto = testo dell'editor (HTML); galleria (url, alt, width, height), ha_galleria; prec e succ (url, nome, immagine (url, alt)); archivio = pagina Progetti; cta (testo, href) }}
+<article class="mo-prj" data-mo-block="progetto">
+  <div class="mo-block mo-prj-head" data-dark>
+    <div class="mo-wrap">
+      <a class="mo-prj-back" href="{{archivio}}">{{> icona-prec}}<span>Tutti i progetti</span></a>
+      <span class="mo-prj-badge">{{area_nome}}</span>
+      <h1 class="mo-prj-title">{{nome}}</h1>
+      {{#tipo}}<p class="mo-prj-tipo">{{tipo}}</p>{{/tipo}}
+    </div>
+  </div>
+  {{#copertina}}
+  <figure class="mo-prj-cover"><img src="{{url}}" alt="{{alt}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}} fetchpriority="high" decoding="async"></figure>
+  {{/copertina}}
+  <div class="mo-block mo-prj-body">
+    <div class="mo-wrap">
+      {{#ha_blocchi}}
+      <div class="mo-prj-blocks">
+        {{#blocchi}}<div class="mo-prj-block mo-reveal"><h2>{{titolo}}</h2><p>{{testo}}</p></div>{{/blocchi}}
+      </div>
+      {{/ha_blocchi}}
+      {{#racconto}}<div class="mo-prj-text mo-reveal">{{{racconto}}}</div>{{/racconto}}
+      {{#ha_galleria}}
+      <div class="mo-prj-gallery">
+        {{#galleria}}<figure class="mo-prj-img mo-reveal"><img src="{{url}}" alt="{{alt}}"{{#width}} width="{{width}}" height="{{height}}"{{/width}} loading="lazy" decoding="async"></figure>{{/galleria}}
+      </div>
+      {{/ha_galleria}}
+    </div>
+  </div>
+  {{#succ}}
+  <nav class="mo-block mo-prj-nav" aria-label="Altri progetti">
+    <div class="mo-wrap mo-prj-nav-in">
+      {{#prec}}<a class="mo-prj-near mo-prj-near--prec" href="{{url}}"><span class="mo-prj-near-img">{{#immagine}}<img src="{{url}}" alt="" loading="lazy">{{/immagine}}</span><span class="mo-prj-near-txt"><span class="mo-prj-near-dir">{{> icona-prec}} Progetto precedente</span><span class="mo-prj-near-nome">{{nome}}</span></span></a>{{/prec}}
+      <a class="mo-prj-near mo-prj-near--succ" href="{{url}}"><span class="mo-prj-near-txt"><span class="mo-prj-near-dir">Progetto successivo {{> icona-succ}}</span><span class="mo-prj-near-nome">{{nome}}</span></span><span class="mo-prj-near-img">{{#immagine}}<img src="{{url}}" alt="" loading="lazy">{{/immagine}}</span></a>
+    </div>
+  </nav>
+  {{/succ}}
+  <div class="mo-block mo-prj-cta" data-dark>
+    <div class="mo-wrap">
+      <p class="mo-statement">Hai un progetto in mente?</p>
+      <a class="mo-btn mo-btn-primary mo-magnetic" href="{{cta.href}}">{{cta.testo}}</a>
+    </div>
+  </div>
+</article>

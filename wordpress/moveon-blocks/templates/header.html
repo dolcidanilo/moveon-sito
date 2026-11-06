@@ -1,8 +1,8 @@
-{{! HEADER · home_url logo_scuro logo_chiaro (url, w, h); menu (testo, href, nav); cta (testo, href) }}
+{{! HEADER · home_url logo_href (#top sulla home, l’indirizzo della home nelle pagine dei progetti) logo_scuro logo_chiaro (url, w, h); menu (testo, href, nav); cta (testo, href) }}
 <a class="mo-skip" href="#mo-main">Vai al contenuto</a>
 <header class="mo-site-header">
   <div class="mo-header-inner">
-    <a href="#top" class="mo-logo" aria-label="MoveOn Studio, torna all’inizio">
+    <a href="{{logo_href}}" class="mo-logo" aria-label="MoveOn Studio, torna all’inizio">
       {{#logo_scuro}}<img class="mo-logo-d" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_scuro}}
       {{#logo_chiaro}}<img class="mo-logo-l" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_chiaro}}
     </a>

@@ -1,0 +1,29 @@
+{{! PAGINA PROGETTI (tutti i lavori) · titolo testo; filtri (valore, nome), ha_filtri; progetti (url, nome, tipo, area, area_nome, immagine (url, alt, w, h)); vuoto; cta (testo, href) }}
+<div class="mo-prjs" data-mo-block="progetti">
+  <div class="mo-block mo-prj-head mo-prjs-head" data-dark>
+    <div class="mo-wrap">
+      <h1 class="mo-prj-title">{{titolo}}</h1>
+      {{#testo}}<p class="mo-prjs-sub">{{testo}}</p>{{/testo}}
+      {{#ha_filtri}}<div class="mo-seg mo-prjs-filter" role="group" aria-label="Filtra per area"><button type="button" data-filter="all" aria-pressed="true">Tutti</button>{{#filtri}}<button type="button" data-filter="{{valore}}" aria-pressed="false">{{nome}}</button>{{/filtri}}</div>{{/ha_filtri}}
+    </div>
+  </div>
+  <div class="mo-block mo-prjs-body">
+    <div class="mo-wrap">
+      <div class="mo-prjs-grid">
+        {{#progetti}}
+        <a class="mo-prjs-card" href="{{url}}" data-cat="{{area}}">
+          <span class="mo-prjs-cover">{{#immagine}}<img src="{{url}}" alt=""{{#w}} width="{{w}}" height="{{h}}"{{/w}} loading="lazy" decoding="async">{{/immagine}}</span>
+          <span class="mo-prjs-cap"><span class="mo-prjs-name">{{nome}}</span><span class="mo-prjs-cat">{{area_nome}}{{#tipo}}, {{tipo}}{{/tipo}}</span></span>
+        </a>
+        {{/progetti}}
+      </div>
+      {{#vuoto}}<p class="mo-prjs-vuoto">Presto qui i nostri lavori.</p>{{/vuoto}}
+    </div>
+  </div>
+  <div class="mo-block mo-prj-cta" data-dark>
+    <div class="mo-wrap">
+      <p class="mo-statement">Hai un progetto in mente?</p>
+      <a class="mo-btn mo-btn-primary mo-magnetic" href="{{cta.href}}">{{cta.testo}}</a>
+    </div>
+  </div>
+</div>

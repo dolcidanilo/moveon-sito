@@ -2,14 +2,15 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.11
+Stable tag: 1.1.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
 
 == Descrizione ==
 
-* 8 elementi WPBakery (categoria MoveOn): Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Le nostre garanzie, Contatti.
+* 9 elementi WPBakery (categoria MoveOn): Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Carosello progetti, Le nostre garanzie, Contatti.
+* Pagine dei progetti (/progetti/nome-progetto/) e pagina Progetti con tutti i lavori (/progetti/).
 * Modello di pagina "MoveOn · pagina intera" con header, footer, menu mobile e barra contatti del prototipo.
 * MoveOn → Impostazioni: logo, contatti, pulsanti, footer.
 * MoveOn → Modelli HTML: l'HTML di ogni parte del sito, modificabile e ripristinabile.
@@ -24,6 +25,14 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.1.0 =
+* Nuovo elemento «Carosello progetti»: progetti su un'elica 3D da trascinare (mouse, dito, frecce, tastiera, trackpad), con filtri; un clic apre la pagina del progetto.
+* Ogni progetto ha la sua pagina (/progetti/nome-progetto/): copertina, testi, racconto facoltativo, immagini, progetto precedente e successivo, invito a contattarti.
+* Nuova pagina Progetti (/progetti/) con tutti i lavori e i filtri; titolo e testo in MoveOn → Impostazioni.
+* Progetti: «Immagine del carosello» (verticale) e «Immagini del progetto» con Aggiungi, Sostituisci, × e ordine a trascinamento.
+* Dalle pagine dei progetti menu, logo e pulsanti riportano alle sezioni della home.
+* Impostazioni: descrizioni dei link Privacy e Cookie senza riferimenti a iubenda.
 
 = 1.0.11 =
 * Header quando scorri: sfondo leggermente trasparente con sfocatura (backdrop-filter: blur 6.5px). Regolabili con le variabili --mo-header-blur e --mo-header-opacita.

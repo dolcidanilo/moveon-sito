@@ -43,7 +43,7 @@ if ( ! function_exists( 'mo_blocks' ) ) {
 
 /* 1) Campi per WPBakery */
 do_action( 'vc_before_init' );
-check( 'WPBakery: registrati 8 elementi', 8 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
+check( 'WPBakery: registrati 9 elementi', 9 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
 $tipi = array( 'textfield', 'textarea', 'attach_image', 'dropdown', 'param_group', 'colorpicker' );
 $err  = array();
 foreach ( $GLOBALS['mo_vc'] as $el ) {
@@ -133,11 +133,76 @@ check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $
 $html = do_shortcode( '[mo_hero sfondo_img="' . $jpg . '" sfondo_opacita="15" sfondo_dimensione="auto" sfondo_posizione="100% 50%"]' );
 check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg mo-bg--foto"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
 check( 'Sfondo: niente livello se non c’è l’immagine', false === strpos( do_shortcode( '[mo_hero]' ), 'mo-bg' ) );
-check( 'WPBakery: scheda Sfondo in tutti gli 8 elementi', 8 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
+check( 'WPBakery: scheda Sfondo in tutti i 9 elementi', 9 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
 
 /* 9) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
 check( 'WhatsApp da 0039', 'https://wa.me/393331234567' === mo_wa_href( '0039 333 1234567' ) );
+
+/* 10) Progetti: pagine, carosello, immagini nel pannello */
+check( 'Progetti: pagine pubbliche in /progetti/', is_post_type_viewable( MO_CPT ) && str_ends_with( mo_progetti_url(), '/progetti/' ), mo_progetti_url() );
+$forno = get_posts( array( 'post_type' => MO_CPT, 'name' => 'forno-aurora', 'numberposts' => 1 ) )[0] ?? null;
+check( 'Progetto di prova presente (Forno Aurora)', (bool) $forno );
+if ( $forno ) {
+	$dati = mo_progetto_dati( $forno );
+	check( 'Progetto: indirizzo della sua pagina e 3 immagini', str_contains( $dati['url'], '/progetti/forno-aurora/' ) && 3 === count( $dati['galleria'] ), $dati['url'] . ' · ' . count( $dati['galleria'] ) );
+	$html = do_shortcode( '[mo_carosello]' );
+	$n    = count( mo_progetti_in_evidenza() );
+	check( 'Carosello: una card per progetto, ognuna porta alla sua pagina', $n === substr_count( $html, 'class="mo-car-card"' ) && $n === substr_count( $html, '<a class="mo-car-card" href="' . home_url( '/progetti/' ) ), $n . ' / ' . substr_count( $html, 'class="mo-car-card"' ) );
+	check( 'Carosello: filtri e pulsante verso la pagina Progetti', str_contains( $html, 'mo-car-filter' ) && str_contains( $html, 'href="' . mo_progetti_url() . '"' ) );
+	$html = do_shortcode( '[mo_carosello filtri="no" pulsante="-" titolo="-"]' );
+	check( 'Carosello: filtri, pulsante e titolo si possono nascondere', ! str_contains( $html, 'mo-car-filter' ) && ! str_contains( $html, 'mo-car-allbtn' ) && ! str_contains( $html, 'mo-statement' ) );
+	// Immagine verticale del carosello al posto della copertina
+	update_post_meta( $forno->ID, '_mo_carosello_img', $jpg );
+	$html = do_shortcode( '[mo_carosello]' );
+	check( 'Carosello: usa l’immagine del carosello se c’è', str_contains( $html, wp_basename( (string) wp_get_attachment_image_url( $jpg, 'large' ) ) ) );
+	delete_post_meta( $forno->ID, '_mo_carosello_img' );
+	// Pagina del progetto
+	$html = mo_progetto_pagina_html( $forno );
+	check( 'Pagina progetto: titolo, testi, racconto, 3 immagini, precedente e successivo', str_contains( $html, '<h1 class="mo-prj-title">Forno Aurora</h1>' ) && 3 === substr_count( $html, 'mo-prj-block mo-reveal' ) && str_contains( $html, 'come è nato' ) && 3 === substr_count( $html, 'class="mo-prj-img' ) && str_contains( $html, 'mo-prj-near--prec' ) && str_contains( $html, 'mo-prj-near--succ' ) );
+	$html = mo_progetti_archivio_html();
+	check( 'Pagina Progetti: tutte le card e i filtri', $n === substr_count( $html, 'class="mo-prjs-card"' ) && str_contains( $html, 'mo-prjs-filter' ) );
+	// Riquadro nel pannello: immagine del carosello e immagini del progetto con Sostituisci e ×
+	ob_start();
+	mo_progetto_metabox( $forno );
+	$box = (string) ob_get_clean();
+	check( 'Pannello: immagine del carosello e immagini con Sostituisci e ×', str_contains( $box, 'name="mo_carosello_img"' ) && 3 === substr_count( $box, 'mo-galleria-voce' ) && 3 === substr_count( $box, 'mo-galleria-sostituisci' ) && 3 === substr_count( $box, 'mo-galleria-togli' ) && str_contains( $box, 'mo-aggiungi-galleria' ) );
+	// Salvataggio: nuovo ordine, un'immagine tolta, immagine del carosello scelta
+	$prima = get_post_meta( $forno->ID, '_mo_galleria', true );
+	$ids   = array_map( 'intval', explode( ',', $prima ) );
+	wp_set_current_user( 1 );
+	$_POST = array(
+		'mo_progetto_nonce' => wp_create_nonce( 'mo_progetto_salva' ),
+		'mo_area'           => 'branding',
+		'mo_tipo'           => get_post_meta( $forno->ID, '_mo_tipo', true ),
+		'mo_richiesta'      => get_post_meta( $forno->ID, '_mo_richiesta', true ),
+		'mo_lavoro'         => get_post_meta( $forno->ID, '_mo_lavoro', true ),
+		'mo_risultato'      => get_post_meta( $forno->ID, '_mo_risultato', true ),
+		'mo_galleria'       => $ids[2] . ',' . $ids[0],
+		'mo_carosello_img'  => (string) $jpg,
+		'mo_evidenza'       => '1',
+	);
+	do_action( 'save_post_' . MO_CPT, $forno->ID );
+	check( 'Pannello: salva ordine e immagini tolte, e l’immagine del carosello', $ids[2] . ',' . $ids[0] === get_post_meta( $forno->ID, '_mo_galleria', true ) && (int) $jpg === (int) get_post_meta( $forno->ID, '_mo_carosello_img', true ) );
+	$_POST['mo_galleria'] = $prima;
+	$_POST['mo_carosello_img'] = '';
+	do_action( 'save_post_' . MO_CPT, $forno->ID );
+	check( 'Pannello: immagine del carosello rimossa', '' === get_post_meta( $forno->ID, '_mo_carosello_img', true ) && $prima === get_post_meta( $forno->ID, '_mo_galleria', true ) );
+	$_POST = array();
+	wp_set_current_user( 0 );
+	// Progetto nascosto: niente pagina per i visitatori
+	$codice = function ( $url ) {
+		$ctx = stream_context_create( array( 'http' => array( 'ignore_errors' => true, 'timeout' => 10 ) ) );
+		@file_get_contents( $url, false, $ctx ); // phpcs:ignore
+		return isset( $http_response_header[0] ) && preg_match( '#\s(\d{3})\s#', $http_response_header[0], $m ) ? (int) $m[1] : 0;
+	};
+	$url = get_permalink( $forno );
+	check( 'Pagina del progetto visibile', 200 === $codice( $url ), $url );
+	update_post_meta( $forno->ID, '_mo_evidenza', '0' );
+	check( 'Progetto nascosto: la sua pagina non si apre (404)', 404 === $codice( $url ) );
+	update_post_meta( $forno->ID, '_mo_evidenza', '1' );
+}
+check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

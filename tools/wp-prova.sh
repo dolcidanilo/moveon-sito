@@ -93,4 +93,21 @@ if ( ! $vecchia ) {
   echo "· Pagina prova-sfondo creata\n";
 }
 ' 2>/dev/null
+php wpcli.php '
+$home = get_post( (int) get_option("page_on_front") );
+if ( $home && false === strpos( $home->post_content, "[mo_carosello" ) ) {
+  $c = preg_replace( "#(\[mo_portfolio[^\]]*\]\[/vc_column\]\[/vc_row\])#", "$1[vc_row full_width=\"stretch_row_content_no_spaces\" el_class=\"mo-riga\"][vc_column][mo_carosello][/vc_column][/vc_row]", $home->post_content, 1 );
+  wp_update_post( array( "ID" => $home->ID, "post_content" => $c ) );
+  echo "· Carosello progetti aggiunto sotto il Portfolio\n";
+}
+$p = get_posts( array( "post_type" => MO_CPT, "name" => "forno-aurora", "numberposts" => 1 ) );
+if ( $p && ! get_post_meta( $p[0]->ID, "_mo_galleria", true ) ) {
+  $ids = array( mo_importa_immagine( "pausa-cuffie.jpg", "Foto di prova 1" ), mo_importa_immagine( "idea-arcobaleno.jpg", "Foto di prova 2" ), mo_importa_immagine( "contatti-lettore.jpg", "Foto di prova 3" ) );
+  update_post_meta( $p[0]->ID, "_mo_galleria", implode( ",", array_filter( $ids ) ) );
+  update_post_meta( $p[0]->ID, "_mo_risultato", "+40% di clienti nuovi nei primi tre mesi." );
+  wp_update_post( array( "ID" => $p[0]->ID, "post_content" => "<p>Il racconto del progetto: <strong>come è nato</strong> il marchio del forno.</p>" ) );
+  echo "· Galleria di prova su Forno Aurora\n";
+}
+flush_rewrite_rules( false );
+' 2>/dev/null
 echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1)"

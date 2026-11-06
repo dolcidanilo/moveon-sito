@@ -637,3 +637,118 @@ img,svg{max-width:100%}
    Pulsanti, card e pannelli hanno un loro sfondo e tengono i colori automatici. */
 .mo-block{--mo-ink-base:var(--mo-ink);--mo-body-base:var(--mo-body);--mo-muted-base:var(--mo-muted);--mo-link-base:var(--mo-link);--mo-chip-ink-base:var(--mo-chip-ink)}
 .mo-block.mo-block.mo-block.mo-block :is(.mo-seg,.mo-card,.mo-pf-card,.mo-gar-card,.mo-r-light,.mo-r-tint,.mo-chips li,.mo-svc-hud,.mo-t-light,.mo-t-alt,.mo-btn,.mo-fld){--mo-ink:var(--mo-ink-base);--mo-body:var(--mo-body-base);--mo-muted:var(--mo-muted-base);--mo-link:var(--mo-link-base);--mo-chip-ink:var(--mo-chip-ink-base)}
+
+/* =====================================================================
+   CAROSELLO PROGETTI (elemento «MoveOn · Carosello progetti»)
+   Senza JavaScript o con «riduci movimento»: fila di card da scorrere.
+   Con JavaScript: carosello 3D (classe mo-car--3d), posizioni calcolate in moveon.js.
+   ===================================================================== */
+.mo-car{--mo-car-w:clamp(230px,23vw,330px);--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;position:relative;padding:112px 0 104px;background:var(--mo-navy);color:var(--mo-body);overflow:hidden}
+.mo-car-head{position:relative;z-index:2}
+.mo-car-head .mo-statement{max-width:16ch}
+.mo-car-sub{margin:0 0 28px;max-width:46ch;color:var(--mo-muted)}
+.mo-car-stage{position:relative;z-index:1;margin:40px 0 0}
+.mo-car-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:16px var(--mo-margin) 28px;scrollbar-width:thin}
+.mo-car-card{position:relative;flex:0 0 auto;display:block;width:var(--mo-car-w);aspect-ratio:3/4;border-radius:18px;overflow:hidden;scroll-snap-align:center;background:var(--mo-surface-alt);box-shadow:0 40px 70px -30px rgba(2,6,23,.75);-webkit-tap-highlight-color:transparent}
+.mo-car-card[hidden]{display:none}
+.mo-block .mo-car-card img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.mo-car-card:focus-visible{outline:3px solid #93c5fd;outline-offset:5px}
+.mo-car--3d .mo-car-stage{height:calc(var(--mo-car-w) * 4 / 3 + 96px);perspective:1500px;perspective-origin:50% 42%;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.mo-car--3d .mo-car-track{position:absolute;inset:0;display:block;overflow:visible;padding:0;transform-style:preserve-3d;pointer-events:none} /* nello spazio 3D starebbe davanti alle card laterali e ne coprirebbe i clic */
+.mo-car--3d .mo-car-card{pointer-events:auto}
+.mo-car.mo-car--3d .mo-car-card{position:absolute;left:50%;top:44px;margin:0 0 0 calc(var(--mo-car-w) / -2);transition:none;will-change:transform,opacity;backface-visibility:hidden}
+.mo-car--3d .mo-car-card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#020617;opacity:var(--mo-car-dim,0);pointer-events:none}
+.mo-car--3d .mo-car-card.mo-is-active{box-shadow:0 50px 90px -30px rgba(2,6,23,.85)}
+.mo-car-foot{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:28px;margin-top:8px}
+.mo-car-info{display:flex;flex:0 1 440px;flex-direction:column;align-items:center;gap:6px;min-width:0;text-align:center}
+.mo-car-count{font:700 12px/16px var(--mo-font);letter-spacing:.16em;color:var(--mo-muted)}
+.mo-block .mo-car-name{max-width:100%;font:800 clamp(22px,2.4vw,32px)/1.15 var(--mo-font);letter-spacing:-.02em;color:var(--mo-ink);text-decoration:none}
+.mo-block .mo-car-name:hover{color:var(--mo-link)}
+.mo-car-cat{font:500 14px/20px var(--mo-font);color:var(--mo-muted)}
+.mo-block .mo-car-btn{display:grid;place-items:center;flex:0 0 auto;width:52px;height:52px;min-height:0;padding:0;border:1px solid var(--mo-border);border-radius:50%;background:transparent;color:var(--mo-ink);cursor:pointer;transition:background .2s,border-color .2s}
+.mo-block .mo-car-btn:hover,.mo-block .mo-car-btn:focus-visible{background:rgba(148,163,184,.16);border-color:var(--mo-muted);color:var(--mo-ink)}
+.mo-car-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mo-car-all{position:relative;z-index:2;margin-top:36px;text-align:center}
+.mo-block .mo-car-allbtn,.mo-block .mo-car-allbtn:is(:link,:visited,:focus,:active){border-color:currentColor;background:transparent;color:var(--mo-ink)}
+.mo-block .mo-car-allbtn:hover{background:rgba(148,163,184,.16);color:var(--mo-ink)}
+@media (max-width:767px){
+  .mo-car{--mo-car-w:min(60vw,250px);padding:80px 0 72px}
+  .mo-car--3d .mo-car-stage{height:calc(var(--mo-car-w) * 4 / 3 + 64px)}
+  .mo-car.mo-car--3d .mo-car-card{top:28px}
+  .mo-car-foot{gap:12px}
+  .mo-block .mo-car-btn{width:44px;height:44px}
+}
+
+/* =====================================================================
+   PAGINE DEI PROGETTI: /progetti/ e /progetti/nome-progetto/
+   ===================================================================== */
+.mo-prj-head{position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:#cbd5e1}
+.mo-prjs-head{padding-bottom:80px}
+.mo-block .mo-prj-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font:600 14px/20px var(--mo-font);color:#cbd5e1;text-decoration:none}
+.mo-block .mo-prj-back:hover{color:#fff}
+.mo-prj-back svg,.mo-prj-near-dir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mo-prj-badge{display:table;margin:0 0 18px;padding:6px 14px;border-radius:999px;background:rgba(96,165,250,.16);font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:#93c5fd}
+.mo-block .mo-prj-title{margin:0;max-width:18ch;font:800 clamp(40px,6.2vw,92px)/1.02 var(--mo-font);letter-spacing:-.035em;color:#fff}
+.mo-prj-tipo{margin:20px 0 0;font:500 clamp(18px,1.6vw,22px)/1.4 var(--mo-font);color:#cbd5e1}
+.mo-prjs-sub{margin:24px 0 0;max-width:52ch;font:400 18px/1.6 var(--mo-font);color:#cbd5e1}
+.mo-prjs-filter{margin-top:40px}
+.mo-prj-cover{position:relative;z-index:1;max-width:1200px;margin:calc(-10vw - 64px) auto 0;padding:0 var(--mo-margin)}
+.mo-prj-cover img{display:block;width:100%;height:auto;max-height:82vh;object-fit:cover;border-radius:18px;background:var(--mo-surface-alt);box-shadow:0 50px 90px -40px rgba(2,6,23,.55);view-transition-name:mo-progetto-img}
+.mo-prj-body{padding:96px 0 112px;background:var(--mo-surface);color:var(--mo-body)}
+.mo-prj-blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;margin:0 0 80px}
+.mo-block .mo-prj-block h2{margin:0 0 12px;font:700 13px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:var(--mo-link)}
+.mo-block .mo-prj-block p{margin:0;font:400 18px/1.6 var(--mo-font);color:var(--mo-body)}
+.mo-prj-text{max-width:760px;margin:0 0 80px;font:400 18px/1.7 var(--mo-font);color:var(--mo-body)}
+.mo-block .mo-prj-text p{margin:0 0 1em}
+.mo-block .mo-prj-text :is(h2,h3){margin:1.6em 0 .5em;font:800 clamp(24px,2.4vw,32px)/1.2 var(--mo-font);letter-spacing:-.02em;color:var(--mo-ink)}
+.mo-block .mo-prj-text a{color:var(--mo-link)}
+.mo-prj-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.mo-block .mo-prj-img{margin:0}
+.mo-prj-img:nth-child(3n+1){grid-column:1 / -1}
+.mo-prj-img img{display:block;width:100%;height:auto;border-radius:14px;background:var(--mo-surface-alt)}
+.mo-prj-nav{padding:56px 0;background:var(--mo-surface-alt)}
+.mo-prj-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.mo-block .mo-prj-near{display:flex;align-items:center;gap:20px;padding:16px;border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card);color:var(--mo-ink);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.mo-block .mo-prj-near:hover{transform:translateY(-4px);color:var(--mo-ink)}
+.mo-prj-near--succ{grid-column:2;justify-content:flex-end;text-align:right}
+.mo-prj-near-img{flex:0 0 auto;width:128px;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--mo-surface-alt)}
+.mo-prj-near-img img{display:block;width:100%;height:100%;object-fit:cover}
+.mo-prj-near-txt{display:flex;flex-direction:column;gap:6px;min-width:0}
+.mo-prj-near-dir{display:inline-flex;align-items:center;gap:6px;font:700 12px/16px var(--mo-font);letter-spacing:.1em;text-transform:uppercase;color:var(--mo-muted)}
+.mo-prj-near--succ .mo-prj-near-dir{justify-content:flex-end}
+.mo-prj-near-nome{font:800 22px/1.2 var(--mo-font);letter-spacing:-.01em}
+.mo-prj-cta{padding:120px 0;background:var(--mo-navy);text-align:center}
+.mo-block.mo-prj-cta .mo-statement{max-width:none;margin:0 auto 32px;color:#fff}
+.mo-prjs-body{padding:72px 0 120px;background:var(--mo-surface)}
+.mo-prjs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 32px}
+.mo-block .mo-prjs-card{display:block;color:var(--mo-ink);text-decoration:none}
+.mo-prjs-card.mo-is-out{display:none}
+.mo-prjs-cover{display:block;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:var(--mo-surface-alt);box-shadow:var(--mo-shadow-card)}
+.mo-prjs-cover img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.mo-prjs-card:hover .mo-prjs-cover img{transform:scale(1.05)}
+.mo-prjs-cap{display:flex;flex-direction:column;gap:4px;padding:16px 4px 0}
+.mo-prjs-name{font:700 20px/1.25 var(--mo-font);color:var(--mo-ink)}
+.mo-prjs-cat{font:400 14px/20px var(--mo-font);color:var(--mo-muted)}
+.mo-prjs-vuoto{margin:0;font-size:18px;color:var(--mo-muted)}
+@media (max-width:1023px){
+  .mo-prjs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mo-prj-blocks{grid-template-columns:1fr;gap:32px}
+}
+@media (max-width:767px){
+  .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw)}
+  .mo-prjs-head{padding-bottom:56px}
+  .mo-prj-cover{margin-top:calc(-14vw - 28px)}
+  .mo-prj-body{padding:64px 0 80px}
+  .mo-prj-blocks{margin-bottom:56px}
+  .mo-prj-gallery{grid-template-columns:1fr;gap:16px}
+  .mo-prj-nav-in{grid-template-columns:1fr}
+  .mo-prj-near--succ{grid-column:auto}
+  .mo-prj-near-img{width:88px}
+  .mo-prj-near-nome{font-size:18px}
+  .mo-prjs-grid{grid-template-columns:1fr}
+  .mo-prj-cta{padding:88px 0}
+}
+/* Dalla card del carosello alla pagina del progetto: l'immagine «vola» al suo posto (nei browser che lo supportano) */
+@view-transition{navigation:auto}
+::view-transition-group(mo-progetto-img){animation-duration:.65s;animation-timing-function:cubic-bezier(.65,0,.35,1)}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}

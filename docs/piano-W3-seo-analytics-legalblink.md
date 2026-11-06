@@ -41,7 +41,7 @@ Cosa manca:
 ## 2. Lavoro sul plugin (lo fa Claude)
 
 - **Scheda attività per Google** (JSON-LD, tipo attività con zona servita, senza indirizzo) dai dati di MoveOn → Impostazioni: nome, zona servita, telefono, email, profili social, link alla scheda Google.
-- **Progetti del portfolio come pagine vere** (indirizzo proprio, leggibili da Google); la scheda a comparsa sulla home resta.
+- ~~Progetti del portfolio come pagine vere~~ **fatto nella 1.1.0**: /progetti/nome-progetto/ e la pagina /progetti/ (da aggiungere alla sitemap con Rank Math e al menu).
 - **Modello «pagina servizio»** con grafica e animazioni del sito, da riempire in WPBakery: titolo, testo, vantaggi, progetti collegati, domande frequenti, contatto.
 - **Google Analytics 4**: campo in Impostazioni per il codice G-XXXXXXX; parte solo dopo il consenso (Consent Mode v2 con il banner LegalBlink).
 - Misure delle immagini e titoli di sezione più parlanti.

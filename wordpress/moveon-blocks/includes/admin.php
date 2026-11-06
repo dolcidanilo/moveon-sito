@@ -22,8 +22,8 @@ add_action(
 			return;
 		}
 		wp_enqueue_media();
-		wp_enqueue_script( 'moveon-admin', MOVEON_URL . 'assets/js/admin.js', array( 'jquery' ), MOVEON_VERSION, true );
-		wp_add_inline_style( 'wp-admin', '.mo-galleria-anteprima img,.mo-media-anteprima img{width:80px;height:80px;object-fit:cover;margin:0 6px 6px 0;border-radius:6px;background:#f0f0f1}.mo-media-anteprima img{width:auto;max-width:220px;height:auto;max-height:80px;object-fit:contain;padding:8px;background:#1e293b}.mo-tabs{margin:16px 0}.mo-guida{max-width:860px;font-size:14px;line-height:1.7}.mo-guida code{font-size:13px}.mo-guida h2{margin-top:2em}.mo-guida table{border-collapse:collapse}.mo-guida td,.mo-guida th{border:1px solid #dcdcde;padding:6px 10px;text-align:left;vertical-align:top}' );
+		wp_enqueue_script( 'moveon-admin', MOVEON_URL . 'assets/js/admin.js', array( 'jquery', 'jquery-ui-sortable' ), MOVEON_VERSION, true );
+		wp_add_inline_style( 'wp-admin', '.mo-galleria-anteprima img,.mo-media-anteprima img{width:80px;height:80px;object-fit:cover;margin:0 6px 6px 0;border-radius:6px;background:#f0f0f1}.mo-media-anteprima img{width:auto;max-width:220px;height:auto;max-height:80px;object-fit:contain;padding:8px;background:#1e293b}.mo-galleria{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px;padding:0;list-style:none}.mo-galleria-voce{position:relative;width:110px;margin:0;cursor:grab;background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:4px}.mo-galleria-voce img{display:block;width:100%;height:100px;object-fit:cover;border-radius:5px}.mo-galleria-sostituisci{display:block;width:100%;margin-top:4px;padding:3px 0;border:0;background:#f0f0f1;border-radius:4px;font-size:12px;cursor:pointer}.mo-galleria-sostituisci:hover{background:#dcdcde}.mo-galleria-togli{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border:0;border-radius:50%;background:#d63638;color:#fff;font-size:16px;line-height:24px;cursor:pointer}.mo-galleria-voce.ui-sortable-helper{box-shadow:0 8px 20px rgba(0,0,0,.2)}.mo-car-anteprima img{display:block;width:150px;height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#f0f0f1}.mo-tabs{margin:16px 0}.mo-guida{max-width:860px;font-size:14px;line-height:1.7}.mo-guida code{font-size:13px}.mo-guida h2{margin-top:2em}.mo-guida table{border-collapse:collapse}.mo-guida td,.mo-guida th{border:1px solid #dcdcde;padding:6px 10px;text-align:left;vertical-align:top}' );
 		if ( $is_mo && 'modelli' === ( $_GET['tab'] ?? '' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			// Niente controllo automatico dell'HTML: segnalerebbe i segnaposto {{…}} come errori
 			$settings = wp_enqueue_code_editor( array( 'type' => 'text/html', 'codemirror' => array( 'lint' => false, 'gutters' => array() ) ) );
@@ -215,11 +215,18 @@ function mo_admin_impostazioni(): void {
 			<?php
 			$text( 'claim', 'Claim del footer', 'Es. «Diamo forma alle tue idee, pixel dopo pixel.»' );
 			$text( 'legali', 'Dati legali', 'Compare dopo «© anno»: ragione sociale e P. IVA.' );
-			$text( 'privacy_url', 'Link Privacy Policy', 'iubenda. Usato nel footer e nel consenso del modulo.', 'url' );
-			$text( 'cookie_url', 'Link Cookie Policy', 'iubenda. Lascia vuoto per non mostrarlo.', 'url' );
+			$text( 'privacy_url', 'Link Privacy Policy', 'Indirizzo della pagina della privacy. Usato nel footer e nel consenso del modulo.', 'url' );
+			$text( 'cookie_url', 'Link Cookie Policy', 'Indirizzo della pagina dei cookie. Lascia vuoto per non mostrarlo.', 'url' );
 			?>
 		</table>
-		<h2>Opzioni</h2>
+		<h2>Pagina Progetti</h2>
+		<table class="form-table" role="presentation">
+			<?php
+			$text( 'progetti_titolo', 'Titolo', 'Titolo della pagina con tutti i lavori (' . mo_progetti_url() . '). Compare anche nella scheda del browser e su Google.' );
+			$text( 'progetti_testo', 'Testo introduttivo', 'Una o due frasi sotto il titolo.' );
+			?>
+		</table>
+				<h2>Opzioni</h2>
 		<table class="form-table" role="presentation">
 			<tr><th>Richieste del modulo</th><td><label><input type="checkbox" name="mo[salva_richieste]" value="1" <?php checked( ! empty( $s['salva_richieste'] ) ); ?>> Salva una copia di ogni richiesta in «Richieste dal sito» (utile se un’email non arriva)</label></td></tr>
 			<tr><th>Tema scuro</th><td><label><input type="checkbox" name="mo[tema_scuro]" value="1" <?php checked( ! empty( $s['tema_scuro'] ) ); ?>> Tema scuro automatico</label><p class="description">Acceso: chi ha il telefono o il computer impostato sul tema scuro vede il sito con sfondi scuri, come nel prototipo. Spento: il sito è sempre chiaro.</p></td></tr>

@@ -1,9 +1,9 @@
 <h2>Come è fatto il sito</h2>
 <ul>
 	<li>La home è una <strong>pagina normale</strong> con il modello <strong>«MoveOn · pagina intera»</strong> (Pagine → modifica → Attributi pagina → Template). Il modello mette header, footer, menu mobile, barra contatti in basso e animazione di caricamento del prototipo, e ignora quelli di Porto.</li>
-	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
+	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Carosello progetti, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
 	<li>Accanto puoi mettere <strong>righe ed elementi standard</strong> di WPBakery (testo, immagini, pulsanti…) e dar loro lo stile del sito con le <strong>classi pronte</strong> (più sotto).</li>
-	<li>I <strong>progetti del portfolio</strong> sono nel menu <strong>Progetti portfolio</strong>; le <strong>richieste</strong> arrivate dal modulo in <strong>Richieste dal sito</strong>.</li>
+	<li>I <strong>progetti del portfolio</strong> sono nel menu <strong>Progetti portfolio</strong>: ognuno ha la sua <strong>pagina</strong> (es. <code>/progetti/forno-aurora/</code>) e c’è la pagina <strong>Progetti</strong> con tutti i lavori (<code>/progetti/</code>). Le <strong>richieste</strong> arrivate dal modulo sono in <strong>Richieste dal sito</strong>.</li>
 </ul>
 
 <h2>Primi passi</h2>
@@ -29,7 +29,9 @@
 <h2>Immagini: dove si cambiano</h2>
 <table>
 	<tr><th>Immagine</th><th>Dove</th></tr>
-	<tr><td>Copertine e gallerie del portfolio</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra; <strong>Galleria</strong> nel riquadro «Dettagli del progetto»</td></tr>
+	<tr><td>Copertina di un progetto (card del Portfolio, pagina Progetti, grande immagine in cima alla pagina del progetto)</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra (orizzontale 4:3)</td></tr>
+	<tr><td>Immagine nel Carosello progetti</td><td>Stesso progetto → riquadro «Dettagli del progetto» → <strong>Immagine del carosello</strong> (verticale 3:4): <strong>Scegli</strong>, <strong>Sostituisci</strong>, <strong>Rimuovi</strong>. Se manca si usa la copertina, ritagliata al centro</td></tr>
+	<tr><td>Immagini nella pagina del progetto</td><td>Stesso progetto → <strong>Immagini del progetto</strong>: <strong>Aggiungi immagini</strong>; su ogni miniatura <strong>Sostituisci</strong> o <strong>×</strong> per toglierla; <strong>trascinale</strong> per cambiare l’ordine. Nella pagina la 1ª, la 4ª, la 7ª… sono a tutta larghezza, le altre a due a due</td></tr>
 	<tr><td>Illustrazioni dei Servizi</td><td>Elemento <strong>MoveOn · Servizi</strong> → scheda <strong>Elenchi</strong> → apri il servizio → <strong>Immagine (4:3 o 1:1)</strong>: prende il posto dell’illustrazione animata</td></tr>
 	<tr><td>Cubo «Dall’idea al prodotto finito»</td><td>Elemento <strong>MoveOn · Chi siamo</strong> → scheda <strong>Immagini</strong> → <strong>Immagine dell’idea</strong></td></tr>
 	<tr><td>Icone dei motivi</td><td>Elemento <strong>MoveOn · Chi siamo</strong> → scheda <strong>Elenchi</strong> → apri il motivo → <strong>Icona personalizzata</strong> (oppure scegli dall’elenco «Icona»)</td></tr>
@@ -44,10 +46,20 @@
 
 <h2>Progetti del portfolio</h2>
 <ul>
-	<li><strong>Titolo</strong> = nome del progetto. <strong>Copertina</strong> = immagine in evidenza (4:3, almeno 1200 px): senza copertina il progetto non compare.</li>
-	<li>Nel riquadro <strong>Dettagli del progetto</strong>: area (decide il filtro), tipo di lavoro, la richiesta, il nostro lavoro, il risultato, galleria, «In evidenza».</li>
+	<li><strong>Titolo</strong> = nome del progetto. <strong>Copertina</strong> = immagine in evidenza (orizzontale 4:3, almeno 1600 px). <strong>Immagine del carosello</strong> = verticale 3:4 (almeno 900×1200 px). Serve almeno una delle due perché il progetto compaia.</li>
+	<li>Nel riquadro <strong>Dettagli del progetto</strong>: area (decide il filtro), tipo di lavoro, la richiesta, il nostro lavoro, il risultato, immagine del carosello, immagini del progetto, «Mostra questo progetto nel sito».</li>
+	<li><strong>Testo</strong> nell’editor (facoltativo): un racconto più lungo del progetto, mostrato nella sua pagina sotto i tre testi. Utile anche per Google: scrivi per chi è il lavoro e dove (es. «per un forno di Pescara»). Il <strong>riassunto</strong> potrà servire come descrizione per Google.</li>
+	<li><strong>Pagina del progetto</strong>: titolo, copertina, la richiesta / il nostro lavoro / il risultato, il testo, le immagini, il progetto precedente e successivo, un invito a contattarti. Il suo HTML è il modello <em>progetto</em> in Modelli HTML; quello della pagina con tutti i lavori è <em>progetti</em> (titolo e testo in MoveOn → Impostazioni → Pagina Progetti).</li>
 	<li>I <strong>progetti di esempio</strong> si modificano allo stesso modo (cambia titolo, copertina e testi) oppure si tolgono dal sito spegnendo «In evidenza» o spostandoli nel cestino.</li>
 	<li><strong>Ordine</strong>: Attributi → Ordine (numeri più bassi prima).</li>
+</ul>
+
+<h2>Carosello progetti</h2>
+<ul>
+	<li>Elemento <strong>MoveOn · Carosello progetti</strong>: i progetti su un’elica 3D. Si sfogliano <strong>trascinando</strong> (mouse o dito), con le <strong>frecce</strong>, con i tasti ← → o scorrendo di lato sul trackpad.</li>
+	<li>Un clic sulla card <strong>al centro</strong> apre la <strong>pagina del progetto</strong> (nei browser recenti l’immagine «vola» al suo posto); un clic su una card di lato la porta al centro.</li>
+	<li>Campi: etichetta, titolo, testo, <strong>filtri</strong> per area (mostra/nascondi), testo del pulsante verso la pagina <strong>Progetti</strong> (<code>-</code> per toglierlo), ancora e scheda <strong>Sfondo</strong>. Di serie la sezione è blu notte.</li>
+	<li>Con «riduci movimento» attivo sul dispositivo diventa una fila semplice da scorrere.</li>
 </ul>
 
 <h2>Modulo contatti</h2>

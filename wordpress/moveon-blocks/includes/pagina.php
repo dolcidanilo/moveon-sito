@@ -31,10 +31,15 @@ function mo_has_blocks(): bool {
 	return $post && false !== strpos( (string) $post->post_content, '[mo_' );
 }
 
+/** Pagina con il modello MoveOn: le pagine scelte da te e quelle dei progetti. */
+function mo_is_moveon_view(): bool {
+	return mo_is_page() || mo_is_progetti_view();
+}
+
 add_filter(
 	'template_include',
 	function ( $template ) {
-		return mo_is_page() ? MOVEON_DIR . 'includes/modello-pagina.php' : $template;
+		return mo_is_moveon_view() && ! is_404() ? MOVEON_DIR . 'includes/modello-pagina.php' : $template;
 	},
 	99
 );
@@ -65,7 +70,7 @@ function mo_pulisci_contenuto( string $html ): string {
 add_filter(
 	'body_class',
 	function ( $classes ) {
-		if ( mo_is_page() ) {
+		if ( mo_is_moveon_view() && ! is_404() ) {
 			$classes[] = 'mo-page';
 		}
 		return $classes;
@@ -93,12 +98,12 @@ function mo_menu_items(): array {
 			}
 			$url     = (string) $it->url;
 			$frag    = (string) wp_parse_url( $url, PHP_URL_FRAGMENT );
-			$items[] = array( 'testo' => $it->title, 'href' => $url, 'nav' => $frag );
+			$items[] = array( 'testo' => $it->title, 'href' => mo_link_sezione( $url ), 'nav' => $frag );
 		}
 		return $items;
 	}
 	foreach ( array( 'Chi siamo' => 'chi-siamo', 'Servizi' => 'servizi', 'Portfolio' => 'portfolio', 'Contatti' => 'contatti' ) as $t => $a ) {
-		$items[] = array( 'testo' => $t, 'href' => '#' . $a, 'nav' => $a );
+		$items[] = array( 'testo' => $t, 'href' => mo_link_sezione( '#' . $a ), 'nav' => $a );
 	}
 	return $items;
 }
@@ -121,9 +126,10 @@ function mo_header_html(): string {
 		array_merge(
 			mo_logo_data(),
 			array(
-				'home_url' => home_url( '/' ),
-				'menu'     => mo_menu_items(),
-				'cta'      => '' !== $cta ? array( 'testo' => $cta, 'href' => mo_href( $s['cta_link'] ) ) : null,
+				'home_url'  => home_url( '/' ),
+				'logo_href' => mo_is_progetti_view() ? home_url( '/' ) : '#top',
+				'menu'      => mo_menu_items(),
+				'cta'       => '' !== $cta ? array( 'testo' => $cta, 'href' => mo_link_sezione( mo_href( $s['cta_link'] ) ) ) : null,
 			)
 		)
 	);
@@ -141,7 +147,7 @@ function mo_footer_html(): string {
 				'legali'       => $s['legali'],
 				'privacy_url'  => $s['privacy_url'],
 				'cookie_url'   => $s['cookie_url'],
-				'cta'          => trim( (string) $s['mobile_cta'] ) !== '' ? array( 'href' => mo_href( $s['cta_link'] ) ) : null,
+				'cta'          => trim( (string) $s['mobile_cta'] ) !== '' ? array( 'href' => mo_link_sezione( mo_href( $s['cta_link'] ) ) ) : null,
 				'mobile_testo' => $s['mobile_cta'],
 				'tel_href'     => mo_tel_href( $s['telefono'] ),
 				'wa_href'      => mo_wa_href( $s['whatsapp'] ),
@@ -155,7 +161,7 @@ function mo_footer_html(): string {
 add_action(
 	'wp_enqueue_scripts',
 	function () {
-		if ( ! mo_is_page() && ! mo_has_blocks() ) {
+		if ( ! mo_is_moveon_view() && ! mo_has_blocks() ) {
 			return;
 		}
 		$v   = MOVEON_VERSION;
@@ -181,7 +187,7 @@ add_action(
  * Si riattivano da MoveOn → Impostazioni → "Carica anche stili e script del tema".
  */
 function mo_dequeue_theme_assets(): void {
-	if ( ! mo_is_page() || ! empty( mo_settings()['carica_tema'] ) ) {
+	if ( ! mo_is_moveon_view() || is_404() || ! empty( mo_settings()['carica_tema'] ) ) {
 		return;
 	}
 	// Stili globali del tema (theme.json): impostano caratteri e colori di titoli e testi
