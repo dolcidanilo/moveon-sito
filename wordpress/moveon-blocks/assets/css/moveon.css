@@ -717,7 +717,7 @@ img,svg{max-width:100%}
 .mo-block .mo-prj-img{margin:0}
 .mo-prj-img:nth-child(3n+1){grid-column:1 / -1}
 .mo-prj-img img{display:block;width:100%;height:auto;border-radius:14px;background:var(--mo-surface-alt)}
-.mo-prj-nav{margin-top:88px;padding:48px 0;background:rgba(255,255,255,.3)} /* fascia che separa i progetti vicini dal contenuto e dall'invito finale, su qualsiasi sfondo */
+.mo-prj-nav{margin-top:88px;padding:48px 0;background:rgba(0,0,0,.2)} /* fascia che separa i progetti vicini dal contenuto e dall'invito finale, su qualsiasi sfondo */
 .mo-block.mo-prj-body:has(> .mo-prj-nav){padding-bottom:0}
 .mo-prj-body .mo-wrap > :last-child{margin-bottom:0} /* niente spazio doppio se mancano testo o immagini */
 .mo-prj-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:24px}

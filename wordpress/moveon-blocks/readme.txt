@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.1.5 =
+* Pagina del progetto: la fascia dietro «Progetto precedente / successivo» è nera al 20%.
 
 = 1.1.4 =
 * Pagina del progetto: fascia bianca al 30% dietro «Progetto precedente / successivo», che separa il contenuto dall'invito finale su qualsiasi sfondo; meno spazio prima di «Hai un progetto in mente?».

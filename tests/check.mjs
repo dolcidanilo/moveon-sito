@@ -556,7 +556,7 @@ async function provaPortfolio(page, nome, passi) {
   const bordo = await page.evaluate(() => { const n = document.querySelector('.mo-prj-near'); const t = document.querySelector('.mo-prj-block h2'); return n && t ? { b: getComputedStyle(n).borderTopColor, w: getComputedStyle(n).borderTopWidth, t: getComputedStyle(t).color } : null; });
   check('Pagina progetto: box precedente/successivo con bordo di 1px come «La richiesta»', bordo && bordo.w === '1px' && bordo.b === bordo.t, JSON.stringify(bordo));
   const fascia = await page.evaluate(() => { const n = document.querySelector('.mo-prj-nav'); const c = document.querySelector('.mo-prj-cta'); return { bg: getComputedStyle(n).backgroundColor, stacco: Math.round(c.getBoundingClientRect().top - n.getBoundingClientRect().bottom) }; });
-  check('Pagina progetto: fascia bianca al 30% dietro i progetti vicini, attaccata all’invito finale', fascia.bg === 'rgba(255, 255, 255, 0.3)' && fascia.stacco === 0, JSON.stringify(fascia));
+  check('Pagina progetto: fascia nera al 20% dietro i progetti vicini, attaccata all’invito finale', fascia.bg === 'rgba(0, 0, 0, 0.2)' && fascia.stacco === 0, JSON.stringify(fascia));
   // Pagina Progetti: filtri e link
   await page.goto(URL + 'progetti/', { waitUntil: 'load' }); await page.waitForTimeout(1500);
   const tutte = await page.locator('.mo-prjs-card').count();
