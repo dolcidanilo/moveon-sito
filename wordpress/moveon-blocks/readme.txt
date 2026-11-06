@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,10 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.1.3 =
+* Sfumatura della parte alta rifatta, uguale nelle due pagine: foto e colore proseguono sotto il contenuto e svaniscono con una curva morbida; il contenuto non si sposta più.
+* Passaggio animato tra le pagine: nessun avviso nella console se il browser lo interrompe.
 
 = 1.1.2 =
 * Pagina Progetti: i filtri stanno sopra le card, non più sulla foto della parte alta.

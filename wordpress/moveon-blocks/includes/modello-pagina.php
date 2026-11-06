@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 /* Prima che la pagina compaia: classe "mo-js" e breve caricamento iniziale
    (non con "riduci movimento", non dentro l'editor di WPBakery, non nelle pagine dei progetti). Si chiude da solo entro 2,4 s. */
 (function(){var d=document.documentElement;d.classList.add('mo-js');if(<?php echo mo_is_progetti_view() ? 'false&&' : ''; ?>!/[?&]vc_editable=true/.test(location.search)&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('mo-is-loading');setTimeout(function(){d.classList.remove('mo-is-loading')},2400)}})();
+/* Passaggio animato tra le pagine (View Transitions): se il browser lo interrompe non è un errore, solo niente animazione */
+['pageswap','pagereveal'].forEach(function(t){addEventListener(t,function(e){var v=e.viewTransition;if(v){['ready','finished','updateCallbackDone'].forEach(function(k){if(v[k]&&v[k].catch){v[k].catch(function(){})}})}})});
 </script>
 <?php wp_head(); ?>
 </head>

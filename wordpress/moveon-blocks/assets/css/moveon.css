@@ -683,11 +683,17 @@ img,svg{max-width:100%}
    PAGINE DEI PROGETTI: /progetti/ e /progetti/nome-progetto/
    ===================================================================== */
 /* Parte alta: colori come variabili, così «testi scuri» e i colori scelti nelle Impostazioni funzionano anche qui */
-.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw + var(--mo-sfumatura,0px));background:var(--mo-navy);color:var(--mo-body)}
-/* Sfumatura in basso della parte alta (Impostazioni): la zona sfuma nel colore del contenuto sotto */
-.mo-prj,.mo-prjs{--mo-fondo-contenuto:var(--mo-surface)}
-.mo-prj-head.mo-sfuma::after{content:"";position:absolute;left:0;right:0;bottom:0;z-index:-1;height:var(--mo-sfumatura,0px);background:linear-gradient(to bottom,transparent,var(--mo-fondo-contenuto));pointer-events:none}
-.mo-prjs-head{padding-bottom:calc(80px + var(--mo-sfumatura,0px))}
+.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:var(--mo-body)}
+/* Livelli delle pagine dei progetti. La pagina è un livello a sé: gli sfondi del contenuto stanno sotto,
+   poi la parte alta (che con la «sfumatura» prosegue sotto il contenuto e svanisce), poi i contenuti. */
+.mo-prj,.mo-prjs{position:relative;isolation:isolate}
+.mo-block.mo-prj-head{background:none}
+.mo-prj-head::before{content:"";position:absolute;inset:0;z-index:-3;background:var(--mo-navy);pointer-events:none}
+.mo-block.mo-prj-body,.mo-block.mo-prjs-body{isolation:auto;background:none}
+.mo-prj-body::before,.mo-prjs-body::before{content:"";position:absolute;inset:0;z-index:-3;background:var(--mo-surface);pointer-events:none}
+.mo-prj-body > .mo-wrap,.mo-prj-body > .mo-prj-nav,.mo-prjs-body > .mo-wrap{position:relative}
+.mo-prj-head.mo-sfuma::before,.mo-prj-head.mo-sfuma > .mo-bg{bottom:calc(-1 * var(--mo-sfumatura,0px));-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--mo-sfumatura,0px)),rgba(0,0,0,.86) calc(100% - var(--mo-sfumatura,0px) * .8),rgba(0,0,0,.6) calc(100% - var(--mo-sfumatura,0px) * .6),rgba(0,0,0,.32) calc(100% - var(--mo-sfumatura,0px) * .4),rgba(0,0,0,.12) calc(100% - var(--mo-sfumatura,0px) * .2),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - var(--mo-sfumatura,0px)),rgba(0,0,0,.86) calc(100% - var(--mo-sfumatura,0px) * .8),rgba(0,0,0,.6) calc(100% - var(--mo-sfumatura,0px) * .6),rgba(0,0,0,.32) calc(100% - var(--mo-sfumatura,0px) * .4),rgba(0,0,0,.12) calc(100% - var(--mo-sfumatura,0px) * .2),transparent)}
+.mo-prjs-head{padding-bottom:80px}
 .mo-block .mo-prj-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font:600 14px/20px var(--mo-font);color:var(--mo-body);text-decoration:none}
 .mo-block .mo-prj-back:hover{color:var(--mo-ink)}
 .mo-prj-back svg,.mo-prj-near-dir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -741,8 +747,8 @@ img,svg{max-width:100%}
   .mo-prj-blocks{grid-template-columns:1fr;gap:32px}
 }
 @media (max-width:767px){
-  .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw + var(--mo-sfumatura,0px))}
-  .mo-prjs-head{padding-bottom:calc(56px + var(--mo-sfumatura,0px))}
+  .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw)}
+  .mo-prjs-head{padding-bottom:56px}
   .mo-block .mo-prj-cover{margin:calc(-14vw - 92px) auto 56px}
   .mo-prj-body{padding:64px 0 80px}
   .mo-prj-blocks{margin-bottom:56px}

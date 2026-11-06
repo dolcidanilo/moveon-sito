@@ -98,7 +98,7 @@ function mo_sfondo_pulito( $v ): array {
 		'sfondo_opacita'    => $op >= 5 && $op <= 100 ? $op : 30,
 		'sfondo_dimensione' => in_array( $v['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $v['sfondo_dimensione'] : 'cover',
 		'sfondo_posizione'  => sanitize_text_field( (string) ( $v['sfondo_posizione'] ?? '' ) ) ?: '50% 50%',
-		// Solo per la parte alta: pixel aggiunti in basso in cui la zona sfuma nel colore del contenuto
+		// Solo per la parte alta: pixel in cui foto e colore proseguono sotto il contenuto, svanendo
 		'sfumatura'         => max( 0, min( 600, (int) ( $v['sfumatura'] ?? 0 ) ) ),
 	);
 }
@@ -109,17 +109,10 @@ function mo_sfondo_zona( string $zona ): array {
 	return mo_sfondo_pulito( is_array( $tutti ) ? ( $tutti[ $zona ] ?? array() ) : array() );
 }
 
-/**
- * Stile della parte alta: la sfumatura in basso (pixel in più, che sfumano nel colore del contenuto).
- * Il colore verso cui sfuma è quello scelto per il contenuto, altrimenti quello di serie.
- */
-function mo_stile_testa( string $testa, string $corpo ): string {
+/** Stile della parte alta: la sfumatura (pixel in cui foto e colore proseguono sotto il contenuto, svanendo). */
+function mo_stile_testa( string $testa ): string {
 	$px = mo_sfondo_zona( $testa )['sfumatura'];
-	if ( ! $px ) {
-		return '';
-	}
-	$col = mo_sfondo_zona( $corpo )['sfondo_colore'];
-	return '--mo-sfumatura:' . $px . 'px' . ( $col ? ';--mo-fondo-contenuto:' . $col : '' );
+	return $px ? '--mo-sfumatura:' . $px . 'px' : '';
 }
 
 /** La parte alta della pagina ha testi scuri (sfondo chiaro)? Allora anche l'header, finché non scorri, usa il logo e i testi scuri. */
@@ -156,7 +149,7 @@ function mo_progetti_archivio_html(): string {
 		'progetti',
 		array(
 			'sfondo_testa' => mo_sfondo_html( mo_sfondo_zona( 'progetti_testa' ) ),
-			'stile_testa'  => mo_stile_testa( 'progetti_testa', 'progetti_corpo' ),
+			'stile_testa'  => mo_stile_testa( 'progetti_testa' ),
 			'sfondo_corpo' => mo_sfondo_html( mo_sfondo_zona( 'progetti_corpo' ) ),
 			'titolo'   => mo_text( $s['progetti_titolo'] ),
 			'testo'    => mo_text( $s['progetti_testo'] ),
@@ -200,7 +193,7 @@ function mo_progetto_pagina_html( WP_Post $post ): string {
 		'progetto',
 		array(
 			'sfondo_testa' => mo_sfondo_html( mo_sfondo_zona( 'progetto_testa' ) ),
-			'stile_testa'  => mo_stile_testa( 'progetto_testa', 'progetto_corpo' ),
+			'stile_testa'  => mo_stile_testa( 'progetto_testa' ),
 			'sfondo_corpo' => mo_sfondo_html( mo_sfondo_zona( 'progetto_corpo' ) ),
 			'nome'        => $p['nome'],
 			'area_nome'   => $p['area_nome'],

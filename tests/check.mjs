@@ -561,6 +561,19 @@ async function provaPortfolio(page, nome, passi) {
   await page.click('.mo-prjs-filter [data-filter="branding"]'); await page.waitForTimeout(800);
   const br = await page.evaluate(() => [...document.querySelectorAll('.mo-prjs-card')].filter((c) => getComputedStyle(c).display !== 'none').map((c) => c.dataset.cat));
   check('Pagina Progetti: tutti i lavori e filtro «Branding»', tutte === 8 && br.length > 0 && br.every((c) => c === 'branding'), `${tutte} · ${br.join(',')}`);
+  // Sfumatura della parte alta: prosegue sotto il contenuto e il contenuto non si sposta
+  const sf = await page.evaluate(async () => {
+    const h = document.querySelector('.mo-prjs-head'); const f = document.querySelector('.mo-prjs-filter');
+    const y0 = f.getBoundingClientRect().top + scrollY; const b0 = h.getBoundingClientRect().bottom + scrollY;
+    h.classList.add('mo-sfuma'); h.style.setProperty('--mo-sfumatura', '200px');
+    await new Promise((r) => requestAnimationFrame(r));
+    const y1 = f.getBoundingClientRect().top + scrollY;
+    const fondo = getComputedStyle(h, '::before'); const giu = parseFloat(fondo.bottom);
+    const maschera = ['mask-image', '-webkit-mask-image'].map((k) => fondo.getPropertyValue(k)).find((v) => v && v !== 'none') || 'none';
+    h.classList.remove('mo-sfuma'); h.style.removeProperty('--mo-sfumatura');
+    return { sposta: Math.round(y1 - y0), giu, maschera };
+  });
+  check('Sfumatura: la parte alta prosegue 200 px sotto il contenuto, che non si sposta', sf.sposta === 0 && sf.giu === -200 && /gradient/.test(sf.maschera), JSON.stringify({ sposta: sf.sposta, giu: sf.giu, maschera: sf.maschera.slice(0, 30) }));
   await page.locator('.mo-prjs-card:visible').first().click(); await page.waitForTimeout(1200);
   check('Pagina Progetti: la card apre il progetto', /\/progetti\/[^/]+\/$/.test(new globalThis.URL(page.url()).pathname), page.url());
   check('Carosello e pagine dei progetti: nessun errore nella console', errori.length === 0, errori.join(' | '));

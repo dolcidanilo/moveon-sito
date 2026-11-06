@@ -225,7 +225,7 @@ if ( $forno ) {
 	check( 'Sfondi: valgono per tutti i progetti', $altro && str_contains( mo_progetto_pagina_html( $altro ), 'background-color:#f5efe6' ) );
 }
 $html = mo_progetti_archivio_html();
-check( 'Sfumatura: 160 px in fondo alla parte alta, verso il colore dell’elenco', str_contains( $html, 'mo-prj-head mo-prjs-head mo-sfuma' ) && str_contains( $html, 'style="--mo-sfumatura:160px;--mo-fondo-contenuto:#fef3c7"' ) );
+check( 'Sfumatura: 160 px sotto il contenuto per la parte alta della pagina Progetti', str_contains( $html, 'mo-prj-head mo-prjs-head mo-sfuma' ) && str_contains( $html, 'style="--mo-sfumatura:160px"' ) );
 check( 'Pagina Progetti: i filtri stanno sopra le card, non nella parte alta', strpos( $html, 'mo-prjs-filter' ) > strpos( $html, 'mo-prjs-body' ) && strpos( $html, 'mo-prjs-filter' ) < strpos( $html, 'mo-prjs-grid' ) );
 check( 'Sfumatura: senza valore nessuna sfumatura', $forno && ! str_contains( mo_progetto_pagina_html( $forno ), 'mo-sfuma' ) );
 check( 'Sfondi: pagina Progetti, immagine «intera» in alto e colore dell’elenco', str_contains( $html, 'background-size:contain' ) && str_contains( $html, 'background-position:50% 0%' ) && str_contains( $html, 'opacity:0.4' ) && str_contains( $html, 'background-color:#fef3c7' ) );
