@@ -67,27 +67,31 @@ const browser = await chromium.launch();
   const done = await page.evaluate(() => document.querySelector('.mo-gar-art').classList.contains('mo-is-done'));
   check('Scudo completo quando è al centro dello schermo', done);
 
-  // Bug: card del portfolio sopra l'header
-  const pfTop = await topOf(page, '.mo-pf-board');
-  await smoothScroll(page, pfTop - 120);
+  // Le card 3D del carosello passano sotto l'header, mai sopra
+  const carTop = await topOf(page, '.mo-car-stage');
+  await smoothScroll(page, carTop + 80);
   await page.waitForTimeout(1500);
-  const box = await page.locator('.mo-pf-card').first().boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 30, box.y - 200, { steps: 8 });
-  const zinfo = await page.evaluate(() => {
+  const sotto = await page.evaluate(() => {
     const hdr = document.querySelector('.mo-site-header').getBoundingClientRect();
-    const hit = document.elementFromPoint(200, hdr.bottom - 10);
-    return { isolation: getComputedStyle(document.querySelector('.mo-pf-board')).isolation, headerOnTop: !!hit?.closest('.mo-site-header') };
+    const att = document.querySelector('.mo-car-card.mo-is-active').getBoundingClientRect();
+    const x = att.left + att.width / 2, y = hdr.bottom - 10;
+    return { copre: att.top < y, header: !!document.elementFromPoint(x, y)?.closest('.mo-site-header') };
   });
-  await page.mouse.up();
-  check('Card trascinata resta sotto l’header (tavolo isolato)', zinfo.isolation === 'isolate' && zinfo.headerOnTop, JSON.stringify(zinfo));
+  check('Carosello: le card passano sotto l’header', sotto.copre && sotto.header, JSON.stringify(sotto));
 
   // Bug: header senza sfondo in fondo alla pagina
   await smoothScroll(page, await page.evaluate(() => document.documentElement.scrollHeight));
   const hdr = await page.evaluate(() => { const cs = getComputedStyle(document.querySelector('.mo-site-header')); return { scrolled: document.documentElement.classList.contains('mo-scrolled'), bg: cs.backgroundColor, blur: cs.backdropFilter }; });
   check('Header con sfondo anche in fondo alla pagina', hdr.scrolled && hdr.bg !== 'rgba(0, 0, 0, 0)', JSON.stringify(hdr));
   check('Header quando scorri: sfondo un po’ trasparente e sfocatura 6.5px', hdr.blur === 'blur(6.5px)' && /(rgba|color)\(.*0\.8\d?\)|\/ 0\.8/.test(hdr.bg), `${hdr.bg} · ${hdr.blur}`);
+  // Voci del menu: la sezione si ferma subito sotto l'header (le sezioni bloccate a filo dello schermo)
+  const arrivi = {};
+  for (const id of ['portfolio', 'contatti', 'servizi']) {
+    await page.click(`.mo-nav a[href$="#${id}"]`);
+    await page.waitForTimeout(2600);
+    arrivi[id] = await page.evaluate((id) => Math.round(document.getElementById(id).getBoundingClientRect().top - (document.getElementById(id).hasAttribute('data-mo-pin') ? 0 : document.querySelector('.mo-site-header').offsetHeight)), id);
+  }
+  check('Menu: ogni sezione si ferma subito sotto l’header', Object.values(arrivi).every((v) => Math.abs(v) <= 2), JSON.stringify(arrivi));
 
   // Bug: testo a solo contorno non usato
   const stroke = await page.evaluate(() => [...document.querySelectorAll('.mo-mq-item')].some((el) => parseFloat(getComputedStyle(el).webkitTextStrokeWidth) > 0));
@@ -95,48 +99,6 @@ const browser = await chromium.launch();
 
   const alts = await page.evaluate(() => [...document.querySelectorAll('main img')].filter((i) => i.getAttribute('alt') === null).length);
   check('Ogni immagine ha il testo alternativo', alts === 0, `${alts} senza alt`);
-  // Portfolio: "In ordine", filtro e scheda progetto
-  await smoothScroll(page, (await topOf(page, '.mo-pf')) + 100);
-  await page.click('.mo-pf-mode [data-mode="grid"]');
-  await page.waitForTimeout(1000);
-  // Durante l'animazione del filtro il tavolo non deve accorciarsi (la sezione sotto salirebbe)
-  const hPrima = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
-  const campioni = page.evaluate(() => new Promise((ok) => {
-    const b = document.querySelector('.mo-pf-board'); const hs = []; const t0 = performance.now();
-    window.__moLarghezzaMax = 0;
-    const giro = () => {
-      hs.push(b.getBoundingClientRect().height);
-      document.querySelectorAll('.mo-pf-card').forEach((c) => { window.__moLarghezzaMax = Math.max(window.__moLarghezzaMax, c.getBoundingClientRect().width); });
-      if (performance.now() - t0 < 1100) requestAnimationFrame(giro); else ok(hs);
-    };
-    requestAnimationFrame(giro);
-  }));
-  await page.click('.mo-pf-filter [data-filter="web"]');
-  const hs = await campioni;
-  await page.waitForTimeout(300);
-  const hDopo = await page.evaluate(() => document.querySelector('.mo-pf-board').offsetHeight);
-  const hMin = Math.round(Math.min(...hs));
-  check('Filtro: la sezione sotto non sale durante l’animazione', hMin >= Math.min(hPrima, hDopo) - 2, `${hPrima} → min ${hMin} → ${hDopo}px`);
-  const larg = await page.evaluate(() => ({ max: Math.round(window.__moLarghezzaMax), col: Math.round(document.querySelector('.mo-pf-card:not(.mo-is-out)').offsetWidth) }));
-  check('Filtro: le card che escono non si allargano', larg.max <= larg.col + 4, `max ${larg.max}px, colonna ${larg.col}px`);
-  const shown = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-card')].filter((c) => !c.classList.contains('mo-is-out')).map((c) => c.dataset.cat));
-  check('Filtro “Web” mostra solo i lavori web', shown.length > 0 && shown.every((c) => c === 'web'), shown.join(','));
-  await page.locator('.mo-pf-card:not(.mo-is-out)').first().click();
-  await page.waitForTimeout(1200);
-  const modal = await page.evaluate(() => ({ open: !document.querySelector('.mo-pf-modal').hidden, title: document.querySelector('.mo-pfm-title').textContent }));
-  check('La scheda progetto si apre con il titolo', modal.open && modal.title.length > 0, modal.title);
-  await page.keyboard.press('ArrowRight');
-  await page.waitForTimeout(600);
-  const next = await page.evaluate(() => document.querySelector('.mo-pfm-title').textContent);
-  check('Freccia → passa al progetto successivo', next !== modal.title, next);
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(1200);
-  check('Esc chiude la scheda progetto', await page.evaluate(() => document.querySelector('.mo-pf-modal').hidden));
-  await page.click('.mo-pf-filter [data-filter="all"]');
-  await page.waitForTimeout(1500);
-  const resti = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-card')].filter((c) => c.style.width || c.style.opacity || getComputedStyle(c).opacity !== '1').length);
-  check('Filtro «Tutti»: le card tornano tutte, senza resti dell’animazione', resti === 0, `${resti} con stili rimasti`);
-
   // Modulo contatti: errori e conferma
   await smoothScroll(page, (await topOf(page, '.mo-ct-form')) - 200);
   await page.click('.mo-ct-form button[type="submit"]');
@@ -182,9 +144,9 @@ const browser = await chromium.launch();
   });
   check('Schede dei Servizi entrano tra header e barra in basso', fit.tallest <= fit.avail, JSON.stringify(fit));
 
-  // Bug: filtri del portfolio a capo su mobile
+  // Filtri del portfolio su una riga (scorrono di lato) su mobile
   const filt = await page.evaluate(() => {
-    const bs = [...document.querySelectorAll('.mo-pf-filter button')];
+    const bs = [...document.querySelectorAll('.mo-car-filter button')];
     return new Set(bs.map((b) => b.offsetTop)).size;
   });
   check('Filtri del portfolio su una riga', filt === 1, `${filt} righe`);
@@ -200,8 +162,6 @@ const browser = await chromium.launch();
   const closed = await page.evaluate(() => document.getElementById('mo-mobile-menu').hidden);
   check('Toccando una voce il menu si chiude e porta alla sezione', closed && (await page.evaluate(() => window.scrollY)) > 500);
 
-  const mode = await page.evaluate(() => document.querySelector('.mo-pf-board').classList.contains('mo-is-grid'));
-  check('Portfolio “In ordine” su mobile', mode);
   check('Barra contatti in basso visibile su mobile', await page.evaluate(() => getComputedStyle(document.querySelector('.mo-mbar')).display === 'flex'));
   check('Nessun cursore personalizzato al tocco', !(await page.evaluate(() => document.documentElement.classList.contains('mo-has-cursor'))));
   check('Nessun errore nella console (mobile)', errors.length === 0, errors.join(' | '));
@@ -299,8 +259,6 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
   const pin = await page.evaluate(() => { const sp = document.querySelector('.mo-svc')?.parentElement; return sp && sp.classList.contains('pin-spacer') ? parseFloat(getComputedStyle(sp).paddingBottom) : -1; });
   check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
-  const allinea = await page.evaluate(() => [...document.querySelectorAll('.mo-pf-controls .mo-seg')].map((e) => Math.round(e.getBoundingClientRect().left)));
-  check('Portfolio: «Sul tavolo / In ordine» allineato a sinistra', allinea.length === 2 && allinea[0] === allinea[1], allinea.join(' / '));
   check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
   check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
   // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
@@ -370,12 +328,12 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     check('Sfondo: copre tutta la sezione e sta sotto i testi', r.size === 'cover' && r.copre && !r.sopraTesto);
     check('Sfondo: «intera, senza tagli» e posizione in alto', r.contain === 'contain' && r.pos === '50% 0%', `${r.contain} ${r.pos}`);
     const c = await page.evaluate(() => {
-      const pf = document.querySelector('.mo-pf'), gar2 = document.querySelectorAll('.mo-gar')[1];
+      const pf = document.getElementById('pf2'), gar2 = document.querySelectorAll('.mo-gar')[1];
       const st = (el, p) => getComputedStyle(el)[p];
       return {
         coloreLivello: st(pf.querySelector(':scope > .mo-bg--colore'), 'backgroundColor'),
         titoloPf: st(pf.querySelector('.mo-statement'), 'color'),
-        istruzioniPf: st(pf.querySelector('.mo-pf-sub'), 'color'),
+        istruzioniPf: st(pf.querySelector('.mo-car-sub'), 'color'),
         cardGar: gar2 && st(gar2.querySelector('.mo-gar-card'), 'backgroundColor'),
         titoloCard: gar2 && st(gar2.querySelector('.mo-gar-card h3'), 'color'),
       };
@@ -386,111 +344,16 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     const m = await page.evaluate(() => {
       const pf = document.getElementById('pf3'); const st = (sel) => getComputedStyle(pf.querySelector(sel)).color;
       const att = pf.querySelector('.mo-seg button[aria-pressed="true"]'); const cs = getComputedStyle(att);
-      return { titolo: st('.mo-statement'), testo: st('.mo-pf-sub'), etichetta: st('.mo-overline-h2'), attivoFondo: cs.backgroundColor, attivoTesto: cs.color, nomeCard: st('.mo-pf-name') };
+      return { titolo: st('.mo-statement'), testo: st('.mo-car-sub'), etichetta: st('.mo-overline-h2'), attivoFondo: cs.backgroundColor, attivoTesto: cs.color };
     });
     check('Colori dei testi scelti a mano (titoli, testi, etichette)', rgb(m.titolo) === 'rgb(124,45,18)' && rgb(m.testo) === 'rgb(67,20,7)' && rgb(m.etichetta) === 'rgb(29,78,216)', JSON.stringify(m));
-    check('Colori a mano: pulsanti selezionati e card restano leggibili', rgb(m.attivoFondo) === 'rgb(15,23,42)' && rgb(m.attivoTesto) === 'rgb(255,255,255)' && rgb(m.nomeCard) === 'rgb(15,23,42)', `${m.attivoFondo} ${m.attivoTesto} ${m.nomeCard}`);
+    check('Colori a mano: i pulsanti selezionati restano leggibili', rgb(m.attivoFondo) === 'rgb(15,23,42)' && rgb(m.attivoTesto) === 'rgb(255,255,255)', `${m.attivoFondo} ${m.attivoTesto}`);
     check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(15,23,42)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {
     console.log('… pagina "prova-sfondo" assente: controlli sullo sfondo saltati');
   }
   await page.close();
-}
-
-/* ---------------- Portfolio: tutte le combinazioni di modo e filtro ---------------- */
-// Ogni passaggio è osservato fotogramma per fotogramma: nessuna card deve allargarsi, allungarsi
-// o lampeggiare, il tavolo non deve accorciarsi sotto la misura finale, e alla fine non restano stili.
-async function provaPortfolio(page, nome, passi) {
-  await page.evaluate(() => document.querySelector('.mo-pf-board').scrollIntoView({ block: 'start' }));
-  await page.waitForTimeout(2800); // i lavori «cadono sul tavolo» quando compare la sezione
-  const problemi = [];
-  const sel = (a) => (a === 'grid' || a === 'chaos' ? `.mo-pf-mode [data-mode="${a}"]` : `.mo-pf-filter [data-filter="${a}"]`);
-  const foto = () => page.evaluate(() => {
-    const b = document.querySelector('.mo-pf-board');
-    return { h: b.offsetHeight, cards: [...b.querySelectorAll('.mo-pf-card')].map((c) => { const cs = getComputedStyle(c); const vis = cs.display !== 'none'; return { vis, w: c.offsetWidth, h: c.offsetHeight, o: vis ? +cs.opacity : 0 }; }) };
-  });
-  for (const passo of passi) {
-    const rapidi = Array.isArray(passo);
-    if (rapidi) {
-      for (const a of passo) { await page.click(sel(a)); await page.waitForTimeout(90); }
-    } else {
-      const prima = await foto();
-      const campioni = page.evaluate(() => new Promise((ok) => {
-        const b = document.querySelector('.mo-pf-board'); const out = []; const t0 = performance.now();
-        const giro = () => {
-          out.push({ h: b.getBoundingClientRect().height, cards: [...b.querySelectorAll('.mo-pf-card')].map((c) => { const cs = getComputedStyle(c); return cs.display === 'none' ? null : { w: c.offsetWidth, h: c.offsetHeight, o: +cs.opacity }; }) });
-          if (performance.now() - t0 < 1300) requestAnimationFrame(giro); else ok(out);
-        };
-        requestAnimationFrame(giro);
-      }));
-      await page.click(sel(passo));
-      const fr = await campioni;
-      await page.waitForTimeout(250);
-      const dopo = await foto();
-      const bw = await page.evaluate(() => document.querySelector('.mo-pf-board').clientWidth);
-      const maxW = Math.max(...prima.cards.concat(dopo.cards).filter((c) => c.vis).map((c) => c.w)) * 1.05;
-      const maxH = Math.max(...prima.cards.concat(dopo.cards).filter((c) => c.vis).map((c) => c.h)) * 1.1;
-      const hMin = Math.min(prima.h, dopo.h) - 2;
-      fr.forEach((f, k) => {
-        if (f.h < hMin) problemi.push(`${passo}: tavolo ${Math.round(f.h)}px (min ${hMin})`);
-        f.cards.forEach((c, i) => {
-          if (!c) return;
-          if (c.w > maxW) problemi.push(`${passo}: card ${i} larga ${c.w}px (max ${Math.round(maxW)}, tavolo ${bw})`);
-          if (c.h > maxH) problemi.push(`${passo}: card ${i} alta ${c.h}px (max ${Math.round(maxH)})`);
-          const oMax = Math.max(prima.cards[i].o, dopo.cards[i].o) + 0.03;
-          if (c.o > oMax) problemi.push(`${passo}: card ${i} lampeggia (opacità ${c.o.toFixed(2)}, max ${oMax.toFixed(2)})`);
-        });
-      });
-    }
-    await page.waitForTimeout(rapidi ? 1600 : 0);
-    // Stato finale coerente con modo e filtro scelti
-    const fine = await page.evaluate(() => {
-      const b = document.querySelector('.mo-pf-board');
-      const modo = b.classList.contains('mo-is-grid') ? 'grid' : 'chaos';
-      const filtro = document.querySelector('.mo-pf-filter [aria-pressed="true"]').dataset.filter;
-      const err = [];
-      if (b.style.height && b.querySelectorAll('.mo-pf-card').length <= 8) err.push(`altezza del tavolo rimasta ${b.style.height}`);
-      b.querySelectorAll('.mo-pf-card').forEach((c, i) => {
-        const cs = getComputedStyle(c); const ok = filtro === 'all' || c.dataset.cat === filtro;
-        if (c.style.width || c.style.height || c.style.opacity) err.push(`card ${i}: stili rimasti`);
-        if (modo === 'grid' && ok && (cs.display === 'none' || +cs.opacity < 0.99)) err.push(`card ${i}: dovrebbe vedersi`);
-        if (modo === 'grid' && !ok && cs.display !== 'none') err.push(`card ${i}: dovrebbe essere nascosta`);
-        const m = cs.transform === 'none' ? [1, 0, 0, 1, 0, 0] : cs.transform.replace(/^matrix\(|\)$/g, '').split(',').map(Number);
-        const dritta = Math.abs(m[0] - 1) < 0.01 && Math.abs(m[1]) < 0.01 && Math.abs(m[2]) < 0.01 && Math.abs(m[3] - 1) < 0.01 && Math.abs(m[4]) < 1 && Math.abs(m[5]) < 1;
-        if (modo === 'grid' && ok && !dritta) err.push(`card ${i}: ruotata o spostata (${cs.transform})`);
-        if (modo === 'chaos' && Math.abs(+cs.opacity - (ok ? 1 : 0.14)) > 0.02) err.push(`card ${i}: opacità ${cs.opacity}`);
-      });
-      return err;
-    });
-    fine.forEach((e) => problemi.push(`${rapidi ? passo.join('+') : passo} → ${e}`));
-  }
-  check(`Portfolio ${nome}: nessuna card allargata, allungata o lampeggiante, stato finale giusto`, problemi.length === 0, problemi.slice(0, 4).join(' · ') || `${passi.length} passaggi`);
-}
-{
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
-  await page.goto(URL, { waitUntil: 'load' });
-  await page.waitForTimeout(2500);
-  await provaPortfolio(page, 'desktop', ['branding', 'grid', 'web', 'all', 'social', 'chaos', 'stampa', 'all', 'grid', 'chaos', 'web', 'grid', ['chaos', 'branding', 'grid', 'all', 'chaos', 'social']]);
-  // Frecce della scheda progetto: con un filtro passano solo tra i progetti visibili
-  await page.click('.mo-pf-mode [data-mode="grid"]'); await page.waitForTimeout(1300);
-  await page.click('.mo-pf-filter [data-filter="web"]'); await page.waitForTimeout(1300);
-  const visti = [];
-  await page.locator('.mo-pf-card:not(.mo-is-out)').first().click(); await page.waitForTimeout(1000);
-  for (let k = 0; k < 3; k++) { visti.push(await page.evaluate(() => document.querySelector('.mo-pfm-cat').textContent)); await page.keyboard.press('ArrowRight'); await page.waitForTimeout(600); }
-  await page.keyboard.press('Escape'); await page.waitForTimeout(1200);
-  check('Scheda progetto: con il filtro «Web» le frecce restano sui lavori web', visti.every((t) => /^Web/.test(t)), visti.join(' | '));
-  check('Portfolio: nessun errore nella console', errori.length === 0, errori.join(' | '));
-  await page.close();
-}
-{
-  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
-  const page = await ctx.newPage();
-  await page.goto(URL, { waitUntil: 'load' });
-  await page.waitForTimeout(2500);
-  await provaPortfolio(page, 'mobile', ['web', 'all', 'chaos', 'branding', 'grid', 'all']);
-  await ctx.close();
 }
 
 /* ---------------- Carosello progetti e pagine dei progetti ---------------- */
@@ -580,7 +443,10 @@ async function provaPortfolio(page, nome, passi) {
   check('Pagina Progetti: invito finale con nero al 20% sopra il blu', /rgba\(0, 0, 0, 0\.2\)/.test(ctaP), ctaP.slice(0, 60));
   await page.locator('.mo-prjs-card:visible').first().click(); await page.waitForTimeout(1200);
   check('Pagina Progetti: la card apre il progetto', /\/progetti\/[^/]+\/$/.test(new globalThis.URL(page.url()).pathname), page.url());
-  check('Carosello e pagine dei progetti: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  // Avviso interno di Chrome quando il browser dei test cambia pagina durante il passaggio animato (View Transitions):
+  // non è un errore del sito e chi naviga non vede differenze, quindi si ignora solo questo messaggio
+  const veri = errori.filter((m) => !/Transition was aborted because of invalid state/.test(m));
+  check('Carosello e pagine dei progetti: nessun errore nella console', veri.length === 0, veri.join(' | '));
   await page.close();
 }
 {

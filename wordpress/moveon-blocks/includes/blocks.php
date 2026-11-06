@@ -219,21 +219,9 @@ function mo_blocks(): array {
 				...mo_p_sfondo(),
 			),
 		),
-		'portfolio' => array(
-			'name'   => 'MoveOn · Portfolio',
-			'desc'   => 'Tavolo con lavori trascinabili, modalità "In ordine", filtri e scheda progetto. I progetti si gestiscono da "Progetti portfolio".',
-			'params' => array(
-				mo_p_text( 'etichetta', 'Etichetta in alto', '', 'Testi', $d['portfolio']['etichetta'] ),
-				mo_p_text( 'titolo', 'Titolo', '', 'Testi', $d['portfolio']['titolo'] ),
-				mo_p_area( 'istruzioni', 'Testo d’istruzioni', '', 'Testi', $d['portfolio']['istruzioni'] ),
-				mo_p_drop( 'modalita', 'Modalità iniziale', array( 'Sul tavolo' => 'tavolo', 'In ordine' => 'ordine' ), $d['portfolio']['modalita'], 'Su telefono i lavori partono sempre «In ordine».' ),
-				mo_p_anchor( $d['portfolio']['anchor'] ),
-				...mo_p_sfondo(),
-			),
-		),
 		'carosello' => array(
-			'name'   => 'MoveOn · Carosello progetti',
-			'desc'   => 'Progetti in un carosello 3D da trascinare; ogni progetto apre la sua pagina. I progetti si gestiscono da "Progetti portfolio".',
+			'name'   => 'MoveOn · Portfolio',
+			'desc'   => 'I progetti in un carosello 3D da trascinare; ogni progetto apre la sua pagina. I progetti si gestiscono da "Progetti portfolio".',
 			'params' => array(
 				mo_p_text( 'etichetta', 'Etichetta in alto', '', 'Testi', $d['carosello']['etichetta'] ),
 				mo_p_text( 'titolo', 'Titolo', 'Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['carosello']['titolo'] ),
@@ -472,58 +460,6 @@ function mo_render_servizi( $atts ): string {
 	);
 }
 
-function mo_render_portfolio( $atts ): string {
-	$a        = mo_atts( 'portfolio', $atts );
-	$aree     = mo_aree();
-	$progetti = array();
-	$dati     = array();
-	$lista    = array_values( array_filter( mo_progetti_in_evidenza(), fn( $p ) => ! empty( $p['copertina'] ) ) ); // il Portfolio usa la copertina orizzontale
-	foreach ( $lista as $i => $p ) {
-		$progetti[] = array(
-			'i'         => $i,
-			'nome'      => $p['nome'],
-			'tipo'      => $p['tipo'],
-			'area'      => $p['area'],
-			'area_nome' => $aree[ $p['area'] ] ?? $p['area'],
-			'copertina' => $p['copertina'],
-		);
-		$dati[]     = array(
-			'nome'      => $p['nome'],
-			'areaLabel' => $aree[ $p['area'] ] ?? $p['area'],
-			'tipo'      => $p['tipo'],
-			'copertina' => $p['copertina'],
-			'galleria'  => $p['galleria'],
-			'richiesta' => $p['richiesta'],
-			'lavoro'    => $p['lavoro'],
-			'risultato' => $p['risultato'],
-		);
-	}
-	$presenti = array_unique( array_column( $progetti, 'area' ) );
-	$filtri   = array();
-	foreach ( $aree as $k => $nome ) {
-		if ( in_array( $k, $presenti, true ) ) {
-			$filtri[] = array( 'valore' => $k, 'nome' => $nome );
-		}
-	}
-	$tavolo = 'ordine' !== mo_text( $a['modalita'] );
-	return MO_Tpl::render(
-		'portfolio',
-		array(
-			'anchor'     => mo_anchor( $a['anchor'], 'portfolio' ),
-			'sfondo'     => mo_sfondo_html( $a ),
-			'etichetta'  => mo_text( $a['etichetta'] ),
-			'titolo'     => mo_text( $a['titolo'] ),
-			'istruzioni' => mo_text( $a['istruzioni'] ),
-			'modo'       => $tavolo ? 'chaos' : 'grid',
-			'tavolo'     => $tavolo,
-			'aree'       => $filtri,
-			'progetti'   => $progetti,
-			// JSON sicuro dentro <script>: niente "</" che potrebbe chiudere il tag
-			'dati_json'  => wp_json_encode( $dati, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE ),
-		)
-	);
-}
-
 function mo_render_carosello( $atts ): string {
 	$a        = mo_atts( 'carosello', $atts );
 	$progetti = array();
@@ -629,4 +565,14 @@ add_action(
 			add_shortcode( 'mo_' . $key, 'mo_render_' . $key );
 		}
 	}
+);
+
+/* Il vecchio Portfolio («Sul tavolo» / «In ordine») è stato sostituito dal carosello (versione 1.2.0).
+   Le pagine che lo contengono ancora non mostrano niente al suo posto (né codice): basta togliere la riga in WPBakery. */
+add_action(
+	'init',
+	function () {
+		add_shortcode( 'mo_portfolio', '__return_empty_string' );
+	},
+	20
 );

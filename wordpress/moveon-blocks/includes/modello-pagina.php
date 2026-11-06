@@ -41,7 +41,6 @@ if ( is_post_type_archive( MO_CPT ) ) {
 </main>
 <?php
 echo mo_footer_html(); // phpcs:ignore WordPress.Security.EscapeOutput
-echo MO_Tpl::render( 'parti/scheda-progetto' ); // phpcs:ignore WordPress.Security.EscapeOutput
 wp_footer();
 ?>
 </body>

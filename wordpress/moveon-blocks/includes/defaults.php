@@ -117,15 +117,8 @@ function mo_defaults(): array {
 			'pulsante_testo' => 'Contattaci Ora',
 			'pulsante_link'  => '#contatti',
 		),
-		'portfolio' => array(
-			'anchor'     => 'portfolio',
-			'etichetta'  => 'Portfolio',
-			'titolo'     => 'Ogni progetto nasce sul tavolo da lavoro.',
-			'istruzioni' => 'Sposta i lavori come fogli sul tavolo, oppure mettili in ordine e filtrali per area. Sono progetti di esempio, da sostituire con quelli reali.',
-			'modalita'   => 'tavolo',
-		),
 		'carosello' => array(
-			'anchor'    => 'progetti',
+			'anchor'    => 'portfolio', // la voce «Portfolio» del menu porta qui
 			'etichetta' => 'Progetti',
 			'titolo'    => 'Lavori che lasciano il segno.',
 			'testo'     => 'Trascina per sfogliarli, oppure usa le frecce. Apri un progetto per vedere com’è nato.',

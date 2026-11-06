@@ -2,8 +2,8 @@
 /**
  * Progetti del portfolio: ogni lavoro è una scheda a sé (menu "Progetti portfolio").
  * - Titolo = nome del progetto / cliente
- * - Immagine in evidenza = copertina (4:3): card del Portfolio e grande immagine in cima alla pagina del progetto
- * - Immagine del carosello (verticale 3:4): card del Carosello progetti (se manca si usa la copertina)
+ * - Immagine in evidenza = copertina (4:3): card della pagina Progetti e grande immagine in cima alla pagina del progetto
+ * - Immagine del carosello (verticale 3:4): card del Portfolio a carosello (se manca si usa la copertina)
  * - Galleria: le immagini della pagina del progetto
  * - Testo (editor): racconto facoltativo nella pagina del progetto; Riassunto = descrizione breve
  * - Attributi → Ordine = posizione nel sito (numeri più bassi prima)
@@ -72,7 +72,7 @@ function mo_galleria_ids( int $post_id ): array {
 	return array_values( array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $post_id, '_mo_galleria', true ) ) ) ) );
 }
 
-/** Tutti i dati di un progetto, per il Portfolio, il Carosello e la sua pagina. */
+/** Tutti i dati di un progetto, per il Portfolio (carosello), la pagina Progetti e la sua pagina. */
 function mo_progetto_dati( WP_Post $p ): array {
 	$cover    = mo_image( get_post_thumbnail_id( $p ), '', 'large' );
 	$cover_xl = mo_image( get_post_thumbnail_id( $p ), '', '2048x2048' );
@@ -121,7 +121,7 @@ function mo_progetti_visibili(): array {
 	);
 }
 
-/** Progetti per Portfolio e Carosello: solo quelli con un'immagine (le card ne hanno bisogno). */
+/** Progetti per il Portfolio e la pagina Progetti: solo quelli con un'immagine (le card ne hanno bisogno). */
 function mo_progetti_in_evidenza(): array {
 	$out = array();
 	foreach ( mo_progetti_visibili() as $p ) {
@@ -195,7 +195,7 @@ function mo_progetto_metabox( WP_Post $post ): void {
 				<div id="mo_carosello_img-anteprima" class="mo-car-anteprima"><?php echo $car_id ? wp_get_attachment_image( $car_id, 'medium' ) : ''; ?></div>
 				<button type="button" class="button mo-scegli-immagine" data-target="mo_carosello_img"><?php echo $car_id ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
 				<button type="button" class="button-link mo-togli-immagine" data-target="mo_carosello_img">Rimuovi</button>
-				<p class="description">Verticale (3:4, almeno 900×1200 px). È la card del «Carosello progetti». Se manca si usa la copertina, ritagliata al centro.</p>
+				<p class="description">Verticale (3:4, almeno 900×1200 px). È la card del Portfolio (carosello). Se manca si usa la copertina, ritagliata al centro.</p>
 			</td>
 		</tr>
 		<tr>
@@ -209,12 +209,12 @@ function mo_progetto_metabox( WP_Post $post ): void {
 				?></ul>
 				<button type="button" class="button mo-aggiungi-galleria" data-target="mo_galleria">Aggiungi immagini</button>
 				<button type="button" class="button-link mo-svuota-galleria" data-target="mo_galleria">Togli tutte</button>
-				<p class="description">Compaiono nella pagina del progetto (e nella sua scheda nel Portfolio). <strong>Trascinale</strong> per cambiare l’ordine; su ogni immagine: <strong>Sostituisci</strong> o <strong>×</strong> per toglierla. Le immagini restano comunque nella Libreria media.</p>
+				<p class="description">Compaiono nella pagina del progetto. <strong>Trascinale</strong> per cambiare l’ordine; su ogni immagine: <strong>Sostituisci</strong> o <strong>×</strong> per toglierla. Le immagini restano comunque nella Libreria media.</p>
 			</td>
 		</tr>
 		<tr>
 			<th>In evidenza</th>
-			<td><label><input type="checkbox" name="mo_evidenza" value="1" <?php checked( $evid, '1' ); ?>> Mostra questo progetto nel sito</label><p class="description">Spento: il progetto sparisce da Portfolio, Carosello e pagina Progetti, e la sua pagina non si apre.</p></td>
+			<td><label><input type="checkbox" name="mo_evidenza" value="1" <?php checked( $evid, '1' ); ?>> Mostra questo progetto nel sito</label><p class="description">Spento: il progetto sparisce dal Portfolio e dalla pagina Progetti, e la sua pagina non si apre.</p></td>
 		</tr>
 	</table>
 	<?php

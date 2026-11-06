@@ -43,7 +43,7 @@ if ( ! function_exists( 'mo_blocks' ) ) {
 
 /* 1) Campi per WPBakery */
 do_action( 'vc_before_init' );
-check( 'WPBakery: registrati 9 elementi', 9 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
+check( 'WPBakery: registrati 8 elementi', 8 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
 $tipi = array( 'textfield', 'textarea', 'attach_image', 'dropdown', 'param_group', 'colorpicker' );
 $err  = array();
 foreach ( $GLOBALS['mo_vc'] as $el ) {
@@ -133,7 +133,7 @@ check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $
 $html = do_shortcode( '[mo_hero sfondo_img="' . $jpg . '" sfondo_opacita="15" sfondo_dimensione="auto" sfondo_posizione="100% 50%"]' );
 check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg mo-bg--foto"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
 check( 'Sfondo: niente livello se non c’è l’immagine', false === strpos( do_shortcode( '[mo_hero]' ), 'mo-bg' ) );
-check( 'WPBakery: scheda Sfondo in tutti i 9 elementi', 9 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
+check( 'WPBakery: scheda Sfondo in tutti gli 8 elementi', 8 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
 
 /* 9) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
@@ -202,6 +202,8 @@ if ( $forno ) {
 	check( 'Progetto nascosto: la sua pagina non si apre (404)', 404 === $codice( $url ) );
 	update_post_meta( $forno->ID, '_mo_evidenza', '1' );
 }
+check( 'Vecchio Portfolio tolto: non è più tra gli elementi e la sua riga non mostra niente', ! in_array( 'mo_portfolio', array_column( $GLOBALS['mo_vc'], 'base' ), true ) && '' === trim( do_shortcode( '[mo_portfolio modalita="ordine"]' ) ) );
+check( 'Il carosello è il Portfolio: nome dell’elemento e ancora #portfolio', in_array( 'MoveOn · Portfolio', array_column( $GLOBALS['mo_vc'], 'name' ), true ) && str_contains( do_shortcode( '[mo_carosello]' ), 'id="portfolio"' ) );
 check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
 /* 11) Sfondi delle pagine dei progetti (MoveOn → Impostazioni) */

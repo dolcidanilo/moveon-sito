@@ -2,14 +2,14 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.6
+Stable tag: 1.2.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
 
 == Descrizione ==
 
-* 9 elementi WPBakery (categoria MoveOn): Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Carosello progetti, Le nostre garanzie, Contatti.
+* 8 elementi WPBakery (categoria MoveOn): Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio (carosello 3D), Le nostre garanzie, Contatti.
 * Pagine dei progetti (/progetti/nome-progetto/) e pagina Progetti con tutti i lavori (/progetti/).
 * Modello di pagina "MoveOn · pagina intera" con header, footer, menu mobile e barra contatti del prototipo.
 * MoveOn → Impostazioni: logo, contatti, pulsanti, footer.
@@ -20,11 +20,19 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 
 == Librerie incluse ==
 
-* GSAP 3.15.0 con ScrollTrigger, Flip, Draggable — licenza standard "no charge" di GSAP (https://gsap.com/standard-license)
+* GSAP 3.15.0 con ScrollTrigger — licenza standard "no charge" di GSAP (https://gsap.com/standard-license)
 * Lenis 1.3.27 — licenza MIT
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.2.0 =
+* Il Portfolio è ora il carosello 3D: l'elemento si chiama «MoveOn · Portfolio» e la sua ancora di serie è #portfolio (la voce «Portfolio» del menu porta lì).
+* Tolto il vecchio Portfolio («Sul tavolo», «In ordine», scheda a comparsa). Le pagine che lo contengono ancora non mostrano niente al suo posto: basta eliminarne la riga in WPBakery. La griglia con i filtri resta nella pagina Progetti.
+* Pagine più leggere: non si caricano più le librerie Flip e Draggable.
+* Filtri del Portfolio e della pagina Progetti su una riga sul telefono (scorrono di lato).
+* Portfolio: il «colore delle etichette» della scheda Sfondo vale anche per la scritta in alto.
+* Menu: cliccando una voce la sezione si ferma subito sotto l'header (prima scendeva 72 px di troppo); Servizi e Pausa partono a filo dello schermo.
 
 = 1.1.6 =
 * Pagina Progetti: l'invito «Hai un progetto in mente?» ha uno strato nero al 20% che lo stacca dall'elenco dei lavori.

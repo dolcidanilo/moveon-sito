@@ -16,25 +16,10 @@
 /* Librerie caricate dal plugin come file separati (assets/js/vendor) */
 const gsap = window.gsap;
 const ScrollTrigger = window.ScrollTrigger;
-const Flip = window.Flip;
-const Draggable = window.Draggable;
 const Lenis = window.Lenis;
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-
-/** Posizioni dei lavori sul tavolo (dal prototipo), in % del gruppo da 8. */
-const SLOTS = [
-  { x: 2, y: 4, r: -6, mx: 2, my: 1 },
-  { x: 26, y: 10, r: 3, mx: 50, my: 4 },
-  { x: 51, y: 2, r: -3, mx: 3, my: 25 },
-  { x: 75, y: 9, r: 6, mx: 51, my: 28 },
-  { x: 5, y: 50, r: 4, mx: 2, my: 50 },
-  { x: 29, y: 54, r: -5, mx: 50, my: 53 },
-  { x: 53, y: 48, r: 5, mx: 3, my: 74 },
-  { x: 76, y: 55, r: -4, mx: 51, my: 76 },
-];
-const BAND_H = { desk: 760, mob: 820 };
 
 function initSite() {
   if (window.__moSiteStarted || !gsap || !ScrollTrigger) return;
@@ -49,7 +34,7 @@ function initSite() {
   const mobileQ = window.matchMedia('(max-width: 767px)');
   const G = gsap;
   const ST = ScrollTrigger;
-  G.registerPlugin(ST, Flip, Draggable);
+  G.registerPlugin(ST);
   let lenis = null;
   let heroPlay = null;
 
@@ -88,8 +73,13 @@ function initSite() {
       if (d.classList.contains('mo-menu-open')) setMenu(false);
       if (lenis) {
         if (id === '#top') lenis.scrollTo(0, { duration: 1.4 });
-        // Le sezioni bloccate (pin) partono a filo dello schermo: niente spazio per l'header.
-        else lenis.scrollTo(t, { offset: t.hasAttribute('data-mo-pin') && (t.getAttribute('data-mo-pin') !== 'h' || d.classList.contains('mo-h-scroll')) ? 0 : -headerH(), duration: 1.4 });
+        // Lenis toglie già lo spazio dell'header (scroll-padding-top del CSS): qui si corregge solo la differenza.
+        // Le sezioni bloccate (pin) partono a filo dello schermo: lo spazio dell'header si ridà indietro.
+        else {
+          const pad = parseFloat(getComputedStyle(d).scrollPaddingTop) || 0;
+          const pin = t.hasAttribute('data-mo-pin') && (t.getAttribute('data-mo-pin') !== 'h' || d.classList.contains('mo-h-scroll'));
+          lenis.scrollTo(t, { offset: pin ? pad : pad - headerH(), duration: 1.4 });
+        }
       } else {
         t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
       }
@@ -114,7 +104,7 @@ function initSite() {
   const env = { G, ST, reduce, fine, mobileQ, d, data, setMenu, getLenis: () => lenis, setHeroPlay: (f) => { heroPlay = f; } };
 
   /* ---------- Blocchi, nell'ordine in cui compaiono nella pagina ---------- */
-  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, portfolio: initPortfolio, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti };
+  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti };
   $$('[data-mo-block]').forEach((sec) => {
     const fn = INIT[sec.getAttribute('data-mo-block')];
     if (fn) fn(sec, env);
@@ -471,235 +461,6 @@ function initServizi(sec, { G, d }) {
       G.set(track, { clearProps: 'transform' });
     };
   });
-}
-
-/* =================== PORTFOLIO =================== */
-function initPortfolio(sec, { G, ST, reduce, mobileQ, d }) {
-  // Dati dei progetti scritti dal plugin nella pagina (JSON), letti qui
-  let PROJECTS = [];
-  try { PROJECTS = JSON.parse($('.mo-pf-data', sec)?.textContent || '[]'); } catch (e) { PROJECTS = []; }
-  const board = $('.mo-pf-board', sec);
-  const cards = $$('.mo-pf-card', board);
-  const modal = $('.mo-pf-modal');
-  if (!board || !cards.length) return;
-
-  const initial = sec.getAttribute('data-mode') === 'grid' ? 'grid' : 'chaos';
-  let mode = mobileQ.matches || reduce ? 'grid' : initial;
-  let filter = 'all';
-  let flipAnim = null;
-  let uscite = [];
-  const drags = [];
-  let justDragged = false;
-  const modeBtns = $$('.mo-pf-mode button', sec);
-  const filterBtns = $$('.mo-pf-filter button', sec);
-
-  function placeChaos() {
-    const m = mobileQ.matches;
-    const bandH = m ? BAND_H.mob : BAND_H.desk;
-    const bands = Math.max(1, Math.ceil(cards.length / SLOTS.length));
-    board.style.height = bands > 1 ? `${bands * bandH}px` : '';
-    cards.forEach((c, i) => {
-      const s = SLOTS[i % SLOTS.length];
-      const band = Math.floor(i / SLOTS.length);
-      c.style.left = `${m ? s.mx : s.x}%`;
-      c.style.top = bands > 1 ? `${band * bandH + ((m ? s.my : s.y) / 100) * bandH}px` : `${m ? s.my : s.y}%`;
-      G.set(c, { x: 0, y: 0, rotation: s.r });
-    });
-  }
-  function applyLayout(animate) {
-    const state = animate && !reduce ? Flip.getState(cards) : null;
-    // Un'animazione ancora in corso (clic veloci) va chiusa prima di misurare: lascerebbe le card fuori dal flusso
-    if (flipAnim) { flipAnim.progress(1); flipAnim = null; }
-    const h0 = state ? board.offsetHeight : 0;
-    // Misura e trasparenza di partenza delle card: servono a quelle che escono (vedi onLeave)
-    const prima = new Map(state ? cards.map((c) => [c, { w: c.offsetWidth, o: parseFloat(getComputedStyle(c).opacity) || 0 }]) : []);
-    if (state) G.killTweensOf(board);
-    board.classList.toggle('mo-is-chaos', mode === 'chaos');
-    board.classList.toggle('mo-is-grid', mode === 'grid');
-    cards.forEach((c) => {
-      const match = filter === 'all' || c.getAttribute('data-cat') === filter;
-      c.classList.toggle('mo-is-out', !match);
-      c.tabIndex = match ? 0 : -1;
-      c.setAttribute('aria-hidden', match ? 'false' : 'true');
-      c.setAttribute('data-cursor', mode === 'chaos' ? 'Trascina' : 'Apri');
-    });
-    if (mode === 'chaos') {
-      placeChaos();
-      drags.forEach((dr) => { dr.enable(); dr.update(); });
-    } else {
-      board.style.height = '';
-      cards.forEach((c) => { c.style.left = ''; c.style.top = ''; G.set(c, { x: 0, y: 0, rotation: 0 }); });
-      drags.forEach((dr) => dr.disable());
-    }
-    modeBtns.forEach((b) => b.setAttribute('aria-pressed', b.getAttribute('data-mode') === mode ? 'true' : 'false'));
-    filterBtns.forEach((b) => b.setAttribute('aria-pressed', b.getAttribute('data-filter') === filter ? 'true' : 'false'));
-    if (state) {
-      // Durante Flip le card escono dal flusso (absolute): senza bloccare l'altezza il tavolo
-      // si azzererebbe per un attimo e la sezione sotto salirebbe. L'altezza va dalla vecchia alla nuova.
-      // Flip.from legge subito la posizione finale delle card: l'altezza va bloccata solo dopo,
-      // altrimenti la griglia si stirerebbe sull'altezza vecchia e le card diventerebbero altissime.
-      const hFinale = board.style.height;
-      const h1 = board.offsetHeight;
-      flipAnim = Flip.from(state, {
-        duration: 0.85, ease: 'power3.inOut', stagger: 0.025, absolute: true,
-        // Le card che entrano arrivano alla loro trasparenza finale (sul tavolo le escluse restano velate)
-        onEnter: (els) => {
-          const fine = els.map((el) => { const o = parseFloat(getComputedStyle(el).opacity); return Number.isNaN(o) ? 1 : o; });
-          return G.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: (i) => fine[i], scale: 1, duration: 0.5, clearProps: 'opacity' });
-        },
-        // Le card che escono (filtro, «In ordine») tengono la loro larghezza e sfumano:
-        // fuori dal flusso la larghezza 100% varrebbe per tutto il tavolo.
-        onLeave: (els) => {
-          uscite = els;
-          els.forEach((el) => G.set(el, { width: prima.get(el)?.w || '', opacity: prima.get(el)?.o ?? 1 }));
-          return G.to(els, { opacity: 0, scale: 0.85, duration: 0.35, ease: 'power2.in' });
-        },
-        onComplete: () => {
-          if (uscite.length) { G.killTweensOf(uscite); G.set(uscite, { clearProps: 'width,opacity,scale' }); uscite = []; }
-          G.killTweensOf(board); board.style.height = hFinale; ST.refresh(); drags.forEach((dr) => dr.update()); },
-      });
-      G.set(board, { height: h0 });
-      G.to(board, { height: h1, duration: 0.85, ease: 'power3.inOut' });
-    } else {
-      ST.refresh();
-    }
-  }
-
-  // Trascinamento sul tavolo. Il tavolo è un livello isolato (isolation:isolate nel CSS),
-  // così lo z-index alzato dal trascinamento non porta mai le card sopra l'header.
-  cards.forEach((c, i) => {
-    drags.push(Draggable.create(c, {
-      type: 'x,y', bounds: board, dragClickables: true, zIndexBoost: true, edgeResistance: 0.75, minimumMovement: 4,
-      onPress: () => { if (!reduce) G.to(c, { scale: 1.05, duration: 0.2 }); },
-      onRelease: () => { if (!reduce) G.to(c, { scale: 1, duration: 0.35, ease: 'back.out(2)' }); },
-      onDragStart: () => { justDragged = true; if (!reduce) G.to(c, { rotation: G.utils.random(-9, 9), duration: 0.4 }); },
-      onDragEnd: () => setTimeout(() => { justDragged = false; }, 80),
-      onClick: () => { if (mode === 'chaos') openProject(i); },
-    })[0]);
-  });
-  applyLayout(false);
-
-  modeBtns.forEach((b) => b.addEventListener('click', () => { if (mode === b.getAttribute('data-mode')) return; mode = b.getAttribute('data-mode'); applyLayout(true); }));
-  filterBtns.forEach((b) => b.addEventListener('click', () => { filter = b.getAttribute('data-filter'); applyLayout(true); }));
-  if (mobileQ.addEventListener) mobileQ.addEventListener('change', () => { if (mode === 'chaos') placeChaos(); });
-
-  /* Scheda progetto */
-  const mCover = $('.mo-pfm-cover', modal);
-  const mTitle = $('.mo-pfm-title', modal), mCat = $('.mo-pfm-cat', modal), mBadge = $('.mo-pfm-badge', modal);
-  const mBrief = $('.mo-pfm-brief', modal), mWork = $('.mo-pfm-work', modal), mResult = $('.mo-pfm-result', modal);
-  const mGallery = $('.mo-pfm-gallery', modal);
-  const mClose = $('.mo-pfm-close', modal);
-  const anims = () => $$('.mo-pfm-anim, .mo-pfm-bar', modal).filter((el) => !el.hidden);
-  let openIdx = -1, lastFocus = null;
-
-  function imgEl(src, alt, pos, w, h) {
-    const im = document.createElement('img');
-    im.src = src; im.alt = alt || '';
-    if (pos) im.style.objectPosition = pos;
-    if (w) im.width = w;
-    if (h) im.height = h;
-    im.decoding = 'async';
-    return im;
-  }
-  function fillModal(i) {
-    const p = PROJECTS[i];
-    mCover.replaceChildren(imgEl(p.copertina.url, p.copertina.alt, p.copertina.pos));
-    mCover.setAttribute('data-flip-id', `pf-${i}`);
-    mBadge.textContent = p.areaLabel;
-    mTitle.textContent = p.nome;
-    mCat.textContent = `${p.areaLabel}, ${p.tipo}`;
-    mBrief.textContent = p.richiesta;
-    mWork.textContent = p.lavoro;
-    mResult.textContent = p.risultato;
-    const gal = p.galleria || [];
-    mGallery.replaceChildren(...gal.map((g) => imgEl(g.url, g.alt, null, g.width, g.height)));
-    mGallery.hidden = !gal.length;
-  }
-  const inView = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight; };
-  function openProject(i) {
-    const card = cards[i];
-    lastFocus = card;
-    openIdx = i;
-    const cover = $('.mo-pf-cover', card);
-    const state = !reduce ? Flip.getState(cover) : null;
-    fillModal(i);
-    modal.scrollTop = 0;
-    modal.hidden = false;
-    d.classList.add('mo-modal-open');
-    if (state) {
-      Flip.from(state, { targets: mCover, duration: 0.8, ease: 'power3.inOut', zIndex: 5 });
-      G.fromTo($('.mo-pfm-bg', modal), { opacity: 0 }, { opacity: 1, duration: 0.45 });
-      G.fromTo(anims(), { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.07, delay: 0.45, ease: 'power3.out' });
-    }
-    mClose.focus({ preventScroll: true });
-  }
-  function closeProject() {
-    if (openIdx < 0) return;
-    const card = cards[openIdx];
-    const finish = () => {
-      modal.hidden = true;
-      d.classList.remove('mo-modal-open');
-      G.set([mCover, $('.mo-pfm-bg', modal), ...$$('.mo-pfm-anim, .mo-pfm-bar', modal)], { clearProps: 'all' });
-      openIdx = -1;
-      if (lastFocus) lastFocus.focus({ preventScroll: true });
-    };
-    if (!reduce && inView(card) && !card.classList.contains('mo-is-out')) {
-      G.to(anims(), { opacity: 0, duration: 0.2 });
-      G.to($('.mo-pfm-bg', modal), { opacity: 0, duration: 0.45, delay: 0.25 });
-      Flip.fit(mCover, $('.mo-pf-cover', card), { duration: 0.7, ease: 'power3.inOut', scale: true, onComplete: finish });
-    } else {
-      finish();
-    }
-  }
-  function stepProject(dir) {
-    // Con un filtro attivo le frecce passano solo tra i progetti visibili
-    const giro = cards.map((c, k) => k).filter((k) => !cards[k].classList.contains('mo-is-out'));
-    if (!giro.length) return;
-    const pos = giro.indexOf(openIdx);
-    const i = giro[((pos < 0 ? 0 : pos + dir) + giro.length) % giro.length];
-    openIdx = i;
-    lastFocus = cards[i];
-    fillModal(i);
-    modal.scrollTop = 0;
-    if (!reduce) G.fromTo([mCover, ...$$('.mo-pfm-anim', modal).filter((el) => !el.hidden)], { x: dir * 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out' });
-  }
-  mClose.addEventListener('click', closeProject);
-  $('.mo-pfm-prev', modal).addEventListener('click', () => stepProject(-1));
-  $('.mo-pfm-next', modal).addEventListener('click', () => stepProject(1));
-  cards.forEach((c, i) => {
-    c.addEventListener('click', (e) => {
-      if (justDragged) return;
-      if (mode === 'chaos' && drags.length && e.detail !== 0) return;
-      openProject(i);
-    });
-  });
-  document.addEventListener('keydown', (e) => {
-    if (modal.hidden) return;
-    if (e.key === 'Escape') { closeProject(); return; }
-    if (e.key === 'ArrowRight') stepProject(1);
-    if (e.key === 'ArrowLeft') stepProject(-1);
-    if (e.key === 'Tab') {
-      const f = $$('button', modal);
-      const first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
-
-  // I lavori cadono sul tavolo
-  if (!reduce) {
-    ST.create({
-      trigger: board, start: 'top 80%', once: true,
-      onEnter: () => {
-        const vis = cards.filter((c) => !c.classList.contains('mo-is-out'));
-        if (mode === 'chaos') {
-          G.from(vis, { y: -320, rotation: () => G.utils.random(-35, 35), opacity: 0, duration: 1, ease: 'back.out(1.1)', stagger: { each: 0.08, from: 'random' }, clearProps: 'opacity', onComplete: () => drags.forEach((dr) => dr.update()) });
-        } else {
-          G.from(vis, { y: 50, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06, clearProps: 'opacity' });
-        }
-      },
-    });
-  }
 }
 
 /* =================== CAROSELLO PROGETTI =================== */

@@ -1,7 +1,7 @@
 <h2>Come è fatto il sito</h2>
 <ul>
 	<li>La home è una <strong>pagina normale</strong> con il modello <strong>«MoveOn · pagina intera»</strong> (Pagine → modifica → Attributi pagina → Template). Il modello mette header, footer, menu mobile, barra contatti in basso e animazione di caricamento del prototipo, e ignora quelli di Porto.</li>
-	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Carosello progetti, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
+	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
 	<li>Accanto puoi mettere <strong>righe ed elementi standard</strong> di WPBakery (testo, immagini, pulsanti…) e dar loro lo stile del sito con le <strong>classi pronte</strong> (più sotto).</li>
 	<li>I <strong>progetti del portfolio</strong> sono nel menu <strong>Progetti portfolio</strong>: ognuno ha la sua <strong>pagina</strong> (es. <code>/progetti/forno-aurora/</code>) e c’è la pagina <strong>Progetti</strong> con tutti i lavori (<code>/progetti/</code>). Le <strong>richieste</strong> arrivate dal modulo sono in <strong>Richieste dal sito</strong>.</li>
 </ul>
@@ -29,8 +29,8 @@
 <h2>Immagini: dove si cambiano</h2>
 <table>
 	<tr><th>Immagine</th><th>Dove</th></tr>
-	<tr><td>Copertina di un progetto (card del Portfolio, pagina Progetti, grande immagine in cima alla pagina del progetto)</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra (orizzontale 4:3)</td></tr>
-	<tr><td>Immagine nel Carosello progetti</td><td>Stesso progetto → riquadro «Dettagli del progetto» → <strong>Immagine del carosello</strong> (verticale 3:4): <strong>Scegli</strong>, <strong>Sostituisci</strong>, <strong>Rimuovi</strong>. Se manca si usa la copertina, ritagliata al centro</td></tr>
+	<tr><td>Copertina di un progetto (card della pagina Progetti, grande immagine in cima alla pagina del progetto)</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra (orizzontale 4:3)</td></tr>
+	<tr><td>Immagine nel Portfolio (carosello)</td><td>Stesso progetto → riquadro «Dettagli del progetto» → <strong>Immagine del carosello</strong> (verticale 3:4): <strong>Scegli</strong>, <strong>Sostituisci</strong>, <strong>Rimuovi</strong>. Se manca si usa la copertina, ritagliata al centro</td></tr>
 	<tr><td>Sfondo delle pagine dei progetti e della pagina Progetti</td><td><strong>MoveOn → Impostazioni</strong> → <strong>Sfondi delle pagine dei progetti</strong> (colore, immagine con opacità, dimensione, posizione)</td></tr>
 	<tr><td>Immagini nella pagina del progetto</td><td>Stesso progetto → <strong>Immagini del progetto</strong>: <strong>Aggiungi immagini</strong>; su ogni miniatura <strong>Sostituisci</strong> o <strong>×</strong> per toglierla; <strong>trascinale</strong> per cambiare l’ordine. Nella pagina la 1ª, la 4ª, la 7ª… sono a tutta larghezza, le altre a due a due</td></tr>
 	<tr><td>Illustrazioni dei Servizi</td><td>Elemento <strong>MoveOn · Servizi</strong> → scheda <strong>Elenchi</strong> → apri il servizio → <strong>Immagine (4:3 o 1:1)</strong>: prende il posto dell’illustrazione animata</td></tr>
@@ -56,9 +56,9 @@
 	<li><strong>Ordine</strong>: Attributi → Ordine (numeri più bassi prima).</li>
 </ul>
 
-<h2>Carosello progetti</h2>
+<h2>Portfolio (carosello)</h2>
 <ul>
-	<li>Elemento <strong>MoveOn · Carosello progetti</strong>: i progetti su un’elica 3D. Si sfogliano <strong>trascinando</strong> (mouse o dito), con le <strong>frecce</strong>, con i tasti ← → o scorrendo di lato sul trackpad.</li>
+	<li>Elemento <strong>MoveOn · Portfolio</strong>: i progetti su un’elica 3D (card verticali). La sua ancora è <code>#portfolio</code>, quella della voce «Portfolio» del menu. Si sfogliano <strong>trascinando</strong> (mouse o dito), con le <strong>frecce</strong>, con i tasti ← → o scorrendo di lato sul trackpad.</li>
 	<li>Un clic sulla card <strong>al centro</strong> apre la <strong>pagina del progetto</strong> (nei browser recenti l’immagine «vola» al suo posto); un clic su una card di lato la porta al centro.</li>
 	<li>Campi: etichetta, titolo, testo, <strong>filtri</strong> per area (mostra/nascondi), testo del pulsante verso la pagina <strong>Progetti</strong> (<code>-</code> per toglierlo), ancora e scheda <strong>Sfondo</strong>. Di serie la sezione è blu notte.</li>
 	<li>Con «riduci movimento» attivo sul dispositivo diventa una fila semplice da scorrere.</li>
@@ -94,7 +94,7 @@
 <p>Alcuni colori dentro le illustrazioni (lampadina, scudo, bollino) sono scritti nei disegni: si cambiano da <strong>Modelli HTML</strong> (vedi sotto).</p>
 
 <h2>Modelli HTML</h2>
-<p>In <strong>MoveOn → Modelli HTML</strong> modifichi l’HTML di ogni sezione e delle parti fisse (header, footer, menu mobile, scheda progetto), e di illustrazioni e icone (cartella «parti»). Le modifiche restano anche quando aggiorni il plugin; «Ripristina originale» annulla tutto.</p>
+<p>In <strong>MoveOn → Modelli HTML</strong> modifichi l’HTML di ogni sezione e delle parti fisse (header, footer, menu mobile), e di illustrazioni e icone (cartella «parti»). Le modifiche restano anche quando aggiorni il plugin; «Ripristina originale» annulla tutto.</p>
 <table>
 	<tr><th>Scrivi</th><th>Diventa</th></tr>
 	<tr><td><code>{{titolo}}</code></td><td>il testo del campo (reso sicuro)</td></tr>

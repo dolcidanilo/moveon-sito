@@ -172,11 +172,9 @@ add_action(
 		$js = MOVEON_URL . 'assets/js/vendor/';
 		wp_enqueue_script( 'moveon-gsap', $js . 'gsap.min.js', array(), '3.15.0', true );
 		wp_enqueue_script( 'moveon-scrolltrigger', $js . 'ScrollTrigger.min.js', array( 'moveon-gsap' ), '3.15.0', true );
-		wp_enqueue_script( 'moveon-flip', $js . 'Flip.min.js', array( 'moveon-gsap' ), '3.15.0', true );
-		wp_enqueue_script( 'moveon-draggable', $js . 'Draggable.min.js', array( 'moveon-gsap' ), '3.15.0', true );
 		wp_enqueue_script( 'moveon-lenis', $js . 'lenis.min.js', array(), '1.3.27', true );
 		$main = MOVEON_DIR . 'assets/js/moveon.js';
-		wp_enqueue_script( 'moveon', MOVEON_URL . 'assets/js/moveon.js', array( 'moveon-scrolltrigger', 'moveon-flip', 'moveon-draggable', 'moveon-lenis' ), $v . '-' . ( file_exists( $main ) ? filemtime( $main ) : 0 ), true );
+		wp_enqueue_script( 'moveon', MOVEON_URL . 'assets/js/moveon.js', array( 'moveon-scrolltrigger', 'moveon-lenis' ), $v . '-' . ( file_exists( $main ) ? filemtime( $main ) : 0 ), true );
 	},
 	20
 );

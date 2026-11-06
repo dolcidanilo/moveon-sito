@@ -84,10 +84,10 @@ if ( ! get_page_by_path("prova-classi") ) {
 }
 ' 2>/dev/null
 php wpcli.php '
-$vecchia = get_page_by_path("prova-sfondo"); if ( $vecchia && false === strpos( $vecchia->post_content, "colore_titoli" ) ) { wp_delete_post( $vecchia->ID, true ); $vecchia = null; }
+$vecchia = get_page_by_path("prova-sfondo"); if ( $vecchia && ( false === strpos( $vecchia->post_content, "colore_titoli" ) || false !== strpos( $vecchia->post_content, "mo_portfolio" ) ) ) { wp_delete_post( $vecchia->ID, true ); $vecchia = null; }
 if ( ! $vecchia ) {
   $img = mo_importa_immagine("pausa-cuffie.jpg", "Foto di prova per lo sfondo");
-  $c = "[mo_garanzie sfondo_img=\"$img\" sfondo_opacita=\"40\"]\n[mo_contatti sfondo_img=\"$img\" sfondo_dimensione=\"contain\" sfondo_posizione=\"50% 0%\"]\n[mo_portfolio sfondo_colore=\"#2563eb\" sfondo_testi=\"chiari\" anchor=\"pf2\"]\n[mo_garanzie sfondo_colore=\"#0f172a\" sfondo_testi=\"chiari\" anchor=\"gar2\"]\n[mo_portfolio anchor=\"pf3\" sfondo_colore=\"#f59e0b\" sfondo_testi=\"scuri\" colore_titoli=\"#7c2d12\" colore_testi=\"#431407\" colore_etichette=\"#1d4ed8\"]";
+  $c = "[mo_garanzie sfondo_img=\"$img\" sfondo_opacita=\"40\"]\n[mo_contatti sfondo_img=\"$img\" sfondo_dimensione=\"contain\" sfondo_posizione=\"50% 0%\"]\n[mo_carosello sfondo_colore=\"#2563eb\" sfondo_testi=\"chiari\" anchor=\"pf2\"]\n[mo_garanzie sfondo_colore=\"#0f172a\" sfondo_testi=\"chiari\" anchor=\"gar2\"]\n[mo_carosello anchor=\"pf3\" sfondo_colore=\"#f59e0b\" sfondo_testi=\"scuri\" colore_titoli=\"#7c2d12\" colore_testi=\"#431407\" colore_etichette=\"#1d4ed8\"]";
   $id = wp_insert_post(["post_type"=>"page","post_status"=>"publish","post_title"=>"Prova sfondo","post_name"=>"prova-sfondo","post_content"=>$c]);
   update_post_meta($id, "_wp_page_template", "moveon-pagina-intera");
   echo "· Pagina prova-sfondo creata\n";
@@ -95,10 +95,13 @@ if ( ! $vecchia ) {
 ' 2>/dev/null
 php wpcli.php '
 $home = get_post( (int) get_option("page_on_front") );
-if ( $home && false === strpos( $home->post_content, "[mo_carosello" ) ) {
-  $c = preg_replace( "#(\[mo_portfolio[^\]]*\]\[/vc_column\]\[/vc_row\])#", "$1[vc_row full_width=\"stretch_row_content_no_spaces\" el_class=\"mo-riga\"][vc_column][mo_carosello][/vc_column][/vc_row]", $home->post_content, 1 );
+$riga_car = "[vc_row full_width=\"stretch_row_content_no_spaces\" el_class=\"mo-riga\"][vc_column][mo_carosello][/vc_column][/vc_row]";
+if ( $home && false !== strpos( $home->post_content, "[mo_portfolio" ) ) {
+  // Il vecchio Portfolio non esiste più (1.2.0): al suo posto il carosello (una volta sola)
+  $vecchia = "#\\[vc_row[^\\]]*\\]\\[vc_column\\]\\[mo_portfolio[^\\]]*\\]\\[/vc_column\\]\\[/vc_row\\]#";
+  $c = preg_replace( $vecchia, false === strpos( $home->post_content, "[mo_carosello" ) ? $riga_car : "", $home->post_content, 1 );
   wp_update_post( array( "ID" => $home->ID, "post_content" => $c ) );
-  echo "· Carosello progetti aggiunto sotto il Portfolio\n";
+  echo "· Vecchio Portfolio tolto dalla home\n";
 }
 $p = get_posts( array( "post_type" => MO_CPT, "name" => "forno-aurora", "numberposts" => 1 ) );
 if ( $p && ! get_post_meta( $p[0]->ID, "_mo_galleria", true ) ) {
