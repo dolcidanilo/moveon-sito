@@ -204,5 +204,41 @@ if ( $forno ) {
 }
 check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
+/* 11) Sfondi delle pagine dei progetti (MoveOn → Impostazioni) */
+$sp = mo_sfondo_pulito( array( 'sfondo_colore' => 'red;}body{x', 'sfondo_testi' => 'viola', 'sfondo_opacita' => 300, 'sfondo_dimensione' => 'enorme', 'sfondo_img' => 999999 ) );
+check( 'Sfondi: valori sbagliati scartati', '' === $sp['sfondo_colore'] && '' === $sp['sfondo_testi'] && 30 === $sp['sfondo_opacita'] && 'cover' === $sp['sfondo_dimensione'] && 0 === $sp['sfondo_img'], wp_json_encode( $sp ) );
+$di_serie = $forno ? mo_progetto_pagina_html( $forno ) : '';
+check( 'Sfondi: di serie nessun livello in più', $forno && ! str_contains( $di_serie, 'mo-bg' ) );
+update_option( 'moveon_sfondi', array(
+	'progetto_testa' => array( 'sfondo_colore' => '#f5efe6', 'sfondo_testi' => 'scuri', 'sfondo_img' => $jpg, 'sfondo_opacita' => 25 ),
+	'progetto_corpo' => array( 'sfondo_colore' => '#1e293b', 'sfondo_testi' => 'chiari' ),
+	'progetti_testa' => array( 'sfondo_img' => $jpg, 'sfondo_opacita' => 40, 'sfondo_dimensione' => 'contain', 'sfondo_posizione' => '50% 0%' ),
+	'progetti_corpo' => array( 'sfondo_colore' => '#fef3c7', 'sfondo_testi' => 'scuri' ),
+) );
+if ( $forno ) {
+	$html = mo_progetto_pagina_html( $forno );
+	$testa = substr( $html, 0, (int) strpos( $html, 'mo-prj-body' ) );
+	$corpo = substr( $html, (int) strpos( $html, 'mo-prj-body' ) );
+	check( 'Sfondi: parte alta del progetto con colore, testi scuri e immagine al 25%', str_contains( $testa, 'background-color:#f5efe6' ) && str_contains( $testa, 'data-testi="scuri"' ) && str_contains( $testa, 'opacity:0.25' ) );
+	check( 'Sfondi: contenuto del progetto con colore e testi chiari (dietro anche la copertina)', str_contains( $corpo, 'background-color:#1e293b' ) && str_contains( $corpo, 'data-testi="chiari"' ) && strpos( $corpo, 'mo-bg--colore' ) < strpos( $corpo, 'mo-prj-cover' ) );
+	$altro = get_posts( array( 'post_type' => MO_CPT, 'name' => 'hotel-belvedere', 'numberposts' => 1 ) )[0] ?? null;
+	check( 'Sfondi: valgono per tutti i progetti', $altro && str_contains( mo_progetto_pagina_html( $altro ), 'background-color:#f5efe6' ) );
+}
+$html = mo_progetti_archivio_html();
+check( 'Sfondi: pagina Progetti, immagine «intera» in alto e colore dell’elenco', str_contains( $html, 'background-size:contain' ) && str_contains( $html, 'background-position:50% 0%' ) && str_contains( $html, 'opacity:0.4' ) && str_contains( $html, 'background-color:#fef3c7' ) );
+$pagina = $forno ? (string) @file_get_contents( get_permalink( $forno ) ) : ''; // phpcs:ignore
+check( 'Sfondi: parte alta chiara → header con logo e testi scuri', str_contains( $pagina, 'class="mo-testa-chiara"' ) );
+$arch = (string) @file_get_contents( mo_progetti_url() ); // phpcs:ignore
+check( 'Sfondi: parte alta scura → header come sempre', ! str_contains( $arch, 'mo-testa-chiara' ) && str_contains( $arch, 'mo-bg--foto' ) );
+delete_option( 'moveon_sfondi' );
+if ( ! function_exists( 'mo_admin_impostazioni' ) ) {
+	require_once MOVEON_DIR . 'includes/admin.php'; // il pannello si carica solo nella bacheca
+	require_once ABSPATH . 'wp-admin/includes/template.php';
+}
+ob_start();
+mo_admin_impostazioni();
+$imp = (string) ob_get_clean();
+check( 'Impostazioni: 4 zone di sfondo con colore, testi, immagine, opacità, dimensione, posizione', 4 === substr_count( $imp, 'class="mo-sfondo-zona"' ) && 4 === substr_count( $imp, '[sfondo_opacita]' ) && 4 === substr_count( $imp, 'class="mo-colore"' ) && 4 === substr_count( $imp, '[sfondo_posizione]' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

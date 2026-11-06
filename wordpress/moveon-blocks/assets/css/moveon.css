@@ -682,17 +682,19 @@ img,svg{max-width:100%}
 /* =====================================================================
    PAGINE DEI PROGETTI: /progetti/ e /progetti/nome-progetto/
    ===================================================================== */
-.mo-prj-head{position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:#cbd5e1}
+/* Parte alta: colori come variabili, così «testi scuri» e i colori scelti nelle Impostazioni funzionano anche qui */
+.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:var(--mo-body)}
 .mo-prjs-head{padding-bottom:80px}
-.mo-block .mo-prj-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font:600 14px/20px var(--mo-font);color:#cbd5e1;text-decoration:none}
-.mo-block .mo-prj-back:hover{color:#fff}
+.mo-block .mo-prj-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font:600 14px/20px var(--mo-font);color:var(--mo-body);text-decoration:none}
+.mo-block .mo-prj-back:hover{color:var(--mo-ink)}
 .mo-prj-back svg,.mo-prj-near-dir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.mo-prj-badge{display:table;margin:0 0 18px;padding:6px 14px;border-radius:999px;background:rgba(96,165,250,.16);font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:#93c5fd}
-.mo-block .mo-prj-title{margin:0;max-width:18ch;font:800 clamp(40px,6.2vw,92px)/1.02 var(--mo-font);letter-spacing:-.035em;color:#fff}
-.mo-prj-tipo{margin:20px 0 0;font:500 clamp(18px,1.6vw,22px)/1.4 var(--mo-font);color:#cbd5e1}
-.mo-prjs-sub{margin:24px 0 0;max-width:52ch;font:400 18px/1.6 var(--mo-font);color:#cbd5e1}
+.mo-prj-badge{display:table;margin:0 0 18px;padding:6px 14px;border-radius:999px;background:rgba(96,165,250,.16);font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:var(--mo-chip-ink)}
+.mo-block .mo-prj-title{margin:0;max-width:18ch;font:800 clamp(40px,6.2vw,92px)/1.02 var(--mo-font);letter-spacing:-.035em;color:var(--mo-ink)}
+.mo-prj-tipo{margin:20px 0 0;font:500 clamp(18px,1.6vw,22px)/1.4 var(--mo-font);color:var(--mo-body)}
+.mo-prjs-sub{margin:24px 0 0;max-width:52ch;font:400 18px/1.6 var(--mo-font);color:var(--mo-body)}
 .mo-prjs-filter{margin-top:40px}
-.mo-prj-cover{position:relative;z-index:1;max-width:1200px;margin:calc(-10vw - 64px) auto 0;padding:0 var(--mo-margin)}
+/* La copertina sta nel contenuto (così lo sfondo del contenuto le passa dietro) e risale sulla parte alta */
+.mo-block .mo-prj-cover{position:relative;z-index:1;max-width:1200px;margin:calc(-10vw - 160px) auto 96px;padding:0 var(--mo-margin)}
 .mo-prj-cover img{display:block;width:100%;height:auto;max-height:82vh;object-fit:cover;border-radius:18px;background:var(--mo-surface-alt);box-shadow:0 50px 90px -40px rgba(2,6,23,.55);view-transition-name:mo-progetto-img}
 .mo-prj-body{padding:96px 0 112px;background:var(--mo-surface);color:var(--mo-body)}
 .mo-prj-blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;margin:0 0 80px}
@@ -706,7 +708,7 @@ img,svg{max-width:100%}
 .mo-block .mo-prj-img{margin:0}
 .mo-prj-img:nth-child(3n+1){grid-column:1 / -1}
 .mo-prj-img img{display:block;width:100%;height:auto;border-radius:14px;background:var(--mo-surface-alt)}
-.mo-prj-nav{padding:56px 0;background:var(--mo-surface-alt)}
+.mo-prj-nav{padding:88px 0 0}
 .mo-prj-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .mo-block .mo-prj-near{display:flex;align-items:center;gap:20px;padding:16px;border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card);color:var(--mo-ink);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
 .mo-block .mo-prj-near:hover{transform:translateY(-4px);color:var(--mo-ink)}
@@ -737,7 +739,7 @@ img,svg{max-width:100%}
 @media (max-width:767px){
   .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw)}
   .mo-prjs-head{padding-bottom:56px}
-  .mo-prj-cover{margin-top:calc(-14vw - 28px)}
+  .mo-block .mo-prj-cover{margin:calc(-14vw - 92px) auto 56px}
   .mo-prj-body{padding:64px 0 80px}
   .mo-prj-blocks{margin-bottom:56px}
   .mo-prj-gallery{grid-template-columns:1fr;gap:16px}
@@ -748,6 +750,12 @@ img,svg{max-width:100%}
   .mo-prjs-grid{grid-template-columns:1fr}
   .mo-prj-cta{padding:88px 0}
 }
+/* Pagine dei progetti con la parte alta chiara (Impostazioni → testi scuri): header con logo e testi scuri finché non scorri */
+.mo-testa-chiara:not(.mo-scrolled):not(.mo-menu-open) .mo-site-header{color:#0f172a}
+.mo-testa-chiara:not(.mo-scrolled):not(.mo-menu-open) .mo-site-header .mo-logo .mo-logo-l{opacity:1}
+.mo-testa-chiara:not(.mo-scrolled):not(.mo-menu-open) .mo-site-header .mo-logo .mo-logo-d{opacity:0}
+.mo-testa-chiara:not(.mo-scrolled):not(.mo-menu-open) body::before{background:transparent}
+
 /* Dalla card del carosello alla pagina del progetto: l'immagine «vola» al suo posto (nei browser che lo supportano) */
 @view-transition{navigation:auto}
 ::view-transition-group(mo-progetto-img){animation-duration:.65s;animation-timing-function:cubic-bezier(.65,0,.35,1)}

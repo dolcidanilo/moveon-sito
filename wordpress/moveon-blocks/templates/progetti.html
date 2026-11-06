@@ -1,6 +1,7 @@
-{{! PAGINA PROGETTI (tutti i lavori) · titolo testo; filtri (valore, nome), ha_filtri; progetti (url, nome, tipo, area, area_nome, immagine (url, alt, w, h)); vuoto; cta (testo, href) }}
+{{! PAGINA PROGETTI (tutti i lavori) · sfondo_testa e sfondo_corpo = sfondi scelti in MoveOn → Impostazioni; titolo testo; filtri (valore, nome), ha_filtri; progetti (url, nome, tipo, area, area_nome, immagine (url, alt, w, h)); vuoto; cta (testo, href) }}
 <div class="mo-prjs" data-mo-block="progetti">
   <div class="mo-block mo-prj-head mo-prjs-head" data-dark>
+    {{{sfondo_testa}}}
     <div class="mo-wrap">
       <h1 class="mo-prj-title">{{titolo}}</h1>
       {{#testo}}<p class="mo-prjs-sub">{{testo}}</p>{{/testo}}
@@ -8,6 +9,7 @@
     </div>
   </div>
   <div class="mo-block mo-prjs-body">
+    {{{sfondo_corpo}}}
     <div class="mo-wrap">
       <div class="mo-prjs-grid">
         {{#progetti}}

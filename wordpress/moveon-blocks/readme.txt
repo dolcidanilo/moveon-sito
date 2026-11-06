@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,11 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.1.1 =
+* Sfondi delle pagine dei progetti (MoveOn → Impostazioni): pagina Progetti (parte alta, elenco) e pagine dei progetti (parte alta, contenuto, per tutti i progetti) con colore, stile dei testi, immagine con opacità, dimensione e posizione.
+* Con la parte alta chiara («testi scuri») l'header usa logo e testi scuri finché non scorri.
+* Pagina del progetto: la copertina sta nel contenuto, così il suo sfondo le passa dietro; i progetti vicini sono in fondo al contenuto.
 
 = 1.1.0 =
 * Nuovo elemento «Carosello progetti»: progetti su un'elica 3D da trascinare (mouse, dito, frecce, tastiera, trackpad), con filtri; un clic apre la pagina del progetto.

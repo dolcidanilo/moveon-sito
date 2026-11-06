@@ -22,8 +22,9 @@ add_action(
 			return;
 		}
 		wp_enqueue_media();
-		wp_enqueue_script( 'moveon-admin', MOVEON_URL . 'assets/js/admin.js', array( 'jquery', 'jquery-ui-sortable' ), MOVEON_VERSION, true );
-		wp_add_inline_style( 'wp-admin', '.mo-galleria-anteprima img,.mo-media-anteprima img{width:80px;height:80px;object-fit:cover;margin:0 6px 6px 0;border-radius:6px;background:#f0f0f1}.mo-media-anteprima img{width:auto;max-width:220px;height:auto;max-height:80px;object-fit:contain;padding:8px;background:#1e293b}.mo-galleria{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px;padding:0;list-style:none}.mo-galleria-voce{position:relative;width:110px;margin:0;cursor:grab;background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:4px}.mo-galleria-voce img{display:block;width:100%;height:100px;object-fit:cover;border-radius:5px}.mo-galleria-sostituisci{display:block;width:100%;margin-top:4px;padding:3px 0;border:0;background:#f0f0f1;border-radius:4px;font-size:12px;cursor:pointer}.mo-galleria-sostituisci:hover{background:#dcdcde}.mo-galleria-togli{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border:0;border-radius:50%;background:#d63638;color:#fff;font-size:16px;line-height:24px;cursor:pointer}.mo-galleria-voce.ui-sortable-helper{box-shadow:0 8px 20px rgba(0,0,0,.2)}.mo-car-anteprima img{display:block;width:150px;height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#f0f0f1}.mo-tabs{margin:16px 0}.mo-guida{max-width:860px;font-size:14px;line-height:1.7}.mo-guida code{font-size:13px}.mo-guida h2{margin-top:2em}.mo-guida table{border-collapse:collapse}.mo-guida td,.mo-guida th{border:1px solid #dcdcde;padding:6px 10px;text-align:left;vertical-align:top}' );
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_script( 'moveon-admin', MOVEON_URL . 'assets/js/admin.js', array( 'jquery', 'jquery-ui-sortable', 'wp-color-picker' ), MOVEON_VERSION, true );
+		wp_add_inline_style( 'wp-admin', '.mo-galleria-anteprima img,.mo-media-anteprima img{width:80px;height:80px;object-fit:cover;margin:0 6px 6px 0;border-radius:6px;background:#f0f0f1}.mo-media-anteprima img{width:auto;max-width:220px;height:auto;max-height:80px;object-fit:contain;padding:8px;background:#1e293b}.mo-galleria{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px;padding:0;list-style:none}.mo-galleria-voce{position:relative;width:110px;margin:0;cursor:grab;background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:4px}.mo-galleria-voce img{display:block;width:100%;height:100px;object-fit:cover;border-radius:5px}.mo-galleria-sostituisci{display:block;width:100%;margin-top:4px;padding:3px 0;border:0;background:#f0f0f1;border-radius:4px;font-size:12px;cursor:pointer}.mo-galleria-sostituisci:hover{background:#dcdcde}.mo-galleria-togli{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border:0;border-radius:50%;background:#d63638;color:#fff;font-size:16px;line-height:24px;cursor:pointer}.mo-galleria-voce.ui-sortable-helper{box-shadow:0 8px 20px rgba(0,0,0,.2)}.mo-car-anteprima img{display:block;width:150px;height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#f0f0f1}.mo-sfondo-zona{margin:0 0 24px;padding:4px 20px 12px;background:#fff;border:1px solid #dcdcde;border-radius:8px;max-width:900px}.mo-sfondo-zona h3{margin:16px 0 0}.mo-sfondo-zona .form-table th{width:170px}.mo-sfondo-anteprima img{display:block;width:220px;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#f0f0f1}.mo-tabs{margin:16px 0}.mo-guida{max-width:860px;font-size:14px;line-height:1.7}.mo-guida code{font-size:13px}.mo-guida h2{margin-top:2em}.mo-guida table{border-collapse:collapse}.mo-guida td,.mo-guida th{border:1px solid #dcdcde;padding:6px 10px;text-align:left;vertical-align:top}' );
 		if ( $is_mo && 'modelli' === ( $_GET['tab'] ?? '' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			// Niente controllo automatico dell'HTML: segnalerebbe i segnaposto {{…}} come errori
 			$settings = wp_enqueue_code_editor( array( 'type' => 'text/html', 'codemirror' => array( 'lint' => false, 'gutters' => array() ) ) );
@@ -61,6 +62,13 @@ add_action(
 			}
 		}
 		update_option( 'moveon_settings', $out );
+		// Sfondi delle pagine dei progetti
+		$sfondi = array();
+		$in_sf  = wp_unslash( $_POST['mo_sfondi'] ?? array() );
+		foreach ( array_keys( mo_zone_sfondo() ) as $zona ) {
+			$sfondi[ $zona ] = mo_sfondo_pulito( is_array( $in_sf ) ? ( $in_sf[ $zona ] ?? array() ) : array() );
+		}
+		update_option( 'moveon_sfondi', $sfondi );
 		wp_safe_redirect( admin_url( 'admin.php?page=moveon&tab=impostazioni&salvato=1' ) );
 		exit;
 	}
@@ -167,6 +175,46 @@ function mo_media_field( string $key, string $label, string $desc, int $id ): vo
 	<?php
 }
 
+/** Campi di uno sfondo (colore, testi, immagine, opacità, dimensione, posizione) per una zona delle pagine dei progetti. */
+function mo_sfondo_campi( string $zona, string $titolo, string $desc ): void {
+	$v    = mo_sfondo_zona( $zona );
+	$base = 'mo_sfondi[' . $zona . ']';
+	$id   = 'mo-sf-' . $zona;
+	$sel  = function ( $campo, $opzioni ) use ( $v, $base, $id ) {
+		echo '<select name="' . esc_attr( $base . '[' . $campo . ']' ) . '" id="' . esc_attr( $id . '-' . $campo ) . '">';
+		foreach ( $opzioni as $val => $label ) {
+			echo '<option value="' . esc_attr( (string) $val ) . '"' . selected( (string) $v[ $campo ], (string) $val, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select>';
+	};
+	?>
+	<div class="mo-sfondo-zona">
+		<h3><?php echo esc_html( $titolo ); ?></h3>
+		<p class="description"><?php echo esc_html( $desc ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-colore">Colore di sfondo</label></th>
+				<td><input type="text" class="mo-colore" id="<?php echo esc_attr( $id ); ?>-colore" name="<?php echo esc_attr( $base ); ?>[sfondo_colore]" value="<?php echo esc_attr( $v['sfondo_colore'] ); ?>" data-default-color=""><p class="description">Vuoto = colore di serie.</p></td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_testi">Stile dei testi e delle card</label></th>
+				<td><?php $sel( 'sfondo_testi', array( '' => 'Automatico', 'chiari' => 'Testi chiari (per sfondi scuri)', 'scuri' => 'Testi scuri (per sfondi chiari)' ) ); ?></td></tr>
+			<tr><th>Immagine di sfondo</th>
+				<td>
+					<input type="hidden" name="<?php echo esc_attr( $base ); ?>[sfondo_img]" id="<?php echo esc_attr( $id ); ?>-img" value="<?php echo $v['sfondo_img'] ? (int) $v['sfondo_img'] : ''; ?>">
+					<div class="mo-sfondo-anteprima" id="<?php echo esc_attr( $id ); ?>-img-anteprima"><?php echo $v['sfondo_img'] ? wp_get_attachment_image( $v['sfondo_img'], 'medium' ) : ''; // phpcs:ignore ?></div>
+					<button type="button" class="button mo-scegli-immagine" data-target="<?php echo esc_attr( $id ); ?>-img"><?php echo $v['sfondo_img'] ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
+					<button type="button" class="button-link mo-togli-immagine" data-target="<?php echo esc_attr( $id ); ?>-img">Rimuovi</button>
+					<p class="description">JPG o PNG. Sta sopra il colore e sotto i testi.</p>
+				</td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-opacita">Opacità dell’immagine</label></th>
+				<td><input type="number" min="5" max="100" step="5" class="small-text" id="<?php echo esc_attr( $id ); ?>-opacita" name="<?php echo esc_attr( $base ); ?>[sfondo_opacita]" value="<?php echo (int) $v['sfondo_opacita']; ?>"> % <span class="description">da 5 (appena visibile) a 100 (piena)</span></td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_dimensione">Dimensione dell’immagine</label></th>
+				<td><?php $sel( 'sfondo_dimensione', array( 'cover' => 'Copre tutta la zona', 'contain' => 'Intera, senza tagli', 'auto' => 'Grandezza originale' ) ); ?></td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-posizione">Posizione dell’immagine</label></th>
+				<td><input type="text" style="width:9em" id="<?php echo esc_attr( $id ); ?>-posizione" name="<?php echo esc_attr( $base ); ?>[sfondo_posizione]" value="<?php echo esc_attr( $v['sfondo_posizione'] ); ?>"> <span class="description"><code>50% 50%</code> = centrata, <code>50% 0%</code> = in alto</span></td></tr>
+		</table>
+	</div>
+	<?php
+}
+
 function mo_admin_impostazioni(): void {
 	$s = mo_settings();
 	if ( isset( $_GET['salvato'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
@@ -226,6 +274,13 @@ function mo_admin_impostazioni(): void {
 			$text( 'progetti_testo', 'Testo introduttivo', 'Una o due frasi sotto il titolo.' );
 			?>
 		</table>
+				<h2>Sfondi delle pagine dei progetti</h2>
+		<p class="description">Come la scheda «Sfondo» degli elementi: colore, stile dei testi, immagine con opacità. Le «pagine dei progetti» valgono per tutti i progetti insieme. Lascia vuoto per l’aspetto di serie.</p>
+		<?php
+		foreach ( mo_zone_sfondo() as $zona => $info ) {
+			mo_sfondo_campi( $zona, $info[0], $info[1] );
+		}
+		?>
 				<h2>Opzioni</h2>
 		<table class="form-table" role="presentation">
 			<tr><th>Richieste del modulo</th><td><label><input type="checkbox" name="mo[salva_richieste]" value="1" <?php checked( ! empty( $s['salva_richieste'] ) ); ?>> Salva una copia di ogni richiesta in «Richieste dal sito» (utile se un’email non arriva)</label></td></tr>

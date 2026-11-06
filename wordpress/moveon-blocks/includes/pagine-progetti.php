@@ -74,6 +74,47 @@ function mo_link_sezione( string $href ): string {
 	return $href;
 }
 
+/* ---------------- Sfondi delle pagine dei progetti (MoveOn → Impostazioni) ---------------- */
+
+/** Le zone con uno sfondo proprio: stesse opzioni della scheda «Sfondo» degli elementi. */
+function mo_zone_sfondo(): array {
+	return array(
+		'progetti_testa' => array( 'Pagina Progetti · parte alta', 'Titolo, testo e filtri. Di serie blu notte.' ),
+		'progetti_corpo' => array( 'Pagina Progetti · elenco dei lavori', 'Dietro le card dei progetti. Di serie bianco.' ),
+		'progetto_testa' => array( 'Pagine dei progetti · parte alta', 'Nome del progetto (vale per tutti i progetti). Di serie blu notte.' ),
+		'progetto_corpo' => array( 'Pagine dei progetti · contenuto', 'Dietro copertina, testi, immagini e progetti vicini (vale per tutti i progetti). Di serie bianco.' ),
+	);
+}
+
+/** Valori di uno sfondo, puliti (accetta i campi così come arrivano dal modulo). */
+function mo_sfondo_pulito( $v ): array {
+	$v   = is_array( $v ) ? $v : array();
+	$img = absint( $v['sfondo_img'] ?? 0 );
+	$op  = (int) ( $v['sfondo_opacita'] ?? 30 );
+	return array(
+		'sfondo_colore'     => mo_colore( $v['sfondo_colore'] ?? '' ),
+		'sfondo_testi'      => in_array( $v['sfondo_testi'] ?? '', array( 'chiari', 'scuri' ), true ) ? $v['sfondo_testi'] : '',
+		'sfondo_img'        => $img && wp_attachment_is_image( $img ) ? $img : 0,
+		'sfondo_opacita'    => $op >= 5 && $op <= 100 ? $op : 30,
+		'sfondo_dimensione' => in_array( $v['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $v['sfondo_dimensione'] : 'cover',
+		'sfondo_posizione'  => sanitize_text_field( (string) ( $v['sfondo_posizione'] ?? '' ) ) ?: '50% 50%',
+	);
+}
+
+/** Sfondo salvato per una zona. */
+function mo_sfondo_zona( string $zona ): array {
+	$tutti = get_option( 'moveon_sfondi', array() );
+	return mo_sfondo_pulito( is_array( $tutti ) ? ( $tutti[ $zona ] ?? array() ) : array() );
+}
+
+/** La parte alta della pagina ha testi scuri (sfondo chiaro)? Allora anche l'header, finché non scorri, usa il logo e i testi scuri. */
+function mo_testa_chiara(): bool {
+	if ( ! mo_is_progetti_view() ) {
+		return false;
+	}
+	return 'scuri' === mo_sfondo_zona( is_post_type_archive( MO_CPT ) ? 'progetti_testa' : 'progetto_testa' )['sfondo_testi'];
+}
+
 /** HTML della pagina con tutti i progetti. */
 function mo_progetti_archivio_html(): string {
 	$s        = mo_settings();
@@ -99,6 +140,8 @@ function mo_progetti_archivio_html(): string {
 	return MO_Tpl::render(
 		'progetti',
 		array(
+			'sfondo_testa' => mo_sfondo_html( mo_sfondo_zona( 'progetti_testa' ) ),
+			'sfondo_corpo' => mo_sfondo_html( mo_sfondo_zona( 'progetti_corpo' ) ),
 			'titolo'   => mo_text( $s['progetti_titolo'] ),
 			'testo'    => mo_text( $s['progetti_testo'] ),
 			'filtri'    => $filtri,
@@ -140,6 +183,8 @@ function mo_progetto_pagina_html( WP_Post $post ): string {
 	return MO_Tpl::render(
 		'progetto',
 		array(
+			'sfondo_testa' => mo_sfondo_html( mo_sfondo_zona( 'progetto_testa' ) ),
+			'sfondo_corpo' => mo_sfondo_html( mo_sfondo_zona( 'progetto_corpo' ) ),
 			'nome'        => $p['nome'],
 			'area_nome'   => $p['area_nome'],
 			'tipo'        => $p['tipo'],

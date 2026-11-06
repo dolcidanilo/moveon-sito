@@ -1,6 +1,8 @@
 /* Pannello MoveOn: scelta di immagini dalla Libreria media (logo, immagine del carosello, immagini dei progetti). */
 jQuery(function ($) {
-  // Immagine singola (logo)
+  // Colori (sfondi delle pagine dei progetti)
+  if ($.fn.wpColorPicker) $('.mo-colore').wpColorPicker();
+  // Immagine singola (logo, immagine del carosello, immagini di sfondo)
   $(document).on('click', '.mo-scegli-immagine', function (e) {
     e.preventDefault();
     var target = $(this).data('target');
@@ -19,6 +21,7 @@ jQuery(function ($) {
     var target = $(this).data('target');
     $('#' + target).val('');
     $('#' + target + '-anteprima').empty();
+    $('.mo-scegli-immagine[data-target="' + target + '"]').filter(function () { return $(this).text() === 'Sostituisci'; }).text('Scegli l’immagine');
   });
   // Immagini del progetto: aggiungi, sostituisci, togli, trascina per l'ordine
   function voce(a) {
