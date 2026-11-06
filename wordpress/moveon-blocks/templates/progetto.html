@@ -1,6 +1,6 @@
-{{! PAGINA DI UN PROGETTO · sfondo_testa e sfondo_corpo = sfondi scelti in MoveOn → Impostazioni; nome area_nome tipo; copertina (url, alt, w, h); blocchi (titolo, testo), ha_blocchi; racconto = testo dell'editor (HTML); galleria (url, alt, width, height), ha_galleria; prec e succ (url, nome, immagine (url, alt)); archivio = pagina Progetti; cta (testo, href) }}
+{{! PAGINA DI UN PROGETTO · sfondo_testa e sfondo_corpo = sfondi scelti in MoveOn → Impostazioni; stile_testa = sfumatura in basso della parte alta; nome area_nome tipo; copertina (url, alt, w, h); blocchi (titolo, testo), ha_blocchi; racconto = testo dell'editor (HTML); galleria (url, alt, width, height), ha_galleria; prec e succ (url, nome, immagine (url, alt)); archivio = pagina Progetti; cta (testo, href) }}
 <article class="mo-prj" data-mo-block="progetto">
-  <div class="mo-block mo-prj-head" data-dark>
+  <div class="mo-block mo-prj-head{{#stile_testa}} mo-sfuma{{/stile_testa}}" data-dark{{#stile_testa}} style="{{stile_testa}}"{{/stile_testa}}>
     {{{sfondo_testa}}}
     <div class="mo-wrap">
       <a class="mo-prj-back" href="{{archivio}}">{{> icona-prec}}<span>Tutti i progetti</span></a>

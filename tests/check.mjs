@@ -553,6 +553,8 @@ async function provaPortfolio(page, nome, passi) {
   check('Clic sul progetto al centro: si apre la sua pagina', /\/progetti\/[^/]+\/$/.test(pg.url) && pg.h1 === atteso && pg.cover, `${pg.url} · ${pg.h1}`);
   check('Pagina progetto: menu, logo e pulsante portano alla home', pg.menu.length > 0 && pg.menu.every((h) => /\/nuovo\/#/.test(h)) && /\/nuovo\/$/.test(pg.logo) && /\/nuovo\/#contatti$/.test(pg.cta) && /\/progetti\/$/.test(pg.back), JSON.stringify({ menu: pg.menu[0], logo: pg.logo, cta: pg.cta }));
   check('Pagina progetto: niente schermata di caricamento', !pg.loader);
+  const bordo = await page.evaluate(() => { const n = document.querySelector('.mo-prj-near'); const t = document.querySelector('.mo-prj-block h2'); return n && t ? { b: getComputedStyle(n).borderTopColor, w: getComputedStyle(n).borderTopWidth, t: getComputedStyle(t).color } : null; });
+  check('Pagina progetto: box precedente/successivo con bordo di 1px come «La richiesta»', bordo && bordo.w === '1px' && bordo.b === bordo.t, JSON.stringify(bordo));
   // Pagina Progetti: filtri e link
   await page.goto(URL + 'progetti/', { waitUntil: 'load' }); await page.waitForTimeout(1500);
   const tutte = await page.locator('.mo-prjs-card').count();

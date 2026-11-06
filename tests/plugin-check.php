@@ -205,14 +205,14 @@ if ( $forno ) {
 check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
 /* 11) Sfondi delle pagine dei progetti (MoveOn → Impostazioni) */
-$sp = mo_sfondo_pulito( array( 'sfondo_colore' => 'red;}body{x', 'sfondo_testi' => 'viola', 'sfondo_opacita' => 300, 'sfondo_dimensione' => 'enorme', 'sfondo_img' => 999999 ) );
-check( 'Sfondi: valori sbagliati scartati', '' === $sp['sfondo_colore'] && '' === $sp['sfondo_testi'] && 30 === $sp['sfondo_opacita'] && 'cover' === $sp['sfondo_dimensione'] && 0 === $sp['sfondo_img'], wp_json_encode( $sp ) );
+$sp = mo_sfondo_pulito( array( 'sfondo_colore' => 'red;}body{x', 'sfondo_testi' => 'viola', 'sfondo_opacita' => 300, 'sfondo_dimensione' => 'enorme', 'sfondo_img' => 999999, 'sfumatura' => 5000 ) );
+check( 'Sfondi: valori sbagliati scartati', '' === $sp['sfondo_colore'] && '' === $sp['sfondo_testi'] && 30 === $sp['sfondo_opacita'] && 'cover' === $sp['sfondo_dimensione'] && 0 === $sp['sfondo_img'] && 600 === $sp['sfumatura'], wp_json_encode( $sp ) );
 $di_serie = $forno ? mo_progetto_pagina_html( $forno ) : '';
 check( 'Sfondi: di serie nessun livello in più', $forno && ! str_contains( $di_serie, 'mo-bg' ) );
 update_option( 'moveon_sfondi', array(
 	'progetto_testa' => array( 'sfondo_colore' => '#f5efe6', 'sfondo_testi' => 'scuri', 'sfondo_img' => $jpg, 'sfondo_opacita' => 25 ),
 	'progetto_corpo' => array( 'sfondo_colore' => '#1e293b', 'sfondo_testi' => 'chiari' ),
-	'progetti_testa' => array( 'sfondo_img' => $jpg, 'sfondo_opacita' => 40, 'sfondo_dimensione' => 'contain', 'sfondo_posizione' => '50% 0%' ),
+	'progetti_testa' => array( 'sfondo_img' => $jpg, 'sfondo_opacita' => 40, 'sfondo_dimensione' => 'contain', 'sfondo_posizione' => '50% 0%', 'sfumatura' => 160 ),
 	'progetti_corpo' => array( 'sfondo_colore' => '#fef3c7', 'sfondo_testi' => 'scuri' ),
 ) );
 if ( $forno ) {
@@ -225,6 +225,9 @@ if ( $forno ) {
 	check( 'Sfondi: valgono per tutti i progetti', $altro && str_contains( mo_progetto_pagina_html( $altro ), 'background-color:#f5efe6' ) );
 }
 $html = mo_progetti_archivio_html();
+check( 'Sfumatura: 160 px in fondo alla parte alta, verso il colore dell’elenco', str_contains( $html, 'mo-prj-head mo-prjs-head mo-sfuma' ) && str_contains( $html, 'style="--mo-sfumatura:160px;--mo-fondo-contenuto:#fef3c7"' ) );
+check( 'Pagina Progetti: i filtri stanno sopra le card, non nella parte alta', strpos( $html, 'mo-prjs-filter' ) > strpos( $html, 'mo-prjs-body' ) && strpos( $html, 'mo-prjs-filter' ) < strpos( $html, 'mo-prjs-grid' ) );
+check( 'Sfumatura: senza valore nessuna sfumatura', $forno && ! str_contains( mo_progetto_pagina_html( $forno ), 'mo-sfuma' ) );
 check( 'Sfondi: pagina Progetti, immagine «intera» in alto e colore dell’elenco', str_contains( $html, 'background-size:contain' ) && str_contains( $html, 'background-position:50% 0%' ) && str_contains( $html, 'opacity:0.4' ) && str_contains( $html, 'background-color:#fef3c7' ) );
 $pagina = $forno ? (string) @file_get_contents( get_permalink( $forno ) ) : ''; // phpcs:ignore
 check( 'Sfondi: parte alta chiara → header con logo e testi scuri', str_contains( $pagina, 'class="mo-testa-chiara"' ) );
@@ -239,6 +242,7 @@ ob_start();
 mo_admin_impostazioni();
 $imp = (string) ob_get_clean();
 check( 'Impostazioni: 4 zone di sfondo con colore, testi, immagine, opacità, dimensione, posizione', 4 === substr_count( $imp, 'class="mo-sfondo-zona"' ) && 4 === substr_count( $imp, '[sfondo_opacita]' ) && 4 === substr_count( $imp, 'class="mo-colore"' ) && 4 === substr_count( $imp, '[sfondo_posizione]' ) );
+check( 'Impostazioni: sfumatura in basso solo per le due parti alte', 2 === substr_count( $imp, '[sfumatura]' ) );
 
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

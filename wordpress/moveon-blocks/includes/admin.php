@@ -208,6 +208,10 @@ function mo_sfondo_campi( string $zona, string $titolo, string $desc ): void {
 				<td><input type="number" min="5" max="100" step="5" class="small-text" id="<?php echo esc_attr( $id ); ?>-opacita" name="<?php echo esc_attr( $base ); ?>[sfondo_opacita]" value="<?php echo (int) $v['sfondo_opacita']; ?>"> % <span class="description">da 5 (appena visibile) a 100 (piena)</span></td></tr>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_dimensione">Dimensione dell’immagine</label></th>
 				<td><?php $sel( 'sfondo_dimensione', array( 'cover' => 'Copre tutta la zona', 'contain' => 'Intera, senza tagli', 'auto' => 'Grandezza originale' ) ); ?></td></tr>
+			<?php if ( str_ends_with( $zona, '_testa' ) ) : ?>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfumatura">Sfumatura in basso</label></th>
+				<td><input type="number" min="0" max="600" step="10" class="small-text" id="<?php echo esc_attr( $id ); ?>-sfumatura" name="<?php echo esc_attr( $base ); ?>[sfumatura]" value="<?php echo (int) $v['sfumatura']; ?>"> px <span class="description">Pixel aggiunti in fondo alla parte alta, dove sfuma nel colore del contenuto sotto. 0 = nessuna sfumatura (es. 160).</span></td></tr>
+			<?php endif; ?>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-posizione">Posizione dell’immagine</label></th>
 				<td><input type="text" style="width:9em" id="<?php echo esc_attr( $id ); ?>-posizione" name="<?php echo esc_attr( $base ); ?>[sfondo_posizione]" value="<?php echo esc_attr( $v['sfondo_posizione'] ); ?>"> <span class="description"><code>50% 50%</code> = centrata, <code>50% 0%</code> = in alto</span></td></tr>
 		</table>

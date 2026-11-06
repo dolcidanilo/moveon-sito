@@ -683,8 +683,11 @@ img,svg{max-width:100%}
    PAGINE DEI PROGETTI: /progetti/ e /progetti/nome-progetto/
    ===================================================================== */
 /* Parte alta: colori come variabili, così «testi scuri» e i colori scelti nelle Impostazioni funzionano anche qui */
-.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:var(--mo-body)}
-.mo-prjs-head{padding-bottom:80px}
+.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw + var(--mo-sfumatura,0px));background:var(--mo-navy);color:var(--mo-body)}
+/* Sfumatura in basso della parte alta (Impostazioni): la zona sfuma nel colore del contenuto sotto */
+.mo-prj,.mo-prjs{--mo-fondo-contenuto:var(--mo-surface)}
+.mo-prj-head.mo-sfuma::after{content:"";position:absolute;left:0;right:0;bottom:0;z-index:-1;height:var(--mo-sfumatura,0px);background:linear-gradient(to bottom,transparent,var(--mo-fondo-contenuto));pointer-events:none}
+.mo-prjs-head{padding-bottom:calc(80px + var(--mo-sfumatura,0px))}
 .mo-block .mo-prj-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font:600 14px/20px var(--mo-font);color:var(--mo-body);text-decoration:none}
 .mo-block .mo-prj-back:hover{color:var(--mo-ink)}
 .mo-prj-back svg,.mo-prj-near-dir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -692,7 +695,7 @@ img,svg{max-width:100%}
 .mo-block .mo-prj-title{margin:0;max-width:18ch;font:800 clamp(40px,6.2vw,92px)/1.02 var(--mo-font);letter-spacing:-.035em;color:var(--mo-ink)}
 .mo-prj-tipo{margin:20px 0 0;font:500 clamp(18px,1.6vw,22px)/1.4 var(--mo-font);color:var(--mo-body)}
 .mo-prjs-sub{margin:24px 0 0;max-width:52ch;font:400 18px/1.6 var(--mo-font);color:var(--mo-body)}
-.mo-prjs-filter{margin-top:40px}
+.mo-prjs-filter{margin:0 0 40px}
 /* La copertina sta nel contenuto (così lo sfondo del contenuto le passa dietro) e risale sulla parte alta */
 .mo-block .mo-prj-cover{position:relative;z-index:1;max-width:1200px;margin:calc(-10vw - 160px) auto 96px;padding:0 var(--mo-margin)}
 .mo-prj-cover img{display:block;width:100%;height:auto;max-height:82vh;object-fit:cover;border-radius:18px;background:var(--mo-surface-alt);box-shadow:0 50px 90px -40px rgba(2,6,23,.55);view-transition-name:mo-progetto-img}
@@ -709,8 +712,9 @@ img,svg{max-width:100%}
 .mo-prj-img:nth-child(3n+1){grid-column:1 / -1}
 .mo-prj-img img{display:block;width:100%;height:auto;border-radius:14px;background:var(--mo-surface-alt)}
 .mo-prj-nav{padding:88px 0 0}
+.mo-prj-body .mo-wrap > :last-child{margin-bottom:0} /* niente spazio doppio se mancano testo o immagini */
 .mo-prj-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.mo-block .mo-prj-near{display:flex;align-items:center;gap:20px;padding:16px;border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card);color:var(--mo-ink);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.mo-block .mo-prj-near{display:flex;align-items:center;gap:20px;padding:16px;border:1px solid var(--mo-link);border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card);color:var(--mo-ink);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
 .mo-block .mo-prj-near:hover{transform:translateY(-4px);color:var(--mo-ink)}
 .mo-prj-near--succ{grid-column:2;justify-content:flex-end;text-align:right}
 .mo-prj-near-img{flex:0 0 auto;width:128px;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--mo-surface-alt)}
@@ -737,8 +741,8 @@ img,svg{max-width:100%}
   .mo-prj-blocks{grid-template-columns:1fr;gap:32px}
 }
 @media (max-width:767px){
-  .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw)}
-  .mo-prjs-head{padding-bottom:56px}
+  .mo-prj-head{padding:calc(var(--mo-header-h) + 32px) 0 calc(56px + 14vw + var(--mo-sfumatura,0px))}
+  .mo-prjs-head{padding-bottom:calc(56px + var(--mo-sfumatura,0px))}
   .mo-block .mo-prj-cover{margin:calc(-14vw - 92px) auto 56px}
   .mo-prj-body{padding:64px 0 80px}
   .mo-prj-blocks{margin-bottom:56px}
