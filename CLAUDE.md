@@ -64,6 +64,7 @@ Regole di costruzione:
 
 Inciampi già visti:
 - Nel WordPress di prova non si scarica da wordpress.org (rete bloccata).
+- Gli script Playwright salvano gli screenshot nella cartella corrente: lanciali dalla scratchpad, mai dalla cartella del plugin (uno screenshot è finito una volta nello zip). Prima del commit controlla `git status`.
 - Il messaggio di Chrome «Transition was aborted because of invalid state» nei test è innocuo (passaggio animato tra pagine interrotto dal browser automatico): il test lo ignora.
 - Gli script Bash con heredoc che contengono `$$` o simili possono essere bloccati dal controllo di sicurezza: scrivi lo script in un file con lo strumento di scrittura e poi eseguilo.
 - `getComputedStyle` è «vivo»: leggi i valori prima di togliere le classi nei test.
