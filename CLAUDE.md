@@ -87,6 +87,7 @@ Inciampi già visti:
 
 ## In sospeso
 
+- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`** (mappa delle pagine, fasi A contenuti → B costruzione → C W3 → D W4). Partire da lì. Ora si aspetta il **vecchio elenco** dei lavori dal cliente (fase A).
 - Possibili ritocchi grafici «di gusto» annunciati dal cliente.
 - **W3** — vedi `docs/piano-W3-seo-analytics-legalblink.md` (da riproporre per intero quando si inizia): SEO locale su Pescara e provincia (scheda Google Business Profile da creare, attività senza sede aperta al pubblico; Rank Math; pagine servizi; dati strutturati), Google Analytics, LegalBlink, invio email affidabile (SMTP con la casella Aruba).
 - **W4** — spostamento da /nuovo al sito principale.

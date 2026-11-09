@@ -18,7 +18,7 @@ Il sito di MoveOn Studio come **plugin WordPress per WPBakery**: le 8 sezioni de
 | `dist/moveon-blocks.zip` | Il plugin pronto da caricare |
 | `tests/`, `tools/` | Controlli automatici e strumenti (zip, WordPress di prova) |
 | `CLAUDE.md` | Memoria del progetto per Claude |
-| `docs/` | Piani delle prossime fasi |
+| `docs/` | Piano del sito (`piano-sito.md`), bozze dei testi, piano SEO/Analytics/LegalBlink |
 
 ## Stato dei lavori
 
