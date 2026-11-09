@@ -80,6 +80,8 @@ Inciampi già visti:
 - **Pagine dei progetti** pubbliche per la SEO: `/progetti/` (tutti, con filtri sopra le card) e `/progetti/nome/` (copertina, testi, racconto dall'editor, immagini, precedente/successivo, invito finale).
 - **Sfondi delle pagine dei progetti** (MoveOn → Impostazioni): 4 zone (parte alta / contenuto per ciascuna pagina) con le stesse opzioni della scheda Sfondo. La «sfumatura in basso» fa proseguire foto e colore della parte alta **sotto** il contenuto, che **non si sposta**.
 - Pagina del progetto: box precedente/successivo con bordo 1px colore etichette, su una **fascia nera al 20%**; pagina Progetti: invito finale con **nero al 20%** sopra il blu.
+- **Struttura per la SEO**: la home resta la vetrina e *riassume*; pagine dedicate *approfondiscono* (Chi sono, una pagina per servizio, Progetti, Contatti), senza testi ripetuti. Menu verso le pagine (sottomenu Servizi: il menu oggi è a un livello, da estendere).
+- **Tono dei testi**: prima persona singolare («io», è un freelance). **Niente nome, niente foto, nessun riferimento all'azienda** per cui lavora come responsabile della comunicazione (non vuole essere riconoscibile). Pochi testi, molte prove (numeri, progetti, recensioni). Bozza in `docs/testi-chi-sono.md`.
 - Cookie e policy: **LegalBlink di Aruba** al posto di iubenda (non disdire iubenda prima della W4).
 - **Google Analytics 4** sì, solo dopo il consenso (Consent Mode v2).
 
