@@ -14,7 +14,7 @@
   --mo-surface:#ffffff; --mo-surface-alt:#f8fafc; --mo-ink:#0f172a; --mo-body:#334155; --mo-muted:#64748b; --mo-border:#e2e8f0;
   --mo-link:#2563eb; --mo-brand:#2563eb; --mo-brand-strong:#1d4ed8; --mo-brand-tint:#eff6ff; --mo-chip-ink:#1d4ed8;
   --mo-accent:#f59e0b; --mo-on-accent:#0f172a; --mo-focus:#2563eb;
-  --mo-navy:#0f172a; --mo-navy-2:#1e293b; --mo-sky:#60a5fa; --mo-tone-b:#60a5fa;
+  --mo-navy:#0f172a; --mo-navy-2:#182343; --mo-sky:#60a5fa; --mo-tone-b:#60a5fa;
   /* Carattere: per cambiarlo, caricalo (es. Google Fonts) e scrivi qui il nome */
   --mo-font:"Montserrat","Helvetica Neue",Arial,sans-serif;
   /* Misure: altezza header, spazi tra colonne, margini laterali */
@@ -34,14 +34,14 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --mo-surface:#0f172a; --mo-surface-alt:#1e293b; --mo-ink:#f8fafc; --mo-body:#cbd5e1; --mo-muted:#94a3b8; --mo-border:#334155;
+    --mo-surface:#0f172a; --mo-surface-alt:#182343; --mo-ink:#f8fafc; --mo-body:#cbd5e1; --mo-muted:#94a3b8; --mo-border:#334155;
     --mo-link:#60a5fa; --mo-brand-tint:#172554; --mo-chip-ink:#93c5fd; --mo-focus:#93c5fd; --mo-tone-b:#93c5fd;
     --mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); --mo-shadow-hover:0 12px 32px rgba(0,0,0,.5);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --mo-surface:#0f172a; --mo-surface-alt:#1e293b; --mo-ink:#f8fafc; --mo-body:#cbd5e1; --mo-muted:#94a3b8; --mo-border:#334155;
+  --mo-surface:#0f172a; --mo-surface-alt:#182343; --mo-ink:#f8fafc; --mo-body:#cbd5e1; --mo-muted:#94a3b8; --mo-border:#334155;
   --mo-link:#60a5fa; --mo-brand-tint:#172554; --mo-chip-ink:#93c5fd; --mo-focus:#93c5fd; --mo-tone-b:#93c5fd;
   --mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); --mo-shadow-hover:0 12px 32px rgba(0,0,0,.5);
   color-scheme:dark;
@@ -276,6 +276,10 @@ img,svg{max-width:100%}
 .mo-dash{stroke-dasharray:4 10;opacity:.55}
 .mo-cur-stroke{stroke:var(--mo-bg-panel);stroke-width:3;stroke-linejoin:round}
 .mo-svc-intro{flex-basis:82%;justify-content:center;padding-left:0;background:transparent}
+/* Stacco tra il titolo e le schede (e tra schede dello stesso colore): ogni scheda ha un'ombra sul lato sinistro,
+   come un foglio appoggiato sul precedente; il titolo sta su un fondo appena diverso */
+.mo-h-scroll .mo-svc-intro{background:var(--mo-surface-alt)}
+.mo-h-scroll .mo-svc-panel:not(.mo-svc-intro){box-shadow:-28px 0 56px -28px rgba(15,23,42,.28)}
 .mo-svc-end{justify-content:center;align-items:flex-start}
 .mo-svc-hint{display:inline-flex;align-items:center;gap:12px;font:700 12px/16px var(--mo-font);letter-spacing:.12em;text-transform:uppercase;color:var(--mo-muted)}
 .mo-svc-hint svg{width:28px;height:16px;animation:nudge 1.4s ease-in-out infinite}
@@ -342,7 +346,7 @@ img,svg{max-width:100%}
 .mo-fld{display:flex;flex-direction:column;gap:8px}
 .mo-fld label{font:600 14px/20px var(--mo-font);color:#e2e8f0}
 .mo-fld .mo-opt{font-weight:500;color:#94a3b8}
-.mo-fld input,.mo-fld select,.mo-fld textarea{width:100%;min-height:48px;padding:12px 14px;border:1px solid #475569;border-radius:8px;background:#1e293b;color:#fff;font:400 16px/24px var(--mo-font)}
+.mo-fld input,.mo-fld select,.mo-fld textarea{width:100%;min-height:48px;padding:12px 14px;border:1px solid #475569;border-radius:8px;background:#182343;color:#fff;font:400 16px/24px var(--mo-font)}
 .mo-fld textarea{resize:vertical;min-height:140px}
 .mo-fld input:focus-visible,.mo-fld select:focus-visible,.mo-fld textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:1px;border-color:#93c5fd}
 .mo-fld [aria-invalid="true"]{border-color:#fcd34d}
@@ -351,13 +355,13 @@ img,svg{max-width:100%}
 .mo-chk a{color:#93c5fd}
 .mo-form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .mo-form-msg{margin:0;font:600 14px/20px var(--mo-font);color:#fcd34d}
-.mo-form-done{padding:32px;border-radius:12px;background:#1e293b;box-shadow:inset 0 0 0 1px #334155}
+.mo-form-done{padding:32px;border-radius:12px;background:#182343;box-shadow:inset 0 0 0 1px #334155}
 .mo-form-done[hidden]{display:none}
 .mo-ok-badge{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;background:#064e3b;color:#6ee7b7;font:700 11px/16px var(--mo-font);letter-spacing:.08em;text-transform:uppercase}
 .mo-ok-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:#10b981}
 .mo-form-done h3{margin:16px 0 8px;font:800 28px/36px var(--mo-font);color:#fff}
 .mo-form-done p{margin:0}
-.mo-foot{padding:40px 0;background:var(--mo-navy);color:#94a3b8;border-top:1px solid #1e293b}
+.mo-foot{padding:40px 0;background:var(--mo-navy);color:#94a3b8;border-top:1px solid #182343}
 .mo-foot-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
 .mo-foot .mo-logo{color:#fff;width:150px}
 .mo-foot p{margin:0;font:500 13px/18px var(--mo-font)}
@@ -432,7 +436,7 @@ img,svg{max-width:100%}
   :is(.mo-car-filter,.mo-prjs-filter) button{flex:none;padding:9px 12px;font-size:13px;white-space:nowrap}
   .mo-fld-row{grid-template-columns:1fr}
   .mo-ct-badge{right:-16px;bottom:-24px;width:108px;height:108px}
-  .mo-emo-text{bottom:10%}
+  .mo-emo-text{bottom:calc(88px + env(safe-area-inset-bottom,0px))} /* sopra la barra dei contatti in basso */
   .mo-mbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--mo-surface);border-top:1px solid var(--mo-border)}
   .mo-mbar .mo-btn{flex:1}
   body{padding-bottom:72px}
@@ -524,12 +528,12 @@ img,svg{max-width:100%}
 .wpb_wrapper > .mo-block{margin:0 !important}
 
 /* Campi del modulo: tutti uguali, scuri, qualunque sia il loro tipo */
-.mo-ct-form .mo-fld :is(input,select,textarea){width:100%;height:auto;min-height:48px;margin:0;padding:12px 14px;border:1px solid #475569;border-radius:8px;background:#1e293b;color:#fff;box-shadow:none;font:400 16px/24px var(--mo-font);letter-spacing:normal}
+.mo-ct-form .mo-fld :is(input,select,textarea){width:100%;height:auto;min-height:48px;margin:0;padding:12px 14px;border:1px solid #475569;border-radius:8px;background:#182343;color:#fff;box-shadow:none;font:400 16px/24px var(--mo-font);letter-spacing:normal}
 .mo-ct-form .mo-fld textarea{min-height:140px}
-.mo-ct-form .mo-fld :is(input,select,textarea):focus{border-color:#93c5fd;background:#1e293b;color:#fff;box-shadow:none}
+.mo-ct-form .mo-fld :is(input,select,textarea):focus{border-color:#93c5fd;background:#182343;color:#fff;box-shadow:none}
 .mo-ct-form .mo-fld :is(input,select,textarea):focus-visible{outline:3px solid #93c5fd;outline-offset:1px}
 .mo-ct-form .mo-fld [aria-invalid="true"]{border-color:#fcd34d}
-.mo-ct-form .mo-fld :is(input,textarea):-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #1e293b inset;-webkit-text-fill-color:#fff;caret-color:#fff}
+.mo-ct-form .mo-fld :is(input,textarea):-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #182343 inset;-webkit-text-fill-color:#fff;caret-color:#fff}
 .mo-ct-form .mo-chk input{width:22px;height:22px;min-height:0;margin:0;padding:0}
 
 /* Link e pulsanti: stessi colori in ogni stato (passaggio del mouse, focus, già visitato) */
@@ -564,8 +568,8 @@ img,svg{max-width:100%}
 .mo-block > .mo-bg{position:absolute;inset:0;z-index:-1;background-repeat:no-repeat;pointer-events:none}
 .mo-block > .mo-bg--colore{z-index:-2}
 /* Stile dei testi e delle card scelto nella scheda Sfondo */
-.mo-block:has(> .mo-bg[data-testi="chiari"]){--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#e2e8f0;--mo-muted:#e2e8f0;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;--mo-tone-b:#93c5fd;--mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color:var(--mo-body)}
-.mo-block:has(> .mo-bg[data-testi="scuri"]){--mo-surface:#ffffff;--mo-surface-alt:#f8fafc;--mo-ink:#0f172a;--mo-body:#1e293b;--mo-muted:#1e293b;--mo-border:#e2e8f0;--mo-link:#2563eb;--mo-brand-tint:#eff6ff;--mo-chip-ink:#1d4ed8;--mo-tone-b:#60a5fa;--mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08);color:var(--mo-body)}
+.mo-block:has(> .mo-bg[data-testi="chiari"]){--mo-surface:#0f172a;--mo-surface-alt:#182343;--mo-ink:#f8fafc;--mo-body:#e2e8f0;--mo-muted:#e2e8f0;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;--mo-tone-b:#93c5fd;--mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color:var(--mo-body)}
+.mo-block:has(> .mo-bg[data-testi="scuri"]){--mo-surface:#ffffff;--mo-surface-alt:#f8fafc;--mo-ink:#0f172a;--mo-body:#182343;--mo-muted:#182343;--mo-border:#e2e8f0;--mo-link:#2563eb;--mo-brand-tint:#eff6ff;--mo-chip-ink:#1d4ed8;--mo-tone-b:#60a5fa;--mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08);color:var(--mo-body)}
 /* Nessuno spazio attorno ai blocchi MoveOn, qualunque contenitore il tema aggiunga */
 .mo-block.mo-block{margin:0 !important}
 /* (tutti i contenitori tra la riga e il blocco, tranne il "pin-spacer" che serve allo scorrimento bloccato) */
@@ -585,7 +589,7 @@ img,svg{max-width:100%}
    Senza JavaScript o con «riduci movimento»: fila di card da scorrere.
    Con JavaScript: carosello 3D (classe mo-car--3d), posizioni calcolate in moveon.js.
    ===================================================================== */
-.mo-car{--mo-car-w:clamp(230px,23vw,330px);--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;position:relative;padding:112px 0 104px;background:var(--mo-navy);color:var(--mo-body);overflow:hidden}
+.mo-car{--mo-car-w:clamp(230px,23vw,330px);--mo-surface:#0f172a;--mo-surface-alt:#182343;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;position:relative;padding:112px 0 104px;background:var(--mo-navy);color:var(--mo-body);overflow:hidden}
 .mo-car-head{position:relative;z-index:2}
 .mo-car .mo-overline-h2{color:var(--mo-link)} /* come le altre sezioni: segue «colore delle etichette» della scheda Sfondo */
 .mo-car-head .mo-statement{max-width:16ch}
@@ -626,7 +630,7 @@ img,svg{max-width:100%}
    PAGINE DEI PROGETTI: /progetti/ e /progetti/nome-progetto/
    ===================================================================== */
 /* Parte alta: colori come variabili, così «testi scuri» e i colori scelti nelle Impostazioni funzionano anche qui */
-.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#1e293b;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:var(--mo-body)}
+.mo-prj-head{--mo-surface:#0f172a;--mo-surface-alt:#182343;--mo-ink:#f8fafc;--mo-body:#cbd5e1;--mo-muted:#94a3b8;--mo-border:#334155;--mo-link:#60a5fa;--mo-chip-ink:#93c5fd;position:relative;padding:calc(var(--mo-header-h) + 72px) 0 calc(112px + 10vw);background:var(--mo-navy);color:var(--mo-body)}
 /* Livelli delle pagine dei progetti. La pagina è un livello a sé: gli sfondi del contenuto stanno sotto,
    poi la parte alta (che con la «sfumatura» prosegue sotto il contenuto e svanisce), poi i contenuti. */
 .mo-prj,.mo-prjs{position:relative;isolation:isolate}
@@ -716,3 +720,44 @@ img,svg{max-width:100%}
 @view-transition{navigation:auto}
 ::view-transition-group(mo-progetto-img){animation-duration:.65s;animation-timing-function:cubic-bezier(.65,0,.35,1)}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+
+/* =====================================================================
+   HERO A IMMAGINI (una per settore): le foto si compongono «pixel dopo pixel».
+   Le tessere sono create da moveon.js; senza JavaScript o con «riduci movimento» si vede la prima foto.
+   ===================================================================== */
+.mo-hero--slide{background:var(--mo-navy)}
+.mo-hs{position:absolute;inset:0;z-index:0;overflow:hidden}
+.mo-hs-slide{position:absolute;inset:0;opacity:0;visibility:hidden}
+.mo-hs-slide.mo-is-on{opacity:1;visibility:visible}
+.mo-block .mo-hs-slide img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform-origin:50% 50%}
+.mo-hs-tiles{position:absolute;inset:0;z-index:1;pointer-events:none}
+.mo-hs-tile{position:absolute;display:block;background-repeat:no-repeat;will-change:transform,opacity}
+/* Velo per leggere il testo: più scuro a sinistra (dove c'è il titolo) e in basso (dove ci sono i settori) */
+.mo-hs-veil{position:absolute;inset:0;z-index:2;background:
+  linear-gradient(0deg,rgba(9,14,32,.75) 0,rgba(9,14,32,0) 34%),
+  linear-gradient(90deg,rgba(9,14,32,calc(var(--mo-hs-velo,.45) + .25)) 0,rgba(9,14,32,var(--mo-hs-velo,.45)) 50%,rgba(9,14,32,calc(var(--mo-hs-velo,.45) * .55)) 100%)}
+.mo-hero--slide .mo-hero-inner{z-index:3}
+.mo-hero--slide .mo-hero-copy{grid-column:1 / span 8}
+.mo-hero--slide .mo-hero-sub{color:#e2e8f0}
+/* Settori in basso, con la barra che si riempie */
+.mo-hs-nav{position:absolute;left:0;right:0;bottom:40px;z-index:3;display:flex;align-items:flex-end;gap:28px;max-width:1200px;margin:0 auto;padding:0 var(--mo-margin)}
+.mo-block .mo-hs-dot{display:flex;flex:0 1 160px;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;min-height:0;margin:0;padding:6px 0;border:0;border-radius:0;background:transparent;box-shadow:none;color:rgba(255,255,255,.62);font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;text-align:left;cursor:pointer;transition:color .3s}
+.mo-block .mo-hs-dot:is(:hover,:focus,:active){background:transparent;color:#fff}
+.mo-block .mo-hs-dot:focus-visible{outline:2px solid #93c5fd;outline-offset:4px}
+.mo-block .mo-hs-dot.mo-is-on{color:#fff}
+.mo-hs-num{font-size:11px;letter-spacing:.1em;opacity:.8}
+.mo-hs-name{max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mo-hs-bar{display:block;width:100%;height:2px;overflow:hidden;background:rgba(255,255,255,.28)}
+.mo-hs-bar b{display:block;width:100%;height:100%;background:var(--mo-accent);transform:scaleX(0);transform-origin:0 50%}
+.mo-block .mo-hs-pausa{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;min-height:0;margin:0 0 0 auto;padding:0;border:1px solid rgba(255,255,255,.4);border-radius:50%;background:transparent;color:#fff;cursor:pointer}
+.mo-block .mo-hs-pausa:is(:hover,:focus,:active){background:rgba(255,255,255,.12);color:#fff}
+.mo-hs-ico-pausa{display:block;width:10px;height:12px;border-left:3px solid currentColor;border-right:3px solid currentColor}
+.mo-hs-pausa[aria-pressed="true"] .mo-hs-ico-pausa{width:0;height:0;border-style:solid;border-width:6px 0 6px 10px;border-color:transparent transparent transparent currentColor;margin-left:3px}
+@media (max-width:767px){
+  .mo-hero--slide .mo-hero-copy{grid-column:1 / -1}
+  .mo-hs-nav{bottom:calc(84px + env(safe-area-inset-bottom,0px));gap:14px} /* sopra la barra dei contatti */
+  .mo-block .mo-hs-dot{flex:1 1 0;font-size:11px;letter-spacing:.08em}
+  .mo-block .mo-hs-dot:not(.mo-is-on) .mo-hs-name{opacity:0}
+}
+@media (max-width:767px){ .mo-hero--slide{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))} }

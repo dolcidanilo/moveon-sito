@@ -25,6 +25,14 @@ Regole per i testi (decise con il cliente):
 
 ## 2. L'ordine dei lavori
 
+### Fatto (10 novembre 2026, versione 1.3.0)
+- Hero a immagini con passaggio «pixel dopo pixel» (foto di prova da sostituire).
+- Pausa emozionale senza blocco; Servizi con stacco tra titolo e schede; colore #182343.
+- Versione 1.2.0 salvata in `dist/archivio/` per poter tornare indietro.
+
+### Prossimo passo
+Il cliente ha chiesto di andare avanti **senza il vecchio elenco**: Claude ricostruisce elenco e situazioni dai servizi; recensioni con **segnaposto** finché non arrivano quelle vere.
+
 ### Fase A · I contenuti (insieme)
 1. **Cliente**: ritrova il vecchio elenco di tutto quello che realizza.
 2. **Claude**: prepara le bozze in parole semplici:

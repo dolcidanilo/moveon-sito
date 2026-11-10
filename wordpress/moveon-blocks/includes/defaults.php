@@ -39,6 +39,16 @@ function mo_defaults(): array {
 			'testo'           => 'Diamo forma alle tue idee, pixel dopo pixel: branding, web, social e stampa con un unico partner, da oltre 25 anni.',
 			'pulsante_testo'  => 'Scopri i Servizi',
 			'pulsante_link'   => '#servizi',
+			'stile'           => 'slide',
+			// Immagini di prova: da sostituire con le foto di ogni settore
+			'slide'           => array(
+				array( 'settore' => 'Grafica', 'posizione' => '50% 45%' ),
+				array( 'settore' => 'Social', 'posizione' => '60% 35%' ),
+				array( 'settore' => 'Web', 'posizione' => '50% 40%' ),
+			),
+			'durata'          => '6',
+			'transizione'     => 'pixel',
+			'scurimento'      => '45',
 		),
 		'nastro'    => array(
 			'anchor'   => 'parole',

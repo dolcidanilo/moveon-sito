@@ -120,13 +120,29 @@ function mo_blocks(): array {
 	return array(
 		'hero'      => array(
 			'name'   => 'MoveOn · Hero',
-			'desc'   => 'Titolo grande parola per parola, lampadina in pixel che si compone.',
+			'desc'   => 'Titolo grande parola per parola su immagini a tutto schermo (una per settore) che si compongono pixel dopo pixel; in alternativa la lampadina in pixel.',
 			'params' => array(
 				mo_p_area( 'titolo', 'Titolo principale', 'Massimo 8 parole. Va a capo dove premi Invio (oppure scrivi | dove vuoi andare a capo). Es. «Creatività, | strategia | e risultati.»', 'Testi', $d['hero']['titolo'] ),
 				mo_p_text( 'parola', 'Parola sottolineata in giallo', 'Scrivi esattamente una parola del titolo, punteggiatura compresa (es. «risultati.»). Scrivi - (un trattino) per nessuna sottolineatura.', 'Testi', $d['hero']['parola'] ),
 				mo_p_area( 'testo', 'Testo sotto il titolo', 'Massimo 2 frasi: beneficio prima della caratteristica.', 'Testi', $d['hero']['testo'] ),
 				mo_p_text( 'pulsante_testo', 'Pulsante: testo', 'Verbo all’imperativo + oggetto, es. «Scopri i Servizi». Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['hero']['pulsante_testo'] ),
 				mo_p_text( 'pulsante_link', 'Pulsante: porta a', 'L’ancora di una sezione (es. #servizi) oppure un indirizzo intero.', 'Testi', $d['hero']['pulsante_link'] ),
+				mo_p_drop( 'stile', 'Dietro al titolo', array( 'Immagini a tutto schermo (una per settore)' => 'slide', 'Lampadina in pixel (versione precedente)' => 'lampadina' ), $d['hero']['stile'], '', 'Immagini' ),
+				mo_p_group(
+					'slide',
+					'Immagini (una per settore)',
+					array(
+						mo_p_text( 'settore', 'Settore', 'Breve, es. «Grafica»: compare in basso, sotto la barra che si riempie.', '' ),
+						mo_p_img( 'immagine', 'Immagine (orizzontale, almeno 1920 px)', 'JPG o PNG. Se manca si usa un’immagine di prova.', '' ),
+						mo_p_text( 'posizione', 'Punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 30% 40% = più a sinistra e in alto.', '' ),
+					),
+					$d['hero']['slide'],
+					'Trascinale per cambiare l’ordine. Con una sola immagine non scorre.',
+					'Immagini'
+				),
+				mo_p_drop( 'durata', 'Tempo per ogni immagine', array( '4 secondi' => '4', '6 secondi' => '6', '8 secondi' => '8', '10 secondi' => '10' ), $d['hero']['durata'], '', 'Immagini' ),
+				mo_p_drop( 'transizione', 'Passaggio tra le immagini', array( 'Pixel che si compongono (disegno diverso ogni volta)' => 'pixel', 'Dissolvenza' => 'dissolvenza' ), $d['hero']['transizione'], '', 'Immagini' ),
+				mo_p_drop( 'scurimento', 'Velo scuro sulle immagini', array( 'Leggero (30%)' => '30', 'Medio (45%)' => '45', 'Forte (60%)' => '60' ), $d['hero']['scurimento'], 'Rende il testo leggibile su qualsiasi foto.', 'Immagini' ),
 				mo_p_anchor( $d['hero']['anchor'] ),
 				...mo_p_sfondo(),
 			),
@@ -308,6 +324,30 @@ function mo_render_hero( $atts ): string {
 	}
 	$btn = mo_text( $a['pulsante_testo'] );
 	$btn = '-' === $btn ? '' : $btn; // il trattino nasconde
+	// Immagini a tutto schermo (una per settore); se manca una foto si usa un'immagine di prova
+	$slide_mode = 'lampadina' !== mo_text( $a['stile'] );
+	$slides     = array();
+	$prova      = array( 'idea', 'pausa', 'contatti' );
+	foreach ( mo_group( $a['slide'] ) as $i => $s ) {
+		$img = mo_image( $s['immagine'] ?? 0, $prova[ $i % 3 ], '2048x2048' );
+		if ( ! $img ) {
+			continue;
+		}
+		list( $x, $y ) = mo_focus( $s['posizione'] ?? '', array( 50, 50 ) );
+		$n             = count( $slides );
+		$slides[]      = array(
+			'n'       => $n,
+			'num'     => sprintf( '%02d', $n + 1 ),
+			'settore' => mo_text( $s['settore'] ?? '' ),
+			'url'     => $img['url'],
+			'w'       => $img['w'],
+			'h'       => $img['h'],
+			'pos'     => $x . '% ' . $y . '%',
+			'primo'   => 0 === $n,
+		);
+	}
+	$durata = in_array( mo_text( $a['durata'] ), array( '4', '6', '8', '10' ), true ) ? mo_text( $a['durata'] ) : '6';
+	$velo   = in_array( mo_text( $a['scurimento'] ), array( '30', '45', '60' ), true ) ? mo_text( $a['scurimento'] ) : '45';
 	return MO_Tpl::render(
 		'hero',
 		array(
@@ -317,7 +357,13 @@ function mo_render_hero( $atts ): string {
 			'titolo_piano' => implode( ' ', mo_lines( $a['titolo'] ) ),
 			'testo'        => mo_text( $a['testo'] ),
 			'pulsante'     => '' !== $btn ? array( 'testo' => $btn, 'href' => mo_href( $a['pulsante_link'] ) ) : null,
-			'bulb'         => mo_pixels( 'bulb' ),
+			'bulb'         => $slide_mode && $slides ? '' : mo_pixels( 'bulb' ),
+			'slide_mode'   => $slide_mode && $slides,
+			'slides'       => $slides,
+			'piu_slide'    => count( $slides ) > 1,
+			'durata'       => $durata,
+			'transizione'  => 'dissolvenza' === mo_text( $a['transizione'] ) ? 'dissolvenza' : 'pixel',
+			'velo'         => (string) ( (int) $velo / 100 ),
 		)
 	);
 }

@@ -82,6 +82,12 @@ Inciampi già visti:
 - Pagina del progetto: box precedente/successivo con bordo 1px colore etichette, su una **fascia nera al 20%**; pagina Progetti: invito finale con **nero al 20%** sopra il blu.
 - **Struttura per la SEO**: la home resta la vetrina e *riassume*; pagine dedicate *approfondiscono* (Chi sono, una pagina per servizio, Progetti, Contatti), senza testi ripetuti. Menu verso le pagine (sottomenu Servizi: il menu oggi è a un livello, da estendere).
 - **Tono dei testi**: prima persona singolare («io», è un freelance). **Niente nome, niente foto, nessun riferimento all'azienda** per cui lavora come responsabile della comunicazione (non vuole essere riconoscibile). Pochi testi, molte prove (numeri, progetti, recensioni). Bozza in `docs/testi-chi-sono.md`.
+- **Gusto del cliente: foto belle, comunicative e professionali** piuttosto che illustrazioni piatte in stile vettoriale. Proporre sempre soluzioni fotografiche (le foto le procura lui, es. Adobe Stock).
+- **Hero a immagini** (1.3.0): una foto per settore, passaggio «pixel dopo pixel» a tessere (disegno diverso ogni volta), settori con barra e pausa. La lampadina resta come opzione («stile» = lampadina). Le immagini di serie sono **di prova**: il cliente le sostituirà.
+- **Colore**: #1e293b sostituito ovunque con **#182343** (1.3.0).
+- **Pausa emozionale** non blocca più lo scorrimento: la foto si apre da quando compare in basso a quando è al centro.
+- **Versioni precedenti** in `dist/archivio/` (es. `moveon-blocks-1.2.0.zip`) per poter tornare indietro: si ricarica lo zip vecchio con «Sostituisci la versione installata». Il plugin non tocca i contenuti delle pagine; per sicurezza il cliente fa un backup di /nuovo prima dei cambi grossi.
+- **Recensioni**: per costruire le pagine si usano **segnaposto chiaramente finti** (es. «[Recensione di un cliente]»), da sostituire con quelle vere prima della messa online: recensioni inventate pubblicate come vere sono vietate.
 - Cookie e policy: **LegalBlink di Aruba** al posto di iubenda (non disdire iubenda prima della W4).
 - **Google Analytics 4** sì, solo dopo il consenso (Consent Mode v2).
 
@@ -89,6 +95,8 @@ Inciampi già visti:
 
 - **Piano del sito e ordine dei lavori: `docs/piano-sito.md`** (mappa delle pagine, fasi A contenuti → B costruzione → C W3 → D W4). Partire da lì. Ora si aspetta il **vecchio elenco** dei lavori dal cliente (fase A).
 - Possibili ritocchi grafici «di gusto» annunciati dal cliente.
+- **App WebView**: il cliente non sa realizzarle. Spiegato: Claude può guidare tutto il percorso tecnico, ma servono account sviluppatore (Google Play una tantum, Apple annuale), una build iOS (Mac o servizio in cloud) e Apple spesso rifiuta app che sono solo un sito «impacchettato». **Decisione del cliente in sospeso**: tenere o togliere il servizio dal sito.
+- **Scheda Google**: il cliente preferisce aprirla quando il sito nuovo è online.
 - **W3** — vedi `docs/piano-W3-seo-analytics-legalblink.md` (da riproporre per intero quando si inizia): SEO locale su Pescara e provincia (scheda Google Business Profile da creare, attività senza sede aperta al pubblico; Rank Math; pagine servizi; dati strutturati), Google Analytics, LegalBlink, invio email affidabile (SMTP con la casella Aruba).
 - **W4** — spostamento da /nuovo al sito principale.
 - **Dopo**: social (Instagram, Facebook, LinkedIn): idee nel piano W3, in fondo.

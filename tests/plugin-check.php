@@ -204,6 +204,12 @@ if ( $forno ) {
 }
 check( 'Vecchio Portfolio tolto: non è più tra gli elementi e la sua riga non mostra niente', ! in_array( 'mo_portfolio', array_column( $GLOBALS['mo_vc'], 'base' ), true ) && '' === trim( do_shortcode( '[mo_portfolio modalita="ordine"]' ) ) );
 check( 'Il carosello è il Portfolio: nome dell’elemento e ancora #portfolio', in_array( 'MoveOn · Portfolio', array_column( $GLOBALS['mo_vc'], 'name' ), true ) && str_contains( do_shortcode( '[mo_carosello]' ), 'id="portfolio"' ) );
+$html = do_shortcode( '[mo_hero]' );
+check( 'Hero: di serie immagini a tutto schermo (3 di prova), settori e pausa, senza lampadina', 3 === substr_count( $html, 'class="mo-hs-slide' ) && 3 === substr_count( $html, 'class="mo-hs-dot' ) && str_contains( $html, 'mo-hs-pausa' ) && ! str_contains( $html, 'mo-bulb' ) && str_contains( $html, 'data-durata="6"' ) );
+$html = do_shortcode( '[mo_hero stile="lampadina"]' );
+check( 'Hero: la lampadina resta disponibile', str_contains( $html, 'mo-bulb' ) && ! str_contains( $html, 'mo-hs-slide' ) );
+$html = do_shortcode( '[mo_hero slide="' . rawurlencode( wp_json_encode( array( array( 'settore' => 'Stampa', 'immagine' => (string) $jpg, 'posizione' => '30% 70%' ) ) ) ) . '" scurimento="60" transizione="dissolvenza" durata="10"]' );
+check( 'Hero: immagine scelta, punto focale, velo e tempi; con una sola immagine niente settori', str_contains( $html, wp_basename( (string) wp_get_attachment_image_url( $jpg, '2048x2048' ) ) ) && str_contains( $html, 'object-position:30% 70%' ) && str_contains( $html, '--mo-hs-velo:0.6' ) && str_contains( $html, 'data-transizione="dissolvenza"' ) && str_contains( $html, 'data-durata="10"' ) && ! str_contains( $html, 'mo-hs-nav' ) );
 check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
 /* 11) Sfondi delle pagine dei progetti (MoveOn → Impostazioni) */

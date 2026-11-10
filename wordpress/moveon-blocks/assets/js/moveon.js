@@ -137,6 +137,7 @@ function initSite() {
 
 /* =================== HERO =================== */
 function initHero(sec, { G, reduce, fine, setHeroPlay }) {
+  if (sec.classList.contains('mo-hero--slide')) { initHeroSlide(sec, { G, reduce, setHeroPlay }); return; }
   const px = $$('.mo-bulb .mo-px-on i', sec);
   const words = $$('.mo-hw-in', sec);
   const hl = $$('.mo-hl-path', sec);
@@ -203,6 +204,159 @@ function initHero(sec, { G, reduce, fine, setHeroPlay }) {
       bx(nx * 30); by(ny * 30); dx(-nx * 50); dy(-ny * 50);
     });
   }
+}
+
+/* =================== HERO A IMMAGINI =================== */
+// Ogni settore ha la sua foto. Il passaggio da una all'altra avviene «pixel dopo pixel»: la foto nuova
+// si compone a tessere quadrate, ogni volta con un disegno diverso. La foto ferma si avvicina lentamente.
+const HS_DISEGNI = ['random', 'center', 'edges', 'start', 'end'];
+function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
+  const slides = $$('.mo-hs-slide', sec);
+  const dots = $$('.mo-hs-dot', sec);
+  const tilesBox = $('.mo-hs-tiles', sec);
+  const pausaBtn = $('.mo-hs-pausa', sec);
+  const words = $$('.mo-hw-in', sec);
+  const hl = $$('.mo-hl-path', sec);
+  const fade = $$('.mo-hero-sub, .mo-hero-actions, .mo-hs-nav', sec);
+  const durata = parseFloat(sec.getAttribute('data-durata')) || 6;
+  const dissolvenza = sec.getAttribute('data-transizione') === 'dissolvenza';
+  const n = slides.length;
+  let cur = 0, busy = false, giro = null, inPausa = false, visibile = true, disegno = 0;
+  const imgOf = (k) => $('img', slides[k]);
+
+  // Prima che l'immagine sia caricata non si può calcolare come «coprire» lo schermo
+  function pronta(img, fn) {
+    if (img.complete && img.naturalWidth) { fn(); return; }
+    let fatto = false;
+    const via = () => { if (!fatto) { fatto = true; fn(); } };
+    img.addEventListener('load', via, { once: true });
+    img.addEventListener('error', via, { once: true });
+    setTimeout(via, 2500);
+  }
+
+  // Tessere con la foto: ognuna mostra il suo pezzo, così insieme ricompongono l'immagine «a tutto schermo»
+  function tessere(k, colonne) {
+    const img = imgOf(k);
+    const W = sec.clientWidth, H = sec.clientHeight;
+    const cols = colonne || (window.innerWidth < 768 ? 6 : 12);
+    const lato = Math.ceil(W / cols);
+    const rows = colonne === 1 ? 1 : Math.ceil(H / lato);
+    const iw = img.naturalWidth || 1920, ih = img.naturalHeight || 1080;
+    const sc = Math.max(W / iw, H / ih);
+    const dw = iw * sc, dh = ih * sc;
+    const [px, py] = (slides[k].getAttribute('data-pos') || '50% 50%').split(/\s+/).map((v) => (parseFloat(v) || 50) / 100);
+    const ox = (W - dw) * px, oy = (H - dh) * py;
+    const src = (img.currentSrc || img.src).replace(/"/g, '%22');
+    tilesBox.textContent = '';
+    const out = [];
+    const frag = document.createDocumentFragment();
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const t = document.createElement('i');
+        const w = colonne === 1 ? W : lato, h = colonne === 1 ? H : lato;
+        t.className = 'mo-hs-tile';
+        t.style.cssText = `left:${c * lato}px;top:${r * lato}px;width:${w + 1}px;height:${h + 1}px;background-image:url("${src}");background-size:${dw}px ${dh}px;background-position:${ox - c * lato}px ${oy - r * lato}px`;
+        frag.appendChild(t);
+        out.push(t);
+      }
+    }
+    tilesBox.appendChild(frag);
+    return { tiles: out, cols, rows };
+  }
+
+  // La foto ferma si avvicina lentamente (molto meno di quanto si nota)
+  function respiro(k) {
+    if (reduce) return;
+    G.fromTo(imgOf(k), { scale: 1 }, { scale: 1.07, duration: durata + 2, ease: 'none', overwrite: true });
+  }
+  function segna(k) {
+    dots.forEach((d, i) => { d.classList.toggle('mo-is-on', i === k); G.set($('.mo-hs-bar b', d), { scaleX: 0 }); });
+  }
+  function avanza() {
+    if (giro) giro.kill();
+    giro = null;
+    if (n < 2 || reduce || inPausa) return;
+    const bar = dots[cur] && $('.mo-hs-bar b', dots[cur]);
+    giro = G.fromTo(bar || {}, { scaleX: 0 }, { scaleX: 1, duration: durata, ease: 'none', onComplete: () => vai((cur + 1) % n) });
+    if (!visibile) giro.pause();
+  }
+  function mostra(k) {
+    slides.forEach((s, i) => s.classList.toggle('mo-is-on', i === k));
+    G.set(imgOf(k), { scale: 1 });
+    tilesBox.textContent = '';
+    cur = k;
+    busy = false;
+    respiro(k);
+    avanza();
+  }
+  function vai(k) {
+    if (busy || k === cur || n < 2) return;
+    busy = true;
+    if (giro) { giro.kill(); giro = null; }
+    segna(k);
+    pronta(imgOf(k), () => {
+      if (reduce) { mostra(k); return; }
+      if (dissolvenza) {
+        const { tiles } = tessere(k, 1);
+        G.fromTo(tiles, { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'power2.inOut', onComplete: () => mostra(k) });
+        return;
+      }
+      const { tiles, cols, rows } = tessere(k);
+      const from = HS_DISEGNI[disegno++ % HS_DISEGNI.length];
+      G.fromTo(tiles,
+        { scale: 0, opacity: 0, rotation: () => G.utils.random(-28, 28), borderRadius: '30%' },
+        { scale: 1, opacity: 1, rotation: 0, borderRadius: '0%', duration: 0.75, ease: 'power3.out', stagger: { grid: [rows, cols], from, amount: 1.05 }, onComplete: () => mostra(k) });
+    });
+  }
+
+  dots.forEach((d, i) => d.addEventListener('click', () => vai(i)));
+  if (pausaBtn) pausaBtn.addEventListener('click', () => {
+    inPausa = !inPausa;
+    pausaBtn.setAttribute('aria-pressed', inPausa ? 'true' : 'false');
+    pausaBtn.setAttribute('aria-label', inPausa ? 'Riprendi lo scorrimento delle immagini' : 'Ferma lo scorrimento delle immagini');
+    if (inPausa) { if (giro) giro.pause(); } else if (giro) giro.resume(); else avanza();
+  });
+  // Fuori dallo schermo le immagini non scorrono
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((e) => {
+      visibile = e[0].isIntersecting;
+      if (giro) { if (visibile && !inPausa) giro.resume(); else giro.pause(); }
+    }).observe(sec);
+  }
+  // Le immagini successive si caricano subito dopo la prima
+  slides.slice(1).forEach((s) => { const i = $('img', s); if (i) i.loading = 'eager'; });
+
+  // Entrata: la prima foto si compone pixel dopo pixel, poi il titolo parola per parola
+  const intro = G.timeline({ paused: true });
+  if (!reduce) {
+    G.set(words, { yPercent: 115 });
+    if (hl.length) G.set(hl, { strokeDasharray: 1, strokeDashoffset: 1 });
+    G.set(fade, { y: 24, opacity: 0 });
+    slides[0].classList.remove('mo-is-on');
+    busy = true; // fino alla fine dell'entrata i clic sui settori aspettano
+    intro
+      .add(() => {
+        pronta(imgOf(0), () => {
+          const { tiles, cols, rows } = tessere(0);
+          G.fromTo(tiles,
+            { scale: 0, opacity: 0, rotation: () => G.utils.random(-35, 35), borderRadius: '30%' },
+            { scale: 1, opacity: 1, rotation: 0, borderRadius: '0%', duration: 0.8, ease: 'power3.out', stagger: { grid: [rows, cols], from: 'random', amount: 1.2 }, onComplete: () => mostra(0) });
+        });
+      }, 0)
+      .to(words, { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.1 }, 0.35)
+      .to(fade, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.12 }, 1.05);
+    if (hl.length) intro.to(hl, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut' }, 1.15);
+    setHeroPlay(() => intro.play());
+  } else {
+    setHeroPlay(() => {});
+    mostra(0);
+  }
+  if (reduce) return;
+
+  // Scorrendo, il testo sale un po' più veloce delle foto (profondità)
+  const st = { trigger: sec, start: 'top top', end: 'bottom top', scrub: 0.6 };
+  G.to($('.mo-hero-copy', sec), { y: -90, ease: 'none', scrollTrigger: st });
+  G.to($('.mo-hs', sec), { yPercent: 12, ease: 'none', scrollTrigger: st });
 }
 
 /* =================== NASTRO PAROLE CHIAVE =================== */
@@ -292,12 +446,16 @@ function initPausa(sec, { G, reduce }) {
   if (reduce) return;
   const fx = sec.getAttribute('data-fx') || '50';
   const fy = sec.getAttribute('data-fy') || '30';
-  G.timeline({ scrollTrigger: { trigger: sec, start: 'top top', end: '+=120%', pin: true, scrub: 0.8, anticipatePin: 1 } })
+  // La foto si apre mentre la sezione sale: comincia appena compare dal basso e finisce quando è al centro dello schermo
+  // (nessun blocco dello scorrimento). La frase entra quando l'apertura è completa.
+  G.timeline({ scrollTrigger: { trigger: sec, start: 'top bottom', end: 'center center', scrub: 0.6 } })
     .fromTo($('.mo-emo-frame', sec), { clipPath: `circle(16% at ${fx}% ${fy}%)` }, { clipPath: 'circle(80% at 50% 50%)', ease: 'none', duration: 1 }, 0)
     .fromTo($('.mo-emo-img', sec), { scale: 1.35, transformOrigin: `${fx}% ${fy}%` }, { scale: 1, transformOrigin: `${fx}% ${fy}%`, ease: 'none', duration: 1 }, 0)
-    .fromTo($('.mo-emo-veil', sec), { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.65)
-    .fromTo($$('.mo-emo-line span', sec), { yPercent: 110 }, { yPercent: 0, duration: 0.35, stagger: 0.1, ease: 'power3.out' }, 0.75)
-    .to({}, { duration: 0.5 });
+    .fromTo($('.mo-emo-veil', sec), { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.35 }, 0.65);
+  G.fromTo($$('.mo-emo-line span', sec), { yPercent: 110 }, {
+    yPercent: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out',
+    scrollTrigger: { trigger: sec, start: 'center center', toggleActions: 'play none none reverse' },
+  });
 }
 
 /* Pixel che fluttuano e linee che ondeggiano */

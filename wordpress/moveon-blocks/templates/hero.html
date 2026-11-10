@@ -1,12 +1,22 @@
-{{! HERO · Segnaposto: anchor titolo_piano testo bulb; righe → parole (testo, evidenziata, spazio); pulsante (testo, href); sfondo = immagine di sfondo (scheda Sfondo) }}
-<section class="mo-block mo-hero" id="{{anchor}}" data-dark data-mo-block="hero">
+{{! HERO · Segnaposto: anchor titolo_piano testo; righe → parole (testo, evidenziata, spazio); pulsante (testo, href); sfondo = scheda Sfondo.
+   Con le immagini (slide_mode): slides (n, num, settore, url, w, h, pos, primo), piu_slide, durata, transizione, velo. Con la lampadina: bulb. }}
+<section class="mo-block mo-hero{{#slide_mode}} mo-hero--slide{{/slide_mode}}" id="{{anchor}}" data-dark data-mo-block="hero"{{#slide_mode}} data-durata="{{durata}}" data-transizione="{{transizione}}"{{/slide_mode}}>
   {{{sfondo}}}
+  {{#slide_mode}}
+  <div class="mo-hs" aria-hidden="true">
+    {{#slides}}<div class="mo-hs-slide{{#primo}} mo-is-on{{/primo}}" data-pos="{{pos}}"><img src="{{url}}" alt=""{{#w}} width="{{w}}" height="{{h}}"{{/w}} style="object-position:{{pos}}" decoding="async"{{#primo}} fetchpriority="high"{{/primo}}></div>{{/slides}}
+    <div class="mo-hs-tiles"></div>
+    <div class="mo-hs-veil" style="--mo-hs-velo:{{velo}}"></div>
+  </div>
+  {{/slide_mode}}
+  {{^slide_mode}}
   <div class="mo-hero-deco" aria-hidden="true">
     <div class="mo-dots"></div>
     <div class="mo-ring"></div>
     <div class="mo-sq2"></div>
     <div class="mo-sq"></div>
   </div>
+  {{/slide_mode}}
   <div class="mo-hero-inner">
     <div class="mo-hero-copy">
       <h1 class="mo-hero-title" aria-label="{{titolo_piano}}">{{#righe}}<span class="mo-hl-line" aria-hidden="true">{{#parole}}{{#evidenziata}}<span class="mo-hw-mark"><span class="mo-hw"><span class="mo-hw-in">{{testo}}</span></span>{{> evidenziatore}}</span>{{/evidenziata}}{{^evidenziata}}<span class="mo-hw"><span class="mo-hw-in">{{testo}}</span></span>{{/evidenziata}}{{#spazio}} {{/spazio}}{{/parole}}</span>{{/righe}}</h1>
@@ -17,12 +27,20 @@
       </div>
       {{/pulsante}}
     </div>
+    {{^slide_mode}}
     <div class="mo-hero-art">
       <button class="mo-bulb-wrap" type="button" data-cursor="Ricomponi" aria-label="Dai forma all’idea">
         <span class="mo-bulb-glow"></span>
         {{{bulb}}}
       </button>
     </div>
+    {{/slide_mode}}
   </div>
-  <div class="mo-scroll-cue" aria-hidden="true"><span>Scorri</span><i></i></div>
+  {{#slide_mode}}{{#piu_slide}}
+  <div class="mo-hs-nav" role="group" aria-label="Settori">
+    {{#slides}}<button type="button" class="mo-hs-dot{{#primo}} mo-is-on{{/primo}}" data-i="{{n}}" aria-label="Mostra: {{settore}}"><span class="mo-hs-num">{{num}}</span><span class="mo-hs-name">{{settore}}</span><i class="mo-hs-bar"><b></b></i></button>{{/slides}}
+    <button type="button" class="mo-hs-pausa" aria-label="Ferma lo scorrimento delle immagini" aria-pressed="false"><span class="mo-hs-ico-pausa"></span></button>
+  </div>
+  {{/piu_slide}}{{/slide_mode}}
+  {{^slide_mode}}<div class="mo-scroll-cue" aria-hidden="true"><span>Scorri</span><i></i></div>{{/slide_mode}}
 </section>

@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,12 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.3.0 =
+* Hero con immagini a tutto schermo, una per settore: passano da una all'altra «pixel dopo pixel» (la nuova foto si compone a tessere, ogni volta con un disegno diverso). Settori in basso con barra di avanzamento, clic per sceglierli e pulsante pausa. Tempo, tipo di passaggio e velo scuro si scelgono nella scheda Immagini. La lampadina resta disponibile come opzione.
+* Pausa emozionale: la foto inizia ad aprirsi appena compare dal basso e finisce quando è al centro dello schermo, senza bloccare lo scorrimento. Su telefono la frase sta sopra la barra dei contatti.
+* Servizi: stacco tra il titolo e la prima scheda (titolo su fondo appena più scuro, schede con ombra sul lato sinistro).
+* Colore #1e293b sostituito ovunque con #182343.
 
 = 1.2.0 =
 * Il Portfolio è ora il carosello 3D: l'elemento si chiama «MoveOn · Portfolio» e la sua ancora di serie è #portfolio (la voce «Portfolio» del menu porta lì).

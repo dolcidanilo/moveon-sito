@@ -51,12 +51,53 @@ const browser = await chromium.launch();
   check('Scorrimento orizzontale dei Servizi attivo su desktop', await page.evaluate(() => document.documentElement.classList.contains('mo-h-scroll')));
   check('Cursore personalizzato attivo con il mouse', await page.evaluate(() => document.documentElement.classList.contains('mo-has-cursor')));
 
-  // Bug: scudo e lampadina che si disturbavano → lo scudo è ancora scomposto mentre la lampadina è composta
-  const iso = await page.evaluate(() => ({
-    bulb: getComputedStyle(document.querySelector('.mo-bulb .mo-px-on i')).opacity,
-    shield: document.querySelector('.mo-shield .mo-px-on i').style.opacity,
+  // Hero a immagini: la prima foto composta, nessuna tessera rimasta, settori e pausa presenti
+  const h0 = await page.evaluate(() => ({
+    on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')),
+    tessere: document.querySelectorAll('.mo-hs-tile').length,
+    settori: document.querySelectorAll('.mo-hs-dot').length,
+    pausa: !!document.querySelector('.mo-hs-pausa'),
+    titolo: getComputedStyle(document.querySelector('.mo-hw-in')).transform,
   }));
-  check('Lampadina composta, scudo ancora fermo (animazioni separate)', iso.bulb === '1' && parseFloat(iso.shield) === 0, JSON.stringify(iso));
+  check('Hero: prima immagine composta, titolo visibile, settori e pausa', h0.on === 0 && h0.tessere === 0 && h0.settori >= 2 && h0.pausa && /none|matrix\(1, 0, 0, 1, 0, 0\)/.test(h0.titolo), JSON.stringify(h0));
+  // Clic su un settore: la foto nuova si compone a tessere, poi resta solo lei
+  await page.click('.mo-hs-dot[data-i="1"]');
+  await page.waitForTimeout(500);
+  const h1 = await page.evaluate(() => document.querySelectorAll('.mo-hs-tile').length);
+  await page.waitForTimeout(1800);
+  const h2 = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), tessere: document.querySelectorAll('.mo-hs-tile').length, dot: [...document.querySelectorAll('.mo-hs-dot')].findIndex((d) => d.classList.contains('mo-is-on')) }));
+  check('Hero: clic su un settore → la foto si compone pixel dopo pixel', h1 > 20 && h2.on === 1 && h2.dot === 1 && h2.tessere === 0, `${h1} tessere · ${JSON.stringify(h2)}`);
+  // Le tessere ricompongono la foto esattamente come la foto ferma (nessuno scatto alla fine)
+  const alli = await page.evaluate(async () => {
+    const sec = document.querySelector('.mo-hero');
+    document.querySelector('.mo-hs-dot[data-i="0"]').click();
+    await new Promise((r) => setTimeout(r, 2200));
+    const img = document.querySelector('.mo-hs-slide.mo-is-on img');
+    return { w: Math.round(img.getBoundingClientRect().width), sec: sec.clientWidth };
+  });
+  check('Hero: la foto copre tutta la larghezza', alli.w >= alli.sec, JSON.stringify(alli));
+  // Pausa: la barra si ferma
+  await page.click('.mo-hs-pausa');
+  const b1 = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-hs-dot.mo-is-on .mo-hs-bar b')).transform);
+  await page.waitForTimeout(1200);
+  const b2 = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-hs-dot.mo-is-on .mo-hs-bar b')).transform);
+  const premuto = await page.evaluate(() => document.querySelector('.mo-hs-pausa').getAttribute('aria-pressed'));
+  check('Hero: il pulsante pausa ferma lo scorrimento', b1 === b2 && premuto === 'true', `${b1} → ${b2}`);
+  await page.click('.mo-hs-pausa');
+
+  // Pausa emozionale: la foto si apre scorrendo, senza bloccare la pagina, ed è aperta del tutto al centro dello schermo
+  const emo = await page.evaluate(() => {
+    const s = document.querySelector('.mo-emo');
+    return { bloccata: s.parentElement.classList.contains('pin-spacer'), top: s.getBoundingClientRect().top + scrollY, h: s.offsetHeight };
+  });
+  await smoothScroll(page, emo.top - 900 + 60);
+  await page.waitForTimeout(900);
+  const aperturaInizio = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-emo-frame')).clipPath);
+  await smoothScroll(page, emo.top + emo.h / 2 - 450);
+  await page.waitForTimeout(1200);
+  const aperturaCentro = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-emo-frame')).clipPath);
+  const raggio = (c) => parseFloat((/circle\(([\d.]+)%/.exec(c) || [])[1] || 'NaN');
+  check('Pausa: la foto inizia ad aprirsi appena compare e finisce al centro, senza blocco', !emo.bloccata && raggio(aperturaInizio) < 30 && raggio(aperturaCentro) >= 79, `${aperturaInizio} → ${aperturaCentro}`);
 
   // Bug: animazioni delle Garanzie già concluse su desktop
   const garTop = await topOf(page, '.mo-gar');
@@ -162,6 +203,16 @@ const browser = await chromium.launch();
   const closed = await page.evaluate(() => document.getElementById('mo-mobile-menu').hidden);
   check('Toccando una voce il menu si chiude e porta alla sezione', closed && (await page.evaluate(() => window.scrollY)) > 500);
 
+  const sopra = await page.evaluate(() => {
+    const bar = document.querySelector('.mo-mbar').getBoundingClientRect().height;
+    const emo = document.querySelector('.mo-emo'), testo = document.querySelector('.mo-emo-text');
+    const nav = document.querySelector('.mo-hs-nav'), hero = document.querySelector('.mo-hero');
+    return {
+      pausa: Math.round(emo.getBoundingClientRect().bottom - testo.getBoundingClientRect().bottom - bar),
+      hero: nav ? Math.round(hero.getBoundingClientRect().bottom - nav.getBoundingClientRect().bottom - bar) : 0,
+    };
+  });
+  check('Telefono: frase della Pausa e settori della hero sopra la barra dei contatti', sopra.pausa > 0 && sopra.hero > 0, JSON.stringify(sopra));
   check('Barra contatti in basso visibile su mobile', await page.evaluate(() => getComputedStyle(document.querySelector('.mo-mbar')).display === 'flex'));
   check('Nessun cursore personalizzato al tocco', !(await page.evaluate(() => document.documentElement.classList.contains('mo-has-cursor'))));
   check('Nessun errore nella console (mobile)', errors.length === 0, errors.join(' | '));
@@ -204,6 +255,9 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     await page.waitForTimeout(400);
     if (hz === 60) {
       // Bug: il nastro ripartiva da capo quando la barra dell'indirizzo cambiava l'altezza della finestra
+      // (si misura con il nastro in vista: fuori dallo schermo non viene ridisegnato)
+      await page.evaluate(() => window.scrollTo(0, document.querySelector('.mo-marquee').offsetTop - 200));
+      await page.waitForTimeout(400);
       const before = await X();
       await page.setViewportSize({ width: 412, height: 700 });
       await page.waitForTimeout(150);
@@ -252,10 +306,10 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     };
   });
   check('Stili di Porto caricati come file: esclusi', !r.portoFile);
-  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(203,213,225)', aboutP: 'rgb(51,65,85)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', reasonP: 'rgb(51,65,85)' };
+  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', aboutP: 'rgb(51,65,85)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', reasonP: 'rgb(51,65,85)' };
   const sbagliati = Object.entries(atteso).filter(([k, v]) => rgb(r.colori[k] || '') !== v).map(([k]) => `${k}=${r.colori[k]}`);
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
-  check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(30,41,59)'), [...new Set(r.campi)].join(' | '));
+  check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(24,35,67)'), [...new Set(r.campi)].join(' | '));
   check('Nessuno spazio tra una sezione e l’altra', r.spazi.every((g) => g === 0), r.spazi.join(','));
   const pin = await page.evaluate(() => { const sp = document.querySelector('.mo-svc')?.parentElement; return sp && sp.classList.contains('pin-spacer') ? parseFloat(getComputedStyle(sp).paddingBottom) : -1; });
   check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
@@ -480,6 +534,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     sub: getComputedStyle(document.querySelector('.mo-hero-sub')).opacity,
     gar: getComputedStyle(document.querySelector('.mo-gar-card')).opacity,
   }));
+  const hr = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), tessere: document.querySelectorAll('.mo-hs-tile').length }));
+  check('Movimento ridotto: hero con la prima foto ferma, senza tessere', hr.on === 0 && hr.tessere === 0, JSON.stringify(hr));
   check('Movimento ridotto: niente caricamento, contenuti visibili, niente scorrimento bloccato', !r.loading && !r.hscroll && r.sub === '1' && r.gar === '1', JSON.stringify(r));
   const car = await page.evaluate(() => ({ treD: document.querySelector('.mo-car').classList.contains('mo-car--3d'), scorre: getComputedStyle(document.querySelector('.mo-car-track')).overflowX, op: getComputedStyle(document.querySelector('.mo-car-card')).opacity }));
   check('Movimento ridotto: il carosello diventa una fila da scorrere', !car.treD && car.scorre === 'auto' && car.op === '1', JSON.stringify(car));

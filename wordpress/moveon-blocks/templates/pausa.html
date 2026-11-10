@@ -1,5 +1,5 @@
 {{! PAUSA EMOZIONALE · anchor fx fy (punto focale in %) frase_piana; foto (url, alt, w, h, pos); righe; sfondo = immagine di sfondo (scheda Sfondo) }}
-<section class="mo-block mo-emo" id="{{anchor}}" aria-label="{{frase_piana}}" data-mo-block="pausa" data-mo-pin data-fx="{{fx}}" data-fy="{{fy}}">
+<section class="mo-block mo-emo" id="{{anchor}}" aria-label="{{frase_piana}}" data-mo-block="pausa" data-fx="{{fx}}" data-fy="{{fy}}">
   {{{sfondo}}}
   <canvas class="mo-emo-canvas" aria-hidden="true"></canvas>
   <div class="mo-emo-frame">{{#foto}}<img class="mo-emo-img" src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" style="object-position:{{pos}}" loading="lazy">{{/foto}}</div>
