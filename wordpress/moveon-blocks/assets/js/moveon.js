@@ -128,6 +128,7 @@ function initSite() {
     heroPlay();
   }
 
+  sezioniAperte();
   initGeneric(env);
   initPointer(env);
 
@@ -1036,6 +1037,19 @@ function wordsOnScroll(el, G) {
    mo-words (il testo si accende parola per parola mentre scorri)
    mo-parallax / mo-parallax-forte (si muove più lento della pagina)
    mo-tilt (si inclina seguendo il mouse) · mo-magnetic (pulsante che segue il mouse)  */
+/* La foto di un'intestazione con «sfumatura» prosegue sotto la sezione successiva: quella sezione diventa «aperta»
+   (il suo sfondo passa sotto la sfumatura, i suoi testi restano sopra). */
+function sezioniAperte() {
+  const sezioni = $$('.mo-content .mo-block').filter((b) => !b.parentElement.closest('.mo-block'));
+  sezioni.forEach((sec, i) => {
+    if (!sec.classList.contains('mo-sfuma') || !sec.classList.contains('mo-ph')) return;
+    const dopo = sezioni[i + 1];
+    if (!dopo) return;
+    dopo.style.setProperty('--mo-fondo-aperto', getComputedStyle(dopo).backgroundColor);
+    dopo.classList.add('mo-aperta');
+  });
+}
+
 function initGeneric({ G, reduce, fine }) {
   if (reduce) return;
   const ritardo = (el) => { const m = /(?:^|\s)mo-delay-(\d)/.exec(el.className); return m ? +m[1] * 0.15 : 0; };

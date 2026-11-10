@@ -116,6 +116,13 @@ if ( ! get_page_by_path( "prova-chi-siamo" ) ) {
   update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
   echo "· Pagina prova-chi-siamo creata\n";
 }
+if ( ! get_page_by_path( "prova-sfumatura" ) ) {
+  $img = mo_importa_immagine( "pausa-cuffie.jpg", "Foto di prova per lo sfondo" );
+  $c = mo_riga( "[mo_intestazione titolo=\"Prova sfumatura\" sfondo_img=\"$img\" sfondo_opacita=\"40\" sfumatura=\"300\"]" ) . mo_riga( "[mo_punti sfondo_colore=\"#182343\" sfondo_testi=\"chiari\"]" ) . mo_riga( "[mo_invito sfondo_colore=\"#ffffff\" sfondo_testi=\"scuri\"]" );
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova sfumatura", "post_name" => "prova-sfumatura", "post_content" => $c ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-sfumatura creata\n";
+}
 // Pagine Chi sono, Servizi (+ una per servizio), Contatti, menu con le pagine, home alleggerita (come con MoveOn → Strumenti)
 $nuove = mo_crea_pagine();
 if ( $nuove ) { echo "· Pagine create: " . count( $nuove ) . "\n"; }

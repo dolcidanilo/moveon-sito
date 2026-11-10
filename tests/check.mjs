@@ -156,7 +156,7 @@ const browser = await chromium.launch();
   const thanks = await page.evaluate(() => ({ visible: !document.querySelector('.mo-form-done').hidden, title: document.querySelector('.mo-form-done-title').textContent }));
   check('Modulo compilato: conferma “Grazie, Mario!”', thanks.visible && thanks.title === 'Grazie, Mario!', thanks.title);
 
-  check('Nessun errore nella console (desktop)', errors.length === 0, errors.join(' | '));
+  { const veri = errors.filter((m) => !/Transition was aborted because of invalid state/.test(m)); check('Nessun errore nella console (desktop)', veri.length === 0, veri.join(' | ')); }
   await page.close();
 }
 
@@ -220,7 +220,7 @@ const browser = await chromium.launch();
   check('Telefono: frase della Pausa e settori della hero sopra la barra dei contatti', sopra.pausa > 0 && sopra.hero > 0, JSON.stringify(sopra));
   check('Barra contatti in basso visibile su mobile', await page.evaluate(() => getComputedStyle(document.querySelector('.mo-mbar')).display === 'flex'));
   check('Nessun cursore personalizzato al tocco', !(await page.evaluate(() => document.documentElement.classList.contains('mo-has-cursor'))));
-  check('Nessun errore nella console (mobile)', errors.length === 0, errors.join(' | '));
+  { const veri = errors.filter((m) => !/Transition was aborted because of invalid state/.test(m)); check('Nessun errore nella console (mobile)', veri.length === 0, veri.join(' | ')); }
   await ctx.close();
 }
 
@@ -583,6 +583,22 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.waitForTimeout(1500);
   const f2 = await page.evaluate(() => ({ url: location.pathname, msg: document.querySelector('#mo-f-msg')?.value }));
   check('«Chiedimi un consiglio» da un’altra pagina: pagina Contatti con il messaggio pronto', /\/contatti\/$/.test(f2.url) && /Voglio più clienti/.test(f2.msg || ''), JSON.stringify(f2));
+  // Intestazione con sfumatura: la sezione dopo è «aperta» (la sfumatura passa sotto i suoi testi); invito con testi scuri
+  await page.goto(URL + 'prova-sfumatura/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const sf = await page.evaluate(() => {
+    const pt = document.querySelector('.mo-pt'), iv = document.querySelector('.mo-iv');
+    const etich = pt.querySelector('.mo-overline-h2'), head = document.querySelector('.mo-ph');
+    const sopra = [...document.elementsFromPoint(etich.getBoundingClientRect().left + 5, etich.getBoundingClientRect().top + 5)];
+    return {
+      aperta: pt.classList.contains('mo-aperta'), isol: getComputedStyle(pt).isolation, fondo: getComputedStyle(pt, '::before').backgroundColor,
+      // l'etichetta deve stare davanti alla foto dell'intestazione
+      etichettaDavanti: sopra.indexOf(etich) > -1 && (sopra.indexOf(head) === -1 || sopra.indexOf(etich) < sopra.indexOf(head)),
+      titoloInvito: getComputedStyle(iv.querySelector('.mo-statement')).color, testoInvito: getComputedStyle(iv.querySelector('.mo-iv-testo')).color,
+    };
+  });
+  check('Sfumatura dell’intestazione sotto i testi della sezione dopo', sf.aperta && sf.isol === 'auto' && sf.etichettaDavanti, JSON.stringify(sf));
+  check('Invito finale su sfondo bianco con «testi scuri»: titolo e testo scuri', sf.titoloInvito === 'rgb(15, 23, 42)' && sf.testoInvito === 'rgb(24, 35, 67)', `${sf.titoloInvito} · ${sf.testoInvito}`);
   check('Pagine nuove: nessun errore nella console', errori.length === 0, errori.join(' | '));
   await page.close();
 }

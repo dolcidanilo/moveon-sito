@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,10 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.4.1 =
+* Intestazione di pagina con «sfumatura»: la foto ora svanisce sotto la sezione successiva, dietro i suoi testi (prima copriva etichetta e titolo, es. «Perché scegliermi»).
+* Invito finale: «Stile dei testi: scuri» e i colori personalizzati della scheda Sfondo ora funzionano (prima titolo e testo restavano chiari).
 
 = 1.4.0 =
 * La home riassume, le pagine approfondiscono: nuove pagine Chi sono, Servizi (con una pagina per ogni servizio) e Contatti, create con un clic da MoveOn → Strumenti, con testi in parole semplici e in prima persona da correggere.
