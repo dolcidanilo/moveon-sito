@@ -1,0 +1,9 @@
+{{! INVITO FINALE · anchor sfondo; righe (titolo); testo; pulsante (testo, href) }}
+<section class="mo-block mo-prj-cta mo-iv" id="{{anchor}}" data-dark data-mo-block="invito">
+  {{{sfondo}}}
+  <div class="mo-wrap">
+    <p class="mo-statement">{{#righe}}{{.}} {{/righe}}</p>
+    {{#testo}}<p class="mo-iv-testo">{{testo}}</p>{{/testo}}
+    <a class="mo-btn mo-btn-primary mo-magnetic" href="{{pulsante.href}}">{{pulsante.testo}}</a>
+  </div>
+</section>

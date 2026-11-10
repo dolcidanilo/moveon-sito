@@ -87,23 +87,41 @@ add_action(
 	20
 );
 
-/** Voci del menu: dal menu assegnato in Aspetto → Menu, altrimenti quelle del prototipo. */
+/**
+ * Voci del menu: dal menu assegnato in Aspetto → Menu (con un livello di sottomenu, es. i singoli servizi),
+ * altrimenti quelle del prototipo.
+ */
 function mo_menu_items(): array {
 	$items     = array();
 	$locations = get_nav_menu_locations();
 	if ( ! empty( $locations['moveon-principale'] ) ) {
-		foreach ( (array) wp_get_nav_menu_items( $locations['moveon-principale'] ) as $it ) {
-			if ( (int) $it->menu_item_parent ) {
-				continue; // niente sottomenu: il menu del prototipo è a un solo livello
+		$tutte = (array) wp_get_nav_menu_items( $locations['moveon-principale'] );
+		// Indirizzo della pagina in cui ci si trova: la sua voce di menu viene evidenziata
+		$qui   = untrailingslashit( is_singular() ? (string) get_permalink( get_queried_object_id() ) : ( mo_is_progetti_view() ? mo_progetti_url() : home_url( '/' ) ) );
+		$voce  = function ( $it ) use ( $qui ) {
+			$url = (string) $it->url;
+			return array( 'id' => (int) $it->ID, 'testo' => $it->title, 'href' => mo_link_sezione( $url ), 'nav' => (string) wp_parse_url( $url, PHP_URL_FRAGMENT ), 'attiva' => untrailingslashit( $url ) === $qui, 'figli' => array() );
+		};
+		$pos = array();
+		foreach ( $tutte as $it ) {
+			if ( ! (int) $it->menu_item_parent ) {
+				$pos[ (int) $it->ID ] = count( $items );
+				$items[]              = $voce( $it );
 			}
-			$url     = (string) $it->url;
-			$frag    = (string) wp_parse_url( $url, PHP_URL_FRAGMENT );
-			$items[] = array( 'testo' => $it->title, 'href' => mo_link_sezione( $url ), 'nav' => $frag );
+		}
+		foreach ( $tutte as $it ) {
+			$madre = (int) $it->menu_item_parent;
+			if ( $madre && isset( $pos[ $madre ] ) ) {
+				$items[ $pos[ $madre ] ]['figli'][] = $voce( $it ); // un solo livello di sottomenu
+			}
+		}
+		foreach ( $items as &$i ) {
+			$i['ha_figli'] = (bool) $i['figli'];
 		}
 		return $items;
 	}
 	foreach ( array( 'Chi siamo' => 'chi-siamo', 'Servizi' => 'servizi', 'Portfolio' => 'portfolio', 'Contatti' => 'contatti' ) as $t => $a ) {
-		$items[] = array( 'testo' => $t, 'href' => mo_link_sezione( '#' . $a ), 'nav' => $a );
+		$items[] = array( 'testo' => $t, 'href' => mo_link_sezione( '#' . $a ), 'nav' => $a, 'figli' => array(), 'ha_figli' => false );
 	}
 	return $items;
 }
@@ -127,7 +145,7 @@ function mo_header_html(): string {
 			mo_logo_data(),
 			array(
 				'home_url'  => home_url( '/' ),
-				'logo_href' => mo_is_progetti_view() ? home_url( '/' ) : '#top',
+				'logo_href' => is_front_page() && ! mo_is_progetti_view() ? '#top' : home_url( '/' ),
 				'menu'      => mo_menu_items(),
 				'cta'       => '' !== $cta ? array( 'testo' => $cta, 'href' => mo_link_sezione( mo_href( $s['cta_link'] ) ) ) : null,
 			)

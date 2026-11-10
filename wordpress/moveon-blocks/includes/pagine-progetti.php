@@ -66,12 +66,27 @@ add_filter(
 	2
 );
 
-/** Indirizzi "#sezione" del menu e dei pulsanti: dalle pagine dei progetti portano alla home. */
+/**
+ * Indirizzi "#sezione" del menu e dei pulsanti: sulla home restano «#sezione»; dalle altre pagine portano alla home
+ * (e «#contatti» alla pagina Contatti, se esiste).
+ */
 function mo_link_sezione( string $href ): string {
-	if ( '' !== $href && '#' === $href[0] && mo_is_progetti_view() ) {
-		return home_url( '/' ) . $href;
+	if ( '' === $href || '#' !== $href[0] || ( is_front_page() && ! mo_is_progetti_view() ) ) {
+		return $href;
 	}
-	return $href;
+	if ( ! did_action( 'wp' ) ) {
+		return $href; // fuori da una pagina del sito (es. nel pannello): resta com'è
+	}
+	if ( '#contatti' === $href && function_exists( 'mo_pagina_pronta' ) ) {
+		$contatti = mo_pagina_pronta( 'contatti' );
+		if ( $contatti && 'publish' === $contatti->post_status && get_queried_object_id() !== $contatti->ID ) {
+			return (string) get_permalink( $contatti );
+		}
+		if ( $contatti && get_queried_object_id() === $contatti->ID ) {
+			return $href; // sulla pagina Contatti il modulo è qui
+		}
+	}
+	return home_url( '/' ) . $href;
 }
 
 /* ---------------- Sfondi delle pagine dei progetti (MoveOn → Impostazioni) ---------------- */
@@ -169,7 +184,7 @@ function mo_progetto_pagina_html( WP_Post $post ): string {
 	$cov  = $p['cover_xl'] ?: $p['carosello'];
 	// Testi: solo quelli compilati
 	$blocchi = array();
-	foreach ( array( 'richiesta' => 'La richiesta', 'lavoro' => 'Il nostro lavoro', 'risultato' => 'Il risultato' ) as $k => $titolo ) {
+	foreach ( array( 'richiesta' => 'La richiesta', 'lavoro' => 'Il mio lavoro', 'risultato' => 'Il risultato' ) as $k => $titolo ) {
 		if ( '' !== trim( $p[ $k ] ) ) {
 			$blocchi[] = array( 'titolo' => $titolo, 'testo' => $p[ $k ] );
 		}

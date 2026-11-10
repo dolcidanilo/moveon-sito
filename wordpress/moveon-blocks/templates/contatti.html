@@ -24,7 +24,7 @@
             <div class="mo-fld"><label for="mo-f-tel">Telefono <span class="mo-opt">(facoltativo)</span></label><input id="mo-f-tel" name="telefono" type="tel" autocomplete="tel"></div>
             <div class="mo-fld"><label for="mo-f-area">Di cosa hai bisogno?</label><select id="mo-f-area" name="area">{{#opzioni}}<option>{{.}}</option>{{/opzioni}}</select></div>
           </div>
-          <div class="mo-fld"><label for="mo-f-msg">Raccontaci la tua idea</label><textarea id="mo-f-msg" name="messaggio" rows="5" required></textarea></div>
+          <div class="mo-fld"><label for="mo-f-msg">Raccontami la tua idea</label><textarea id="mo-f-msg" name="messaggio" rows="5" required></textarea></div>
           <div class="mo-hp" aria-hidden="true"><label for="mo-f-sito">Sito web</label><input id="mo-f-sito" name="sito" tabindex="-1" autocomplete="off"></div>
           <input type="hidden" name="t" value="{{ts}}">
           <label class="mo-chk"><input type="checkbox" name="privacy" value="1" required><span>Ho letto la <a href="{{privacy_url}}" target="_blank" rel="noopener">Privacy Policy</a> e acconsento al trattamento dei miei dati.</span></label>
@@ -39,9 +39,9 @@
       <div class="mo-ct-side">
         <p class="mo-ct-side-title">{{titolo_pulsanti}}</p>
         <div class="mo-ct-list">
-          {{#tel_href}}<a class="mo-ct-item" href="{{tel_href}}" aria-label="Chiamaci al telefono"><span class="mo-ct-ico" aria-hidden="true">{{> icona-telefono}}</span><span class="mo-ct-label">Chiamaci</span></a>{{/tel_href}}
-          {{#wa_href}}<a class="mo-ct-item" href="{{wa_href}}" target="_blank" rel="noopener" aria-label="Chatta con noi su WhatsApp"><span class="mo-ct-ico" aria-hidden="true">{{> icona-whatsapp}}</span><span class="mo-ct-label">Chatta</span></a>{{/wa_href}}
-          {{#email_href}}<a class="mo-ct-item" href="{{email_href}}" aria-label="Scrivici un’email"><span class="mo-ct-ico" aria-hidden="true">{{> icona-email}}</span><span class="mo-ct-label">Scrivici</span></a>{{/email_href}}
+          {{#tel_href}}<a class="mo-ct-item" href="{{tel_href}}" aria-label="Chiamami al telefono"><span class="mo-ct-ico" aria-hidden="true">{{> icona-telefono}}</span><span class="mo-ct-label">Chiamami</span></a>{{/tel_href}}
+          {{#wa_href}}<a class="mo-ct-item" href="{{wa_href}}" target="_blank" rel="noopener" aria-label="Scrivimi su WhatsApp"><span class="mo-ct-ico" aria-hidden="true">{{> icona-whatsapp}}</span><span class="mo-ct-label">Chatta</span></a>{{/wa_href}}
+          {{#email_href}}<a class="mo-ct-item" href="{{email_href}}" aria-label="Mandami un’email"><span class="mo-ct-ico" aria-hidden="true">{{> icona-email}}</span><span class="mo-ct-label">Scrivimi</span></a>{{/email_href}}
         </div>
       </div>
     </div>

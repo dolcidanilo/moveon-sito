@@ -117,7 +117,7 @@ function mo_blocks(): array {
 	$illu  = array( 'Identità (rombo e cerchio)' => 'identita', 'Web (finestra con cursore)' => 'web', 'Social (telefono e cuori)' => 'social', 'App (sito che diventa app)' => 'app', 'Rete (pianeti in orbita)' => 'rete', 'Formazione (livelli)' => 'formazione' );
 	$fuoco = 'Il punto della foto da tenere sempre visibile, in percentuale orizzontale e verticale. Es. «50% 50%» = centro, «30% 40%» = un po’ a sinistra e in alto.';
 
-	return array(
+	$blocchi = array(
 		'hero'      => array(
 			'name'   => 'MoveOn · Hero',
 			'desc'   => 'Titolo grande parola per parola su immagini a tutto schermo (una per settore) che si compongono pixel dopo pixel; in alternativa la lampadina in pixel.',
@@ -226,6 +226,7 @@ function mo_blocks(): array {
 						mo_p_img( 'immagine', 'Immagine (4:3 o 1:1)', 'Facoltativa: se vuota resta l’illustrazione animata scelta sotto.', '' ),
 						mo_p_drop( 'illustrazione', 'Illustrazione di riserva', $illu, 'identita', '', '' ),
 						mo_p_text( 'parola_sfondo', 'Parola di sfondo', 'La parola gigante e trasparente dietro la scheda.', '' ),
+						mo_p_text( 'link', '«Scopri di più» porta a', 'La pagina del servizio, es. /servizi/grafica/. Vuoto = niente link.', '' ),
 						mo_p_drop( 'colore', 'Colore della scheda', $colori, 'bianco', '', '' ),
 					),
 					$d['servizi']['servizi'],
@@ -249,7 +250,7 @@ function mo_blocks(): array {
 			),
 		),
 		'garanzie'  => array(
-			'name'   => 'MoveOn · Le nostre garanzie',
+			'name'   => 'MoveOn · Garanzie',
 			'desc'   => 'Scudo in pixel che si compone, sigillo rotante, timbri sulle card.',
 			'params' => array(
 				mo_p_text( 'etichetta', 'Etichetta in alto', '', 'Testi', $d['garanzie']['etichetta'] ),
@@ -279,6 +280,8 @@ function mo_blocks(): array {
 			),
 		),
 	);
+	// Gli elementi per comporre le pagine (sezioni.php) si aggiungono a quelli della home
+	return array_merge( $blocchi, mo_sezioni_def( $d ) );
 }
 
 /** Valori iniziali di un elemento (per lo shortcode senza attributi). */
@@ -486,6 +489,7 @@ function mo_render_servizi( $atts ): string {
 			'art_key'       => $art,
 			'art'           => MO_Tpl::render( 'parti/illustrazione-' . $art ),
 			'parola_sfondo' => mo_text( $s['parola_sfondo'] ?? '' ),
+			'link'          => mo_href( $s['link'] ?? '' ),
 		);
 	}
 	$btn = mo_text( $a['pulsante_testo'] );

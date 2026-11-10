@@ -29,7 +29,10 @@ Aggiornalo alla fine di ogni lavoro importante (sezioni «Decisioni» e «In sos
 | `includes/template.php` | Motore dei modelli HTML (`MO_Tpl`, sintassi tipo Mustache: `{{x}}`, `{{{x}}}`, `{{#x}}…{{/x}}`, `{{^x}}`, `{{> parte}}`). Ordine: modello salvato in MoveOn → Modelli HTML › tema figlio `moveon/` › `templates/` del plugin |
 | `includes/defaults.php` | Testi iniziali di ogni elemento, impostazioni di serie, 8 progetti di esempio |
 | `includes/helpers.php` | `mo_image()`, `mo_text()` (decodifica le virgolette di WPBakery), `mo_lines()`, `mo_href()`, telefono/WhatsApp… |
-| `includes/blocks.php` | Gli **8 elementi WPBakery** (`mo_blocks()`: Hero, Nastro, Chi siamo, Pausa, Servizi, **Portfolio** = carosello 3D con shortcode `mo_carosello`, Garanzie, Contatti), scheda **Sfondo** (`mo_p_sfondo()`, `mo_sfondo_html()`), funzioni `mo_render_*`. Lo shortcode del vecchio `mo_portfolio` resta registrato ma non mostra niente |
+| `includes/blocks.php` | Gli elementi della home (`mo_blocks()`: Hero, Nastro, Chi siamo lungo, Pausa, Servizi, **Portfolio** = carosello 3D con shortcode `mo_carosello`, Garanzie, Contatti; più quelli di `sezioni.php`, 19 in tutto; la home di serie è `mo_home_elementi()`), scheda **Sfondo** (`mo_p_sfondo()`, `mo_sfondo_html()`), funzioni `mo_render_*`. Lo shortcode del vecchio `mo_portfolio` resta registrato ma non mostra niente |
+| `includes/sezioni.php` | Gli **11 elementi per le pagine** (Intestazione, Numeri, Punti di forza, Come lavoro, Cosa realizzo, Non sai da dove partire?, Domande frequenti, Recensioni, Progetti scelti, Invito finale) e «Chi sono» breve per la home: definizioni e `mo_render_*`. Si aggiungono a `mo_blocks()` |
+| `includes/testi-pagine.php` | Testi di serie dei nuovi elementi (`mo_defaults_sezioni()`) e contenuto delle **pagine pronte** (`mo_pagine_pronte()`, `mo_servizi_pagine()`): in prima persona, parole semplici, [quadre] = da controllare |
+| `includes/pagine-pronte.php` | Strumenti: `mo_crea_pagine()` (Chi sono, Servizi + 5 pagine figlie, Contatti; riconosciute dal meta `_moveon_pagina`), `mo_crea_menu_pagine()` (menu «MoveOn · menu con le pagine» con sottomenu), `mo_alleggerisci_home()` |
 | `includes/pagina.php` | Modello di pagina «MoveOn · pagina intera», header/footer, caricamento CSS/JS, esclusione stili di Porto, righe/colonne finte se manca WPBakery |
 | `includes/modello-pagina.php` | HTML della pagina intera (script di avvio nel `<head>`, header, contenuto, footer) |
 | `includes/progetti.php` | Tipo di contenuto `mo_progetto` (Progetti portfolio), riquadro «Dettagli del progetto» (area, tipo, testi, immagine del carosello, immagini del progetto con Aggiungi/Sostituisci/×/ordine) |
@@ -54,7 +57,7 @@ Regole di costruzione:
 1. **WordPress di prova** (WordPress 6.5 + SQLite in `/nuovo`, con il «tema ostile» che simula Porto):
    `bash tools/wp-prova.sh <cartella>` → http://127.0.0.1:8080/nuovo/ (admin / prova-moveon-1). Il server spesso si spegne tra un turno e l'altro: rilancia lo script (è idempotente). Comandi PHP nel WordPress di prova: `php <cartella>/wpcli.php '<codice PHP>'`.
 2. Modifica il codice, poi **guarda il risultato** con Playwright (screenshot desktop e telefono) e confrontalo con lo screen del cliente.
-3. **Controlli automatici**: `node tests/check.mjs` (browser, ~70 controlli) e `php tests/plugin-check.php <cartella>/wp` (PHP, ~60). Aggiungi un controllo per ogni bug corretto o funzione nuova. Il controllo «Pausa emozionale: stessa velocità a 60 e 120 Hz» a volte fallisce per il carico della macchina: rilancia.
+3. **Controlli automatici**: `node tests/check.mjs` (browser, ~85 controlli) e `php tests/plugin-check.php <cartella>/wp` (PHP, ~85). Aggiungi un controllo per ogni bug corretto o funzione nuova. Il controllo «Pausa emozionale: stessa velocità a 60 e 120 Hz» a volte fallisce per il carico della macchina: rilancia.
 4. **Versione**: aumentala in `moveon-blocks.php` (intestazione **e** `MOVEON_VERSION`) e in `readme.txt` (`Stable tag` + voce di changelog). Aggiorna `guida.html` e i numeri di controlli nel `README.md`.
 5. `python3 tools/build-zip.py` → `dist/moveon-blocks.zip`.
 6. Commit (messaggio in italiano) e `git push -u origin materiali` (se fallisce per errore di rete, riprova con attese crescenti).
@@ -88,14 +91,16 @@ Inciampi già visti:
 - **Pausa emozionale** non blocca più lo scorrimento: la foto si apre da quando compare in basso a quando è al centro.
 - **Versioni precedenti** in `dist/archivio/` (es. `moveon-blocks-1.2.0.zip`) per poter tornare indietro: si ricarica lo zip vecchio con «Sostituisci la versione installata». Il plugin non tocca i contenuti delle pagine; per sicurezza il cliente fa un backup di /nuovo prima dei cambi grossi.
 - **Recensioni**: per costruire le pagine si usano **segnaposto chiaramente finti** (es. «[Recensione di un cliente]»), da sostituire con quelle vere prima della messa online: recensioni inventate pubblicate come vere sono vietate.
+- **Pagine (1.4.0)**: home leggera (`mo_home_elementi()`: hero, nastro, chi_breve, pausa, servizi, situazioni, carosello, garanzie, contatti) + pagine Chi sono, Servizi (/servizi/grafica|siti-web|social|stampa|formazione/), Contatti, create da Strumenti. Menu con sottomenu (un livello). `mo_href('/x/')` = pagina del sito (home_url). `mo_link_sezione('#x')` fuori dalla home → home#x, e #contatti → pagina Contatti.
+- **App WebView tolta** dal sito (decisione del cliente, 10/11/2026). L'illustrazione «app» resta disponibile tra quelle dei Servizi.
+- Testi di serie in **prima persona** («Contattami», «Le mie garanzie»…). Il vecchio «Chi siamo» lungo resta come elemento (usato nella pagina di prova `prova-chi-siamo`).
 - Cookie e policy: **LegalBlink di Aruba** al posto di iubenda (non disdire iubenda prima della W4).
 - **Google Analytics 4** sì, solo dopo il consenso (Consent Mode v2).
 
 ## In sospeso
 
-- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`** (mappa delle pagine, fasi A contenuti → B costruzione → C W3 → D W4). Partire da lì. Ora si aspetta il **vecchio elenco** dei lavori dal cliente (fase A).
+- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`**. Fase B (costruzione) fatta nella 1.4.0: ora il cliente usa gli Strumenti su /nuovo, corregge i testi [tra quadre], carica le foto (hero, punti di forza) e raccoglie le recensioni vere. Poi fase C (W3).
 - Possibili ritocchi grafici «di gusto» annunciati dal cliente.
-- **App WebView**: il cliente non sa realizzarle. Spiegato: Claude può guidare tutto il percorso tecnico, ma servono account sviluppatore (Google Play una tantum, Apple annuale), una build iOS (Mac o servizio in cloud) e Apple spesso rifiuta app che sono solo un sito «impacchettato». **Decisione del cliente in sospeso**: tenere o togliere il servizio dal sito.
 - **Scheda Google**: il cliente preferisce aprirla quando il sito nuovo è online.
 - **W3** — vedi `docs/piano-W3-seo-analytics-legalblink.md` (da riproporre per intero quando si inizia): SEO locale su Pescara e provincia (scheda Google Business Profile da creare, attività senza sede aperta al pubblico; Rank Math; pagine servizi; dati strutturati), Google Analytics, LegalBlink, invio email affidabile (SMTP con la casella Aruba).
 - **W4** — spostamento da /nuovo al sito principale.

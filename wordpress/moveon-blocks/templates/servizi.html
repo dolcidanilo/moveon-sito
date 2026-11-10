@@ -1,4 +1,4 @@
-{{! SERVIZI · anchor etichetta apertura totale primo_nome finale_frase; servizi (nome, beneficio, voci, tono, immagine (url, alt, w, h), art_key, art, parola_sfondo); pulsante (testo, href); sfondo = immagine di sfondo (scheda Sfondo) }}
+{{! SERVIZI · anchor etichetta apertura totale primo_nome finale_frase; servizi (nome, beneficio, voci, link, tono, immagine (url, alt, w, h), art_key, art, parola_sfondo); pulsante (testo, href); sfondo = immagine di sfondo (scheda Sfondo) }}
 <section class="mo-block mo-svc" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="servizi" data-mo-pin="h">
   {{{sfondo}}}
   <div class="mo-svc-track">
@@ -14,6 +14,7 @@
         <h3 class="mo-svc-title">{{nome}}</h3>
         <p class="mo-svc-lead">{{beneficio}}</p>
         <ul class="mo-chips">{{#voci}}<li>{{.}}</li>{{/voci}}</ul>
+        {{#link}}<a class="mo-svc-more" href="{{link}}">Scopri di più <span aria-hidden="true">→</span></a>{{/link}}
       </div>
       {{#immagine}}<div class="mo-svc-art"><img class="mo-svc-img" src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" loading="lazy"></div>{{/immagine}}
       {{^immagine}}<div class="mo-svc-art" aria-hidden="true" data-art="{{art_key}}">{{{art}}}</div>{{/immagine}}

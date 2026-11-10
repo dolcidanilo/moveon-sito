@@ -111,6 +111,17 @@ if ( $p && ! get_post_meta( $p[0]->ID, "_mo_galleria", true ) ) {
   wp_update_post( array( "ID" => $p[0]->ID, "post_content" => "<p>Il racconto del progetto: <strong>come è nato</strong> il marchio del forno.</p>" ) );
   echo "· Galleria di prova su Forno Aurora\n";
 }
+if ( ! get_page_by_path( "prova-chi-siamo" ) ) {
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova Chi siamo", "post_name" => "prova-chi-siamo", "post_content" => mo_riga( "[mo_chi_siamo]" ) . mo_riga( "[mo_contatti]" ) ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-chi-siamo creata\n";
+}
+// Pagine Chi sono, Servizi (+ una per servizio), Contatti, menu con le pagine, home alleggerita (come con MoveOn → Strumenti)
+$nuove = mo_crea_pagine();
+if ( $nuove ) { echo "· Pagine create: " . count( $nuove ) . "\n"; }
+mo_crea_menu_pagine();
+$a = mo_alleggerisci_home();
+if ( ! empty( $a["fatto"] ) ) { echo "· Home alleggerita\n"; }
 flush_rewrite_rules( false );
 ' 2>/dev/null
 echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1)"

@@ -1,4 +1,4 @@
-{{! HEADER · home_url logo_href (#top sulla home, l’indirizzo della home nelle pagine dei progetti) logo_scuro logo_chiaro (url, w, h); menu (testo, href, nav); cta (testo, href) }}
+{{! HEADER · home_url logo_href (#top sulla home, l’indirizzo della home nelle altre pagine) logo_scuro logo_chiaro (url, w, h); menu (testo, href, nav, ha_figli, figli (testo, href)); cta (testo, href) }}
 <a class="mo-skip" href="#mo-main">Vai al contenuto</a>
 <header class="mo-site-header">
   <div class="mo-header-inner">
@@ -7,7 +7,7 @@
       {{#logo_chiaro}}<img class="mo-logo-l" src="{{url}}" alt="" width="{{w}}" height="{{h}}">{{/logo_chiaro}}
     </a>
     <nav class="mo-nav" aria-label="Principale">
-      {{#menu}}<a href="{{href}}"{{#nav}} data-nav="{{nav}}"{{/nav}}>{{testo}}</a>{{/menu}}
+      {{#menu}}{{^ha_figli}}<a href="{{href}}"{{#nav}} data-nav="{{nav}}"{{/nav}}{{#attiva}} class="mo-is-active" aria-current="page"{{/attiva}}>{{testo}}</a>{{/ha_figli}}{{#ha_figli}}<span class="mo-nav-item"><a href="{{href}}"{{#nav}} data-nav="{{nav}}"{{/nav}}{{#attiva}} class="mo-is-active" aria-current="page"{{/attiva}} aria-haspopup="true">{{testo}}</a><span class="mo-sub">{{#figli}}<a href="{{href}}">{{testo}}</a>{{/figli}}</span></span>{{/ha_figli}}{{/menu}}
     </nav>
     {{#cta}}<a href="{{href}}" class="mo-btn mo-btn-primary mo-magnetic mo-header-cta">{{testo}}</a>{{/cta}}
     <button class="mo-menu-btn" type="button" aria-expanded="false" aria-controls="mo-mobile-menu" aria-label="Apri il menu"><span></span><span></span></button>
@@ -15,6 +15,6 @@
   <div class="mo-progress"></div>
 </header>
 <div class="mo-mobile-menu" id="mo-mobile-menu" data-dark data-lenis-prevent hidden>
-  {{#menu}}<a class="mo-mm-item mo-mm-link" href="{{href}}">{{testo}}</a>{{/menu}}
+  {{#menu}}<a class="mo-mm-item mo-mm-link" href="{{href}}">{{testo}}</a>{{#ha_figli}}<span class="mo-mm-item mo-mm-subs">{{#figli}}<a class="mo-mm-sub" href="{{href}}">{{testo}}</a>{{/figli}}</span>{{/ha_figli}}{{/menu}}
   {{#cta}}<a class="mo-mm-item mo-btn mo-btn-primary" href="{{href}}">{{testo}}</a>{{/cta}}
 </div>

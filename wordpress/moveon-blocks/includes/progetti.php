@@ -181,7 +181,7 @@ function mo_progetto_metabox( WP_Post $post ): void {
 			<td><textarea class="large-text" rows="3" name="mo_richiesta" id="mo_richiesta"><?php echo esc_textarea( $m( '_mo_richiesta' ) ); ?></textarea></td>
 		</tr>
 		<tr>
-			<th><label for="mo_lavoro">Il nostro lavoro</label></th>
+			<th><label for="mo_lavoro">Il mio lavoro</label></th>
 			<td><textarea class="large-text" rows="3" name="mo_lavoro" id="mo_lavoro"><?php echo esc_textarea( $m( '_mo_lavoro' ) ); ?></textarea></td>
 		</tr>
 		<tr>

@@ -43,7 +43,7 @@ if ( ! function_exists( 'mo_blocks' ) ) {
 
 /* 1) Campi per WPBakery */
 do_action( 'vc_before_init' );
-check( 'WPBakery: registrati 8 elementi', 8 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
+check( 'WPBakery: registrati 19 elementi (8 della home + 11 per le pagine)', 19 === count( $GLOBALS['mo_vc'] ), (string) count( $GLOBALS['mo_vc'] ) );
 $tipi = array( 'textfield', 'textarea', 'attach_image', 'dropdown', 'param_group', 'colorpicker' );
 $err  = array();
 foreach ( $GLOBALS['mo_vc'] as $el ) {
@@ -133,7 +133,7 @@ check( 'Immagine dell’idea al posto del cubo (anche SVG)', false !== strpos( $
 $html = do_shortcode( '[mo_hero sfondo_img="' . $jpg . '" sfondo_opacita="15" sfondo_dimensione="auto" sfondo_posizione="100% 50%"]' );
 check( 'Sfondo: livello con opacità, dimensione e posizione', false !== strpos( $html, 'class="mo-bg mo-bg--foto"' ) && false !== strpos( $html, 'opacity:0.15' ) && false !== strpos( $html, 'background-size:auto' ) && false !== strpos( $html, 'background-position:100% 50%' ) );
 check( 'Sfondo: niente livello se non c’è l’immagine', false === strpos( do_shortcode( '[mo_hero]' ), 'mo-bg' ) );
-check( 'WPBakery: scheda Sfondo in tutti gli 8 elementi', 8 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
+check( 'WPBakery: scheda Sfondo in tutti i 19 elementi', 19 === count( array_filter( $GLOBALS['mo_vc'], function ( $el ) { return in_array( 'sfondo_img', array_column( $el['params'], 'param_name' ), true ); } ) ) );
 
 /* 9) Telefono e WhatsApp */
 check( 'Telefono senza prefisso → +39', 'tel:+393331234567' === mo_tel_href( '333 123 4567' ) );
@@ -210,6 +210,35 @@ $html = do_shortcode( '[mo_hero stile="lampadina"]' );
 check( 'Hero: la lampadina resta disponibile', str_contains( $html, 'mo-bulb' ) && ! str_contains( $html, 'mo-hs-slide' ) );
 $html = do_shortcode( '[mo_hero slide="' . rawurlencode( wp_json_encode( array( array( 'settore' => 'Stampa', 'immagine' => (string) $jpg, 'posizione' => '30% 70%' ) ) ) ) . '" scurimento="60" transizione="dissolvenza" durata="10"]' );
 check( 'Hero: immagine scelta, punto focale, velo e tempi; con una sola immagine niente settori', str_contains( $html, wp_basename( (string) wp_get_attachment_image_url( $jpg, '2048x2048' ) ) ) && str_contains( $html, 'object-position:30% 70%' ) && str_contains( $html, '--mo-hs-velo:0.6' ) && str_contains( $html, 'data-transizione="dissolvenza"' ) && str_contains( $html, 'data-durata="10"' ) && ! str_contains( $html, 'mo-hs-nav' ) );
+/* 12) Pagine pronte, home leggera, testi */
+check( 'Indirizzi «/pagina/» verso le pagine di questo sito (anche in /nuovo)', home_url( '/chi-sono/' ) === mo_href( '/chi-sono/' ) && '#contatti' === mo_href( '#contatti' ) && 'https://esempio.it/x' === mo_href( 'https://esempio.it/x' ) );
+$html = do_shortcode( '[mo_servizi]' );
+check( 'Servizi: 5 schede con «Scopri di più», niente App WebView', 5 === substr_count( $html, 'class="mo-svc-more"' ) && ! str_contains( $html, 'App WebView' ) && str_contains( $html, 'href="' . home_url( '/servizi/grafica/' ) . '"' ) );
+check( 'Modulo contatti: niente App tra le scelte, «consigliami» c’è', ! str_contains( do_shortcode( '[mo_contatti]' ), '<option>App' ) && str_contains( do_shortcode( '[mo_contatti]' ), 'consigliami' ) );
+$html = do_shortcode( '[mo_situazioni]' );
+check( 'Non sai da dove partire?: situazioni con il messaggio per il modulo', 5 === substr_count( $html, 'class="mo-si-card"' ) && str_contains( $html, 'data-messaggio="Ciao, la mia situazione è: «Apro una nuova attività»' ) );
+check( 'Recensioni di serie: segnaposto chiaramente finti', str_contains( do_shortcode( '[mo_recensioni]' ), '[Nome Cognome]' ) );
+$web = do_shortcode( '[mo_lavori area="web"]' );
+check( 'Progetti scelti: solo l’area chiesta, e niente sezione se non ci sono progetti', str_contains( $web, 'Studio Legale Ferri' ) && ! str_contains( $web, 'Forno Aurora' ) && '' === do_shortcode( '[mo_lavori area="inesistente"]' ) );
+$prima = count( mo_crea_pagine() );
+check( 'Crea le pagine: già presenti → nessun doppione', 0 === $prima );
+$chi = mo_pagina_pronta( 'chi-sono' );
+check( 'Pagina Chi sono: modello MoveOn ed elementi in righe WPBakery', $chi && MO_TEMPLATE === get_page_template_slug( $chi ) && str_contains( $chi->post_content, '[mo_numeri' ) && str_contains( $chi->post_content, '[vc_row full_width="stretch_row_content_no_spaces"' ) );
+$graf = mo_pagina_pronta( 'grafica' );
+check( 'Pagine dei servizi figlie di Servizi: /servizi/grafica/', $graf && str_ends_with( (string) get_permalink( $graf ), '/servizi/grafica/' ) );
+$voci = wp_get_nav_menu_items( wp_get_nav_menu_object( 'MoveOn · menu con le pagine' ) );
+$figli = array_filter( (array) $voci, fn( $v ) => (int) $v->menu_item_parent );
+check( 'Menu con le pagine: 4 voci principali e 5 servizi a tendina', 9 === count( (array) $voci ) && 5 === count( $figli ) );
+// Alleggerisci la home, su una pagina di prova
+$vera = (int) get_option( 'page_on_front' );
+$tmp  = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Prova home', 'post_content' => mo_riga( '[mo_hero]' ) . mo_riga( '[mo_chi_siamo etichetta="Chi siamo"]' ) . mo_riga( '[mo_servizi]' ) . mo_riga( '[mo_contatti]' ) ) );
+update_option( 'page_on_front', $tmp );
+$r1   = mo_alleggerisci_home();
+$c1   = get_post( $tmp )->post_content;
+$r2   = mo_alleggerisci_home();
+update_option( 'page_on_front', $vera );
+wp_delete_post( $tmp, true );
+check( 'Alleggerisci la home: Chi sono breve e «Non sai da dove partire?» dopo i Servizi; la seconda volta niente', 2 === count( $r1['fatto'] ?? array() ) && ! str_contains( $c1, '[mo_chi_siamo' ) && strpos( $c1, '[mo_situazioni]' ) > strpos( $c1, '[mo_servizi]' ) && strpos( $c1, '[mo_situazioni]' ) < strpos( $c1, '[mo_contatti]' ) && ! ( $r2['fatto'] ?? array() ) );
 check( 'Link alle sezioni: nelle pagine normali restano «#sezione»', '#contatti' === mo_link_sezione( '#contatti' ) );
 
 /* 11) Sfondi delle pagine dei progetti (MoveOn → Impostazioni) */

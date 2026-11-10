@@ -1,0 +1,16 @@
+{{! CHI SONO BREVE (home) · anchor sfondo etichetta numero frase_numero titolo; punti (righe); pulsante (testo, href) }}
+<section class="mo-block mo-sec mo-cb" id="{{anchor}}" data-mo-block="chi-breve">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-cb-grid">
+    <div class="mo-cb-num mo-reveal">
+      {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+      <p class="mo-cb-n">{{numero}}</p>
+      <p class="mo-cb-frase">{{frase_numero}}</p>
+    </div>
+    <div class="mo-cb-testo">
+      <h2 class="mo-sec-title mo-reveal">{{titolo}}</h2>
+      <ul class="mo-cb-punti mo-stagger">{{#punti}}<li>{{.}}</li>{{/punti}}</ul>
+      {{#pulsante}}<a class="mo-btn mo-btn-primary mo-magnetic mo-reveal" href="{{href}}">{{testo}}</a>{{/pulsante}}
+    </div>
+  </div>
+</section>

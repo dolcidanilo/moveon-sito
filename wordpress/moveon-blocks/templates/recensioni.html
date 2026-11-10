@@ -1,0 +1,11 @@
+{{! RECENSIONI · anchor sfondo etichetta titolo; recensioni (testo, nome, attivita) }}
+<section class="mo-block mo-sec mo-rc" id="{{anchor}}" data-mo-block="recensioni">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap mo-rc-grid mo-stagger">
+    {{#recensioni}}<figure class="mo-rc-card"><blockquote>{{testo}}</blockquote><figcaption><strong>{{nome}}</strong>{{#attivita}}<span>{{attivita}}</span>{{/attivita}}</figcaption></figure>{{/recensioni}}
+  </div>
+</section>

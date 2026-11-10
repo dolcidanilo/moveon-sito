@@ -1,0 +1,11 @@
+{{! PUNTI DI FORZA · anchor sfondo etichetta titolo; punti (titolo, testo, immagine (url, alt, w, h)) }}
+<section class="mo-block mo-sec mo-pt" id="{{anchor}}" data-mo-block="punti">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap mo-pt-grid mo-stagger">
+    {{#punti}}<article class="mo-pt-card">{{#immagine}}<span class="mo-pt-img"><img src="{{url}}" alt="{{alt}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}} loading="lazy" decoding="async"></span>{{/immagine}}<h3>{{titolo}}</h3><p>{{testo}}</p></article>{{/punti}}
+  </div>
+</section>

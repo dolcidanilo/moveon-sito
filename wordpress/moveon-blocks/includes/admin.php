@@ -124,6 +124,10 @@ add_action(
 			$esito = array( 'progetti' => mo_crea_progetti_esempio() );
 		} elseif ( 'menu' === $azione ) {
 			$esito = array( 'menu' => mo_crea_menu() );
+		} elseif ( 'pagine' === $azione ) {
+			$esito = array( 'pagine' => mo_crea_pagine(), 'menu_pagine' => mo_crea_menu_pagine() );
+		} elseif ( 'alleggerisci' === $azione ) {
+			$esito = array( 'alleggerita' => mo_alleggerisci_home() );
 		}
 		set_transient( 'moveon_esito_' . get_current_user_id(), $esito, 120 );
 		wp_safe_redirect( admin_url( 'admin.php?page=moveon&tab=strumenti&fatto=' . $azione ) );
@@ -257,7 +261,7 @@ function mo_admin_impostazioni(): void {
 		<table class="form-table" role="presentation">
 			<?php
 			$text( 'header_cta', 'Testo del pulsante nell’header', 'Massimo 3 parole, es. «Richiedi Preventivo». Lascia vuoto per non mostrarlo.' );
-			$text( 'mobile_cta', 'Testo del pulsante nella barra mobile', 'Es. «Contattaci Ora».' );
+			$text( 'mobile_cta', 'Testo del pulsante nella barra mobile', 'Es. «Contattami Ora».' );
 			$text( 'cta_link', 'I due pulsanti portano a', 'L’ancora della sezione Contatti, es. #contatti.' );
 			?>
 		</table>
@@ -357,6 +361,31 @@ function mo_admin_strumenti(): void {
 		if ( ! empty( $esito['home'] ) ) {
 			echo '<li>La pagina è ora la <strong>home</strong> del sito (Impostazioni → Lettura).</li>';
 		}
+		if ( isset( $esito['pagine'] ) ) {
+			if ( $esito['pagine'] ) {
+				foreach ( $esito['pagine'] as $pid ) {
+					printf( '<li>Pagina creata: <strong>%s</strong> · <a href="%s" target="_blank">apri nel sito</a> · <a href="%s">modifica</a></li>', esc_html( get_the_title( $pid ) ), esc_url( get_permalink( $pid ) ), esc_url( get_edit_post_link( $pid ) ) );
+				}
+			} else {
+				echo '<li>Le pagine c’erano già: nessuna pagina nuova (quelle esistenti non vengono toccate).</li>';
+			}
+			if ( ! empty( $esito['menu_pagine'] ) ) {
+				echo '<li>Menu «MoveOn · menu con le pagine» pronto e assegnato all’header, con i servizi a tendina. Il menu di prima resta in Aspetto → Menu.</li>';
+			}
+		}
+		if ( isset( $esito['alleggerita'] ) ) {
+			$a = $esito['alleggerita'];
+			if ( ! empty( $a['errore'] ) ) {
+				echo '<li>' . esc_html( $a['errore'] ) . '</li>';
+			} elseif ( ! empty( $a['fatto'] ) ) {
+				foreach ( $a['fatto'] as $f ) {
+					echo '<li>Home: ' . esc_html( $f ) . '.</li>';
+				}
+				printf( '<li>La versione precedente è nelle <a href="%s">revisioni della pagina</a>: da lì puoi ripristinarla.</li>', esc_url( admin_url( 'revision.php?revision=' . (int) ( wp_get_post_revisions( $a['home'], array( 'posts_per_page' => 1 ) ) ? array_key_first( wp_get_post_revisions( $a['home'], array( 'posts_per_page' => 1 ) ) ) : 0 ) ) ) );
+			} else {
+				echo '<li>La home era già alleggerita: niente da cambiare.</li>';
+			}
+		}
 		echo '</ul></div>';
 	}
 	$form = function ( $azione, $titolo, $testo, $bottone, $extra = '' ) {
@@ -374,7 +403,9 @@ function mo_admin_strumenti(): void {
 		</div>
 		<?php
 	};
-	$form( 'demo', 'Crea la pagina demo', 'Crea una pagina «Home MoveOn» con il modello <strong>MoveOn · pagina intera</strong> e tutti gli 8 elementi già compilati con i testi del prototipo, più i progetti di esempio e il menu. Puoi crearla più volte: ogni volta è una pagina nuova.', 'Crea la pagina demo', '<p><label><input type="checkbox" name="home" value="1"> Imposta la pagina come home del sito</label></p>' );
+	$form( 'pagine', 'Crea le pagine', 'Crea le pagine <strong>Chi sono</strong>, <strong>Servizi</strong> (con una pagina per ogni servizio: Grafica, Siti web, Social, Stampa, Formazione) e <strong>Contatti</strong>, già composte con gli elementi MoveOn e i testi da correggere, più il <strong>menu con i servizi a tendina</strong>. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.', 'Crea le pagine e il menu' );
+	$form( 'alleggerisci', 'Alleggerisci la home', 'Nella pagina impostata come home: sostituisce «Chi siamo» con la versione breve <strong>Chi sono</strong> (il resto va nella pagina Chi sono) e aggiunge <strong>Non sai da dove partire?</strong> dopo i Servizi. La versione precedente resta nelle <strong>Revisioni</strong> della pagina e si può ripristinare.', 'Alleggerisci la home' );
+	$form( 'demo', 'Crea la pagina demo', 'Crea una pagina «Home MoveOn» con il modello <strong>MoveOn · pagina intera</strong> e tutte le sezioni della home già compilate, più i progetti di esempio e il menu. Puoi crearla più volte: ogni volta è una pagina nuova.', 'Crea la pagina demo', '<p><label><input type="checkbox" name="home" value="1"> Imposta la pagina come home del sito</label></p>' );
 	$form( 'progetti', 'Crea i progetti di esempio', 'Crea gli 8 progetti di esempio del prototipo in «Progetti portfolio», con le copertine nella Libreria media. Quelli già creati non vengono duplicati.', 'Crea i progetti' );
 	$form( 'menu', 'Crea il menu', 'Crea il menu «MoveOn · menu principale» con le voci Chi siamo, Servizi, Portfolio, Contatti e lo assegna all’header.', 'Crea il menu' );
 }

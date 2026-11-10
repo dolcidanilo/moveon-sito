@@ -1,0 +1,14 @@
+{{! PROGETTI SCELTI · anchor sfondo etichetta titolo; progetti (url, nome, tipo, area_nome, immagine (url, w, h)); pulsante (testo, href) }}
+<section class="mo-block mo-sec mo-lv" id="{{anchor}}" data-mo-block="lavori">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap">
+    <div class="mo-prjs-grid mo-stagger">
+      {{#progetti}}<a class="mo-prjs-card" href="{{url}}"><span class="mo-prjs-cover">{{#immagine}}<img src="{{url}}" alt=""{{#w}} width="{{w}}" height="{{h}}"{{/w}} loading="lazy" decoding="async">{{/immagine}}</span><span class="mo-prjs-cap"><span class="mo-prjs-name">{{nome}}</span><span class="mo-prjs-cat">{{area_nome}}{{#tipo}}, {{tipo}}{{/tipo}}</span></span></a>{{/progetti}}
+    </div>
+    {{#pulsante}}<p class="mo-lv-tutti"><a class="mo-btn mo-btn--secondary mo-magnetic" href="{{href}}">{{testo}}</a></p>{{/pulsante}}
+  </div>
+</section>

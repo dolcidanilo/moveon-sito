@@ -1,0 +1,11 @@
+{{! DOMANDE FREQUENTI · anchor sfondo etichetta titolo; domande (domanda, risposta) }}
+<section class="mo-block mo-sec mo-fq" id="{{anchor}}" data-mo-block="faq">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap mo-fq-list">
+    {{#domande}}<details class="mo-fq-item"><summary>{{domanda}}<span class="mo-fq-ico" aria-hidden="true"></span></summary><p>{{risposta}}</p></details>{{/domande}}
+  </div>
+</section>

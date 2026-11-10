@@ -109,7 +109,14 @@ function mo_href( $v ): string {
 	if ( '' === $v ) {
 		return '';
 	}
-	return ( '#' === $v[0] ) ? '#' . sanitize_title( substr( $v, 1 ) ) : esc_url_raw( $v );
+	if ( '#' === $v[0] ) {
+		return '#' . sanitize_title( substr( $v, 1 ) );
+	}
+	// «/chi-sono/»: una pagina di questo sito, anche se WordPress è in una sottocartella (es. /nuovo)
+	if ( '/' === $v[0] && ( ! isset( $v[1] ) || '/' !== $v[1] ) ) {
+		return esc_url_raw( home_url( $v ) );
+	}
+	return esc_url_raw( $v );
 }
 
 /** "+39 347 461 6434" → "+393474616434" (prefisso italiano aggiunto se manca). */

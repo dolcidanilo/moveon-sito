@@ -1,0 +1,10 @@
+{{! INTESTAZIONE DI PAGINA · anchor sfondo etichetta; righe (titolo, a capo); testo; pulsante (testo, href); sfumatura (stile) }}
+<section class="mo-block mo-prj-head mo-ph{{#sfumatura}} mo-sfuma{{/sfumatura}}" id="{{anchor}}" data-dark data-mo-block="intestazione"{{#sfumatura}} style="{{sfumatura}}"{{/sfumatura}}>
+  {{{sfondo}}}
+  <div class="mo-wrap">
+    {{#etichetta}}<span class="mo-prj-badge">{{etichetta}}</span>{{/etichetta}}
+    <h1 class="mo-prj-title">{{#righe}}<span class="mo-ph-riga">{{.}}</span> {{/righe}}</h1>
+    {{#testo}}<p class="mo-prjs-sub">{{testo}}</p>{{/testo}}
+    {{#pulsante}}<a class="mo-btn mo-btn-primary mo-magnetic mo-ph-btn" href="{{href}}">{{testo}}</a>{{/pulsante}}
+  </div>
+</section>

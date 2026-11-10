@@ -104,7 +104,7 @@ function initSite() {
   const env = { G, ST, reduce, fine, mobileQ, d, data, setMenu, getLenis: () => lenis, setHeroPlay: (f) => { heroPlay = f; } };
 
   /* ---------- Blocchi, nell'ordine in cui compaiono nella pagina ---------- */
-  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti };
+  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti, situazioni: initSituazioni };
   $$('[data-mo-block]').forEach((sec) => {
     const fn = INIT[sec.getAttribute('data-mo-block')];
     if (fn) fn(sec, env);
@@ -812,6 +812,38 @@ function initCarosello(sec, { G, ST, reduce, mobileQ }) {
   });
 }
 
+/* =================== NON SAI DA DOVE PARTIRE? =================== */
+// «Chiedimi un consiglio»: il messaggio con la situazione scelta viene scritto nel modulo contatti,
+// che sia nella stessa pagina (#contatti) o in un'altra (pagina Contatti o home).
+const MO_CONSIGLIO = 'mo-consiglio';
+function initSituazioni(sec) {
+  $$('.mo-si-btn', sec).forEach((a) => a.addEventListener('click', (e) => {
+    const msg = a.getAttribute('data-messaggio') || '';
+    try { sessionStorage.setItem(MO_CONSIGLIO, msg); } catch (err) { /* navigazione privata: niente messaggio */ }
+    const href = a.getAttribute('href') || '';
+    if (href.charAt(0) !== '#') return; // altra pagina: il modulo lo legge all'arrivo
+    const form = document.querySelector('.mo-ct-form');
+    if (form && document.querySelector(href)) {
+      riempiConsiglio(form);
+      return; // lo scorrimento fino al modulo lo fa il gestore delle ancore
+    }
+    e.preventDefault();
+    window.location.href = (sec.getAttribute('data-home') || '/') + href; // il modulo sta nella home
+  }));
+}
+function riempiConsiglio(form) {
+  let msg = '';
+  try { msg = sessionStorage.getItem(MO_CONSIGLIO) || ''; sessionStorage.removeItem(MO_CONSIGLIO); } catch (err) { msg = ''; }
+  if (!msg) return;
+  const testo = form.querySelector('textarea');
+  if (testo && !testo.value.trim()) testo.value = msg;
+  const scelta = form.querySelector('select');
+  if (scelta) {
+    const opt = Array.from(scelta.options).find((o) => /consiglia/i.test(o.textContent));
+    if (opt) scelta.value = opt.value;
+  }
+}
+
 /* =================== PAGINE DEI PROGETTI =================== */
 function entrataTesta(sec, G) {
   const els = $$('.mo-prj-head .mo-wrap > *', sec);
@@ -921,6 +953,7 @@ function initContatti(sec, { G, ST, reduce }) {
 function initForm(sec, { G, ST, reduce }) {
   const form = $('.mo-ct-form', sec);
   if (!form) return;
+  riempiConsiglio(form); // arrivo da «Chiedimi un consiglio» in un'altra pagina
   const formMsg = $('.mo-form-msg', form);
   const formDone = $('.mo-form-done', sec);
   const btn = $('button[type="submit"]', form);

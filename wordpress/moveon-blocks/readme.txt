@@ -2,14 +2,14 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
 
 == Descrizione ==
 
-* 8 elementi WPBakery (categoria MoveOn): Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio (carosello 3D), Le nostre garanzie, Contatti.
+* 19 elementi WPBakery (categoria MoveOn): quelli della home (Hero, Nastro, Chi sono breve, Pausa emozionale, Servizi, Portfolio, Garanzie, Contatti, il Chi siamo lungo) e quelli per le pagine (Intestazione, Numeri, Punti di forza, Come lavoro, Cosa realizzo, Non sai da dove partire?, Domande frequenti, Recensioni, Progetti scelti, Invito finale).
 * Pagine dei progetti (/progetti/nome-progetto/) e pagina Progetti con tutti i lavori (/progetti/).
 * Modello di pagina "MoveOn · pagina intera" con header, footer, menu mobile e barra contatti del prototipo.
 * MoveOn → Impostazioni: logo, contatti, pulsanti, footer.
@@ -25,6 +25,16 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.4.0 =
+* La home riassume, le pagine approfondiscono: nuove pagine Chi sono, Servizi (con una pagina per ogni servizio) e Contatti, create con un clic da MoveOn → Strumenti, con testi in parole semplici e in prima persona da correggere.
+* 11 nuovi elementi per comporre le pagine: Intestazione di pagina, Numeri, Punti di forza, Come lavoro, Cosa realizzo, Non sai da dove partire?, Domande frequenti, Recensioni (segnaposto), Progetti scelti, Invito finale, Chi sono breve per la home.
+* «Non sai da dove partire?»: situazioni con i lavori consigliati; «Chiedimi un consiglio» scrive già il messaggio nel modulo contatti.
+* Menu con i servizi a tendina (anche nel menu del telefono) e voce della pagina corrente evidenziata.
+* Alleggerisci la home (MoveOn → Strumenti): Chi sono breve al posto del Chi siamo lungo e «Non sai da dove partire?» dopo i Servizi; la versione precedente resta nelle Revisioni.
+* Servizi: «Scopri di più» verso la pagina di ogni servizio; App WebView tolta; nomi e voci in parole semplici.
+* Testi di serie in prima persona (Contattami, Raccontami la tua idea, Le mie garanzie…).
+* Indirizzi come /chi-sono/ nei pulsanti: portano alle pagine del sito anche in /nuovo.
 
 = 1.3.0 =
 * Hero con immagini a tutto schermo, una per settore: passano da una all'altra «pixel dopo pixel» (la nuova foto si compone a tessere, ogni volta con un disegno diverso). Settori in basso con barra di avanzamento, clic per sceglierli e pulsante pausa. Tempo, tipo di passaggio e velo scuro si scelgono nella scheda Immagini. La lampadina resta disponibile come opzione.

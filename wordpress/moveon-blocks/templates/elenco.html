@@ -1,0 +1,11 @@
+{{! COSA REALIZZO · anchor sfondo etichetta titolo; gruppi (titolo, voci) }}
+<section class="mo-block mo-sec mo-el" id="{{anchor}}" data-mo-block="elenco">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap mo-el-gruppi">
+    {{#gruppi}}<div class="mo-el-gruppo mo-reveal">{{#titolo}}<h3>{{titolo}}</h3>{{/titolo}}<ul class="mo-el-voci">{{#voci}}<li>{{.}}</li>{{/voci}}</ul></div>{{/gruppi}}
+  </div>
+</section>

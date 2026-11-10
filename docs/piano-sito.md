@@ -30,7 +30,13 @@ Regole per i testi (decise con il cliente):
 - Pausa emozionale senza blocco; Servizi con stacco tra titolo e schede; colore #182343.
 - Versione 1.2.0 salvata in `dist/archivio/` per poter tornare indietro.
 
+### Fatto (10 novembre 2026, versione 1.4.0)
+- Fase B: 11 elementi per le pagine, pagine pronte (Chi sono, Servizi + 5 servizi, Contatti) e menu a tendina dagli Strumenti, home alleggerita, «Scopri di più» sui Servizi, App WebView tolta, testi in prima persona.
+
 ### Prossimo passo
+Il cliente: usa «Crea le pagine e il menu» e «Alleggerisci la home» su /nuovo, corregge i testi (parti tra [quadre]), sostituisce le foto di prova e le recensioni segnaposto. Poi fase C (W3).
+
+### Prossimo passo (prima della 1.4.0)
 Il cliente ha chiesto di andare avanti **senza il vecchio elenco**: Claude ricostruisce elenco e situazioni dai servizi; recensioni con **segnaposto** finché non arrivano quelle vere.
 
 ### Fase A · I contenuti (insieme)

@@ -1,0 +1,11 @@
+{{! NON SAI DA DOVE PARTIRE? · anchor sfondo etichetta titolo; situazioni (situazione, consigli, messaggio); pulsante href home }}
+<section class="mo-block mo-sec mo-si" id="{{anchor}}" data-mo-block="situazioni" data-home="{{home}}">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <div class="mo-wrap mo-si-grid mo-stagger">
+    {{#situazioni}}<article class="mo-si-card"><h3 class="mo-si-q">«{{situazione}}»</h3><p class="mo-si-label">Ti consiglio</p><ul class="mo-si-voci">{{#consigli}}<li>{{.}}</li>{{/consigli}}</ul>{{#pulsante}}<a class="mo-si-btn" href="{{href}}" data-messaggio="{{messaggio}}">{{pulsante}}<span aria-hidden="true">→</span></a>{{/pulsante}}</article>{{/situazioni}}
+  </div>
+</section>

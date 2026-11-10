@@ -1,0 +1,11 @@
+{{! COME LAVORO · anchor sfondo etichetta titolo; passi (num, titolo, testo); quanti }}
+<section class="mo-block mo-sec mo-ps" id="{{anchor}}" data-mo-block="passi">
+  {{{sfondo}}}
+  <div class="mo-wrap mo-sec-head">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
+  </div>
+  <ol class="mo-wrap mo-ps-list mo-stagger" style="--mo-quanti:{{quanti}}">
+    {{#passi}}<li class="mo-ps-item"><span class="mo-ps-num">{{num}}</span><h3>{{titolo}}</h3><p>{{testo}}</p></li>{{/passi}}
+  </ol>
+</section>

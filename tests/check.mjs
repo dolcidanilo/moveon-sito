@@ -125,14 +125,16 @@ const browser = await chromium.launch();
   const hdr = await page.evaluate(() => { const cs = getComputedStyle(document.querySelector('.mo-site-header')); return { scrolled: document.documentElement.classList.contains('mo-scrolled'), bg: cs.backgroundColor, blur: cs.backdropFilter }; });
   check('Header con sfondo anche in fondo alla pagina', hdr.scrolled && hdr.bg !== 'rgba(0, 0, 0, 0)', JSON.stringify(hdr));
   check('Header quando scorri: sfondo un po’ trasparente e sfocatura 6.5px', hdr.blur === 'blur(6.5px)' && /(rgba|color)\(.*0\.8\d?\)|\/ 0\.8/.test(hdr.bg), `${hdr.bg} · ${hdr.blur}`);
-  // Voci del menu: la sezione si ferma subito sotto l'header (le sezioni bloccate a filo dello schermo)
+  // Ancore nella pagina (pulsanti «#sezione»): la sezione si ferma subito sotto l'header (quelle bloccate a filo dello schermo)
   const arrivi = {};
-  for (const id of ['portfolio', 'contatti', 'servizi']) {
-    await page.click(`.mo-nav a[href$="#${id}"]`);
+  for (const [sel, id] of [['.mo-header-cta', 'contatti'], ['.mo-hero-actions a', 'servizi']]) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(600);
+    await page.click(sel);
     await page.waitForTimeout(2600);
     arrivi[id] = await page.evaluate((id) => Math.round(document.getElementById(id).getBoundingClientRect().top - (document.getElementById(id).hasAttribute('data-mo-pin') ? 0 : document.querySelector('.mo-site-header').offsetHeight)), id);
   }
-  check('Menu: ogni sezione si ferma subito sotto l’header', Object.values(arrivi).every((v) => Math.abs(v) <= 2), JSON.stringify(arrivi));
+  check('Ancore: ogni sezione si ferma subito sotto l’header', Object.values(arrivi).every((v) => Math.abs(v) <= 2), JSON.stringify(arrivi));
 
   // Bug: testo a solo contorno non usato
   const stroke = await page.evaluate(() => [...document.querySelectorAll('.mo-mq-item')].some((el) => parseFloat(getComputedStyle(el).webkitTextStrokeWidth) > 0));
@@ -198,10 +200,13 @@ const browser = await chromium.launch();
   await page.waitForTimeout(900);
   const mm = await page.evaluate(() => ({ open: !document.getElementById('mo-mobile-menu').hidden, links: document.querySelectorAll('#mo-mobile-menu .mo-mm-link').length }));
   check('Menu mobile si apre con le voci', mm.open && mm.links > 0, JSON.stringify(mm));
-  await page.tap('#mo-mobile-menu .mo-mm-link >> nth=1');
-  await page.waitForTimeout(1800);
-  const closed = await page.evaluate(() => document.getElementById('mo-mobile-menu').hidden);
-  check('Toccando una voce il menu si chiude e porta alla sezione', closed && (await page.evaluate(() => window.scrollY)) > 500);
+  const sotto = await page.evaluate(() => document.querySelectorAll('#mo-mobile-menu .mo-mm-sub').length);
+  check('Menu mobile: i servizi sotto la voce Servizi', sotto >= 5, `${sotto} servizi`);
+  await page.tap('#mo-mobile-menu .mo-mm-sub >> nth=0');
+  await page.waitForURL(/\/servizi\/[^/]+\/$/, { timeout: 8000 }).catch(() => {});
+  check('Toccando un servizio si apre la sua pagina', /\/servizi\/[^/]+\/$/.test(new globalThis.URL(page.url()).pathname), page.url());
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2500);
 
   const sopra = await page.evaluate(() => {
     const bar = document.querySelector('.mo-mbar').getBoundingClientRect().height;
@@ -294,10 +299,10 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       colori: {
         garSub: css('.mo-gar-sub', 'color'),
         heroSub: css('.mo-hero-sub', 'color'),
-        aboutP: css('.mo-about-p', 'color'),
         statement: css('.mo-gar .mo-statement', 'color'),
         ctText: css('.mo-ct-text', 'color'),
-        reasonP: css('.mo-r-tint p', 'color'),
+        secTitle: css('.mo-cb .mo-sec-title', 'color'),
+        siQ: css('.mo-si-q', 'color'),
       },
       campi: [...document.querySelectorAll('.mo-ct-form .mo-fld :is(input,select,textarea)')].map((e) => getComputedStyle(e).backgroundColor),
       spazi: blocks.slice(1).map((b, i) => Math.round(b.top - blocks[i].bottom)),
@@ -306,7 +311,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     };
   });
   check('Stili di Porto caricati come file: esclusi', !r.portoFile);
-  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', aboutP: 'rgb(51,65,85)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', reasonP: 'rgb(51,65,85)' };
+  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', secTitle: 'rgb(15,23,42)', siQ: 'rgb(15,23,42)' };
   const sbagliati = Object.entries(atteso).filter(([k, v]) => rgb(r.colori[k] || '') !== v).map(([k]) => `${k}=${r.colori[k]}`);
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
   check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(24,35,67)'), [...new Set(r.campi)].join(' | '));
@@ -320,6 +325,11 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.waitForTimeout(400);
   const hov = await page.evaluate(() => { const s = getComputedStyle(document.querySelector('.mo-header-cta')); return { c: s.color, d: s.textDecorationLine }; });
   check('Pulsante leggibile al passaggio del mouse', rgb(hov.c) === 'rgb(255,255,255)' && hov.d === 'none', JSON.stringify(hov));
+  // «Chi siamo» lungo (elemento ancora disponibile, provato nella sua pagina di prova)
+  await page.goto(URL + 'prova-chi-siamo/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const cs = await page.evaluate(() => ({ p: getComputedStyle(document.querySelector('.mo-about-p')).color, r: getComputedStyle(document.querySelector('.mo-r-tint p')).color }));
+  check('Chi siamo (lungo): colori dei testi del prototipo', rgb(cs.p) === 'rgb(51,65,85)' && rgb(cs.r) === 'rgb(51,65,85)', JSON.stringify(cs));
   // Schede dei motivi: restano ferme (sticky) mentre la successiva sale
   const t0 = await topOf(page, '.mo-reasons');
   await smoothScroll(page, t0 + 300);
@@ -468,7 +478,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     back: document.querySelector('.mo-prj-back').getAttribute('href'),
   }));
   check('Clic sul progetto al centro: si apre la sua pagina', /\/progetti\/[^/]+\/$/.test(pg.url) && pg.h1 === atteso && pg.cover, `${pg.url} · ${pg.h1}`);
-  check('Pagina progetto: menu, logo e pulsante portano alla home', pg.menu.length > 0 && pg.menu.every((h) => /\/nuovo\/#/.test(h)) && /\/nuovo\/$/.test(pg.logo) && /\/nuovo\/#contatti$/.test(pg.cta) && /\/progetti\/$/.test(pg.back), JSON.stringify({ menu: pg.menu[0], logo: pg.logo, cta: pg.cta }));
+  check('Pagina progetto: menu verso le pagine, logo verso la home, pulsante verso Contatti', pg.menu.length > 0 && pg.menu.every((h) => /^https?:\/\//.test(h)) && /\/nuovo\/$/.test(pg.logo) && /\/nuovo\/contatti\/$/.test(pg.cta) && /\/progetti\/$/.test(pg.back), JSON.stringify({ menu: pg.menu[0], logo: pg.logo, cta: pg.cta }));
   check('Pagina progetto: niente schermata di caricamento', !pg.loader);
   const bordo = await page.evaluate(() => { const n = document.querySelector('.mo-prj-near'); const t = document.querySelector('.mo-prj-block h2'); return n && t ? { b: getComputedStyle(n).borderTopColor, w: getComputedStyle(n).borderTopWidth, t: getComputedStyle(t).color } : null; });
   check('Pagina progetto: box precedente/successivo con bordo di 1px come «La richiesta»', bordo && bordo.w === '1px' && bordo.b === bordo.t, JSON.stringify(bordo));
@@ -520,6 +530,61 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const w = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
   check('Pagina progetto su telefono: niente scorrimento laterale', w);
   await ctx.close();
+}
+
+/* ---------------- Home leggera, pagine Chi sono / Servizi / Contatti, menu a tendina ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(2500);
+  const h = await page.evaluate(() => ({
+    breve: !!document.querySelector('.mo-cb'), lungo: !!document.querySelector('.mo-about'), situazioni: document.querySelectorAll('.mo-si-card').length,
+    scopri: [...document.querySelectorAll('.mo-svc-more')].map((a) => new URL(a.href).pathname), app: /App WebView/i.test(document.body.textContent),
+  }));
+  check('Home leggera: «Chi sono» breve al posto di quello lungo, «Non sai da dove partire?»', h.breve && !h.lungo && h.situazioni >= 3, JSON.stringify({ breve: h.breve, lungo: h.lungo, situazioni: h.situazioni }));
+  check('Servizi: «Scopri di più» verso la pagina di ogni servizio, App WebView tolta', h.scopri.length === 5 && h.scopri.every((u) => /\/nuovo\/servizi\/[^/]+\/$/.test(u)) && !h.app, h.scopri.join(' '));
+  // Menu a tendina
+  await page.hover('.mo-nav-item > a');
+  await page.waitForTimeout(500);
+  const sub = await page.evaluate(() => { const s = document.querySelector('.mo-sub'); return { vis: getComputedStyle(s).visibility, n: s.querySelectorAll('a').length }; });
+  check('Menu: i servizi compaiono a tendina sotto «Servizi»', sub.vis === 'visible' && sub.n === 5, JSON.stringify(sub));
+  // «Chiedimi un consiglio» nella home: il messaggio è già scritto nel modulo
+  await page.evaluate(() => document.querySelector('.mo-si').scrollIntoView());
+  await page.waitForTimeout(1200);
+  await page.locator('.mo-si-btn').first().click();
+  await page.waitForTimeout(2200);
+  const f1 = await page.evaluate(() => ({ msg: document.querySelector('#mo-f-msg').value, area: document.querySelector('#mo-f-area').value }));
+  check('«Chiedimi un consiglio»: messaggio e scelta già pronti nel modulo', /Apro una nuova attività/.test(f1.msg) && /consigliami/i.test(f1.area), JSON.stringify(f1));
+  // Pagina Chi sono
+  await page.goto(URL + 'chi-sono/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const cs = await page.evaluate(() => ({
+    h1: document.querySelector('h1')?.textContent.trim(), sezioni: [...document.querySelectorAll('[data-mo-block]')].map((s) => s.getAttribute('data-mo-block')),
+    marginNum: getComputedStyle(document.querySelector('.mo-num-n')).marginTop, cta: document.querySelector('.mo-header-cta').getAttribute('href'),
+    attiva: document.querySelector('.mo-nav a.mo-is-active')?.textContent.trim(),
+  }));
+  check('Pagina Chi sono: titolo e sezioni (numeri, punti di forza, passi, lavori, recensioni, invito)', /25 anni/.test(cs.h1 || '') && ['numeri', 'punti', 'passi', 'lavori', 'recensioni', 'invito'].every((k) => cs.sezioni.includes(k)) && cs.marginNum === '0px', JSON.stringify(cs));
+  check('Fuori dalla home: «Richiedi Preventivo» porta alla pagina Contatti e la voce del menu è evidenziata', /\/nuovo\/contatti\/$/.test(cs.cta) && cs.attiva === 'Chi sono', `${cs.cta} · ${cs.attiva}`);
+  // Pagina di un servizio, domande frequenti
+  await page.goto(URL + 'servizi/grafica/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const sv = await page.evaluate(() => ({ h1: document.querySelector('h1')?.textContent.trim(), voci: document.querySelectorAll('.mo-el-voci li').length, lavori: document.querySelectorAll('.mo-lv .mo-prjs-card').length, faq: document.querySelectorAll('.mo-fq-item').length }));
+  await page.locator('.mo-fq-item summary').first().click();
+  const aperta = await page.evaluate(() => document.querySelector('.mo-fq-item').open);
+  check('Pagina servizio: titolo, elenco, lavori di quell’area, domande che si aprono', /Pescara/.test(sv.h1 || '') && sv.voci > 8 && sv.lavori >= 1 && sv.faq >= 3 && aperta, JSON.stringify(sv));
+  // «Chiedimi un consiglio» dalla pagina Servizi: porta alla pagina Contatti con il messaggio pronto
+  await page.goto(URL + 'servizi/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => document.querySelector('.mo-si').scrollIntoView());
+  await page.waitForTimeout(800);
+  await page.locator('.mo-si-btn').nth(1).click();
+  await page.waitForURL(/\/contatti\/$/, { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(1500);
+  const f2 = await page.evaluate(() => ({ url: location.pathname, msg: document.querySelector('#mo-f-msg')?.value }));
+  check('«Chiedimi un consiglio» da un’altra pagina: pagina Contatti con il messaggio pronto', /\/contatti\/$/.test(f2.url) && /Voglio più clienti/.test(f2.msg || ''), JSON.stringify(f2));
+  check('Pagine nuove: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
 }
 
 /* ---------------- Movimento ridotto ---------------- */

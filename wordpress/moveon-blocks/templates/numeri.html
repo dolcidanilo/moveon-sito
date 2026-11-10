@@ -1,0 +1,10 @@
+{{! NUMERI · anchor sfondo etichetta; numeri (numero, testo); quanti }}
+<section class="mo-block mo-sec mo-num" id="{{anchor}}" data-mo-block="numeri">
+  {{{sfondo}}}
+  <div class="mo-wrap">
+    {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
+    <div class="mo-num-grid mo-stagger" style="--mo-quanti:{{quanti}}">
+      {{#numeri}}<div class="mo-num-item"><p class="mo-num-n">{{numero}}</p><p class="mo-num-t">{{testo}}</p></div>{{/numeri}}
+    </div>
+  </div>
+</section>

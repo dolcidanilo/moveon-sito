@@ -1,7 +1,7 @@
 <h2>Come è fatto il sito</h2>
 <ul>
 	<li>La home è una <strong>pagina normale</strong> con il modello <strong>«MoveOn · pagina intera»</strong> (Pagine → modifica → Attributi pagina → Template). Il modello mette header, footer, menu mobile, barra contatti in basso e animazione di caricamento del prototipo, e ignora quelli di Porto.</li>
-	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi siamo, Pausa emozionale, Servizi, Portfolio, Le nostre garanzie, Contatti. Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
+	<li>Le sezioni sono <strong>elementi WPBakery</strong> della categoria <strong>MoveOn</strong>: Hero, Nastro parole chiave, Chi sono (breve), Pausa emozionale, Servizi, Non sai da dove partire?, Portfolio, Garanzie, Contatti. Per le altre pagine ci sono gli elementi delle pagine (vedi «Le pagine del sito»). Li aggiungi, sposti, duplichi ed elimini come qualsiasi elemento.</li>
 	<li>Accanto puoi mettere <strong>righe ed elementi standard</strong> di WPBakery (testo, immagini, pulsanti…) e dar loro lo stile del sito con le <strong>classi pronte</strong> (più sotto).</li>
 	<li>I <strong>progetti del portfolio</strong> sono nel menu <strong>Progetti portfolio</strong>: ognuno ha la sua <strong>pagina</strong> (es. <code>/progetti/forno-aurora/</code>) e c’è la pagina <strong>Progetti</strong> con tutti i lavori (<code>/progetti/</code>). Le <strong>richieste</strong> arrivate dal modulo sono in <strong>Richieste dal sito</strong>.</li>
 </ul>
@@ -45,6 +45,18 @@
 	<tr><td>Scudo (garanzie) e lampadina (hero, se scegli «Lampadina in pixel»)</td><td>Sono animazioni in pixel che si compongono: si cambiano solo come disegno, chiedendolo</td></tr>
 </table>
 <p><strong>File SVG</strong>: WordPress, per sicurezza, non accetta SVG nella Libreria media. Per caricarli installa il plugin gratuito <strong>Safe SVG</strong> (li ripulisce da codice pericoloso): il sito li mostra correttamente in tutti i campi immagine. In alternativa usa PNG trasparenti. Chi conosce l’SVG può anche modificare il disegno delle illustrazioni da <strong>MoveOn → Modelli HTML</strong> (cartella «parti», modelli <code>illustrazione-…</code> e <code>cubo</code>).</p>
+
+<h2>Le pagine del sito</h2>
+<ul>
+	<li>La <strong>home</strong> è la vetrina e <strong>riassume</strong>; le pagine <strong>Chi sono</strong>, <strong>Servizi</strong> (con una pagina per ogni servizio), <strong>Progetti</strong> e <strong>Contatti</strong> approfondiscono. Così Google trova una pagina per ogni argomento, senza testi ripetuti.</li>
+	<li><strong>MoveOn → Strumenti → Crea le pagine e il menu</strong>: crea Chi sono, Servizi (Grafica e immagine, Siti web e negozi online, Social e pubblicità online, Stampa e allestimenti, Formazione) e Contatti, già composte e con i testi da correggere, più il menu con i servizi a tendina. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.</li>
+	<li><strong>MoveOn → Strumenti → Alleggerisci la home</strong>: al posto del «Chi siamo» lungo mette la versione breve «Chi sono» (con il pulsante verso la pagina) e aggiunge «Non sai da dove partire?» dopo i Servizi. La versione di prima resta nelle <strong>Revisioni</strong> della pagina.</li>
+	<li>Le parti dei testi tra <strong>[quadre]</strong> sono tempi o dettagli d’esempio: controllale e correggile. Le <strong>recensioni</strong> di serie sono segnaposto: sostituiscile con recensioni vere (con il permesso dei clienti) prima della messa online.</li>
+	<li>Gli <strong>elementi delle pagine</strong> (categoria MoveOn in WPBakery): Intestazione di pagina, Numeri, Punti di forza (anche con foto), Come lavoro, Cosa realizzo (elenco a etichette), Non sai da dove partire?, Domande frequenti, Recensioni, Progetti scelti (anche di una sola area), Invito finale. Tutti hanno la scheda <strong>Sfondo</strong>.</li>
+	<li><strong>Collegamenti</strong>: nei pulsanti scrivi <code>/chi-sono/</code> per una pagina del sito (funziona anche in /nuovo e dopo lo spostamento) oppure <code>#contatti</code> per una sezione della stessa pagina. Dalle altre pagine «Richiedi Preventivo» porta alla pagina Contatti.</li>
+	<li><strong>«Chiedimi un consiglio»</strong> (in «Non sai da dove partire?») scrive già nel modulo contatti il messaggio con la situazione scelta, anche se il modulo è in un’altra pagina.</li>
+	<li><strong>Menu a tendina</strong>: in Aspetto → Menu trascina una voce un po’ a destra sotto un’altra per farla diventare una sua sottovoce (un solo livello).</li>
+</ul>
 
 <h2>Hero</h2>
 <ul>
