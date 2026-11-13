@@ -131,4 +131,19 @@ $a = mo_alleggerisci_home();
 if ( ! empty( $a["fatto"] ) ) { echo "· Home alleggerita\n"; }
 flush_rewrite_rules( false );
 ' 2>/dev/null
+# Video di sfondo: un breve video di prova (serve ffmpeg) e la pagina prova-video
+if command -v ffmpeg >/dev/null && [ ! -f wp/wp-content/uploads/prova-video.mp4 ]; then
+  mkdir -p wp/wp-content/uploads
+  ffmpeg -loglevel error -y -f lavfi -i "testsrc2=size=640x360:rate=25:duration=4" -c:v libx264 -pix_fmt yuv420p -an wp/wp-content/uploads/prova-video.mp4
+fi
+php wpcli.php '
+if ( ! get_page_by_path( "prova-video" ) && file_exists( WP_CONTENT_DIR . "/uploads/prova-video.mp4" ) ) {
+  $v = "/wp-content/uploads/prova-video.mp4";
+  $img = mo_importa_immagine( "pausa-cuffie.jpg", "Foto di prova per lo sfondo" );
+  $c = mo_riga( "[mo_intestazione titolo=\"Prova video\" sfondo_video=\"$v\" sfondo_video_opacita=\"60\" sfumatura=\"200\"]" ) . mo_riga( "[mo_punti sfondo_colore=\"#182343\" sfondo_testi=\"chiari\" sfondo_img=\"$img\" sfondo_video=\"$v\" sfondo_video_opacita=\"50\" sfondo_sfumatura=\"entrambi\" anchor=\"pv2\"]" ) . mo_riga( "[mo_invito sfondo_video=\"$v\" sfondo_sfumatura=\"basso\" sfondo_sfumatura_ampiezza=\"55\" sfondo_video_telefono=\"no\"]" );
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova video", "post_name" => "prova-video", "post_content" => $c ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-video creata\n";
+}
+' 2>/dev/null
 echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1)"

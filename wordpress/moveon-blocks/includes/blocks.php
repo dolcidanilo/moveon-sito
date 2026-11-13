@@ -55,8 +55,34 @@ function mo_p_sfondo(): array {
 		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore di sfondo.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_dimensione', 'Dimensione dell’immagine', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
-		mo_p_text( 'sfondo_posizione', 'Posizione dell’immagine', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra.', 'Sfondo', '50% 50%' ),
+		mo_p_text( 'sfondo_posizione', 'Posizione dell’immagine', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra. Vale anche per il video.', 'Sfondo', '50% 50%' ),
+		mo_p_text( 'sfondo_video', 'Video di sfondo (facoltativo)', 'Carica il video in Media → Aggiungi file multimediale, aprilo, premi «Copia URL negli appunti» e incollalo qui. MP4, senza audio, 10–20 secondi (si ripete), al massimo 10–15 MB. Sta sopra l’immagine: l’immagine, se c’è, si vede mentre il video si carica e per chi ha scelto «riduci movimento».', 'Sfondo' ),
+		mo_p_drop( 'sfondo_video_opacita', 'Opacità del video', $opacita, '40', '100% = pieno; più è bassa, più il video si fonde con il colore di sfondo.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_video_telefono', 'Video sul telefono', array( 'Sì, anche sul telefono' => '', 'No: sul telefono solo l’immagine (risparmia dati)' => 'no' ), '', '', 'Sfondo' ),
+		mo_p_drop( 'sfondo_sfumatura', 'Sfumatura di video e immagine', mo_sfumature_sfondo(), '', 'Video e immagine svaniscono nel colore di sfondo verso i bordi scelti.', 'Sfondo' ),
+		mo_p_drop( 'sfondo_sfumatura_ampiezza', 'Ampiezza della sfumatura', array( 'Corta' => '20', 'Media' => '35', 'Lunga' => '55' ), '35', 'Quanta parte della sezione occupa la sfumatura.', 'Sfondo' ),
 	);
+}
+
+/** Dove sfumano video e immagine di sfondo. */
+function mo_sfumature_sfondo(): array {
+	return array( 'Nessuna' => '', 'In basso' => 'basso', 'In alto' => 'alto', 'In alto e in basso' => 'entrambi', 'Tutto intorno' => 'bordi' );
+}
+
+/** Indirizzo del video di sfondo: un URL (anche /wp-content/…) o il numero di un file della Libreria media. */
+function mo_video_url( $v ): string {
+	$v = trim( mo_text( (string) $v ) );
+	if ( '' === $v ) {
+		return '';
+	}
+	if ( ctype_digit( $v ) ) {
+		$mime = (string) get_post_mime_type( (int) $v );
+		return 0 === strpos( $mime, 'video/' ) ? (string) wp_get_attachment_url( (int) $v ) : '';
+	}
+	if ( '/' === $v[0] && '/' !== ( $v[1] ?? '' ) ) {
+		return esc_url_raw( home_url( $v ) );
+	}
+	return esc_url_raw( $v, array( 'http', 'https' ) );
 }
 
 /** Colore sicuro: #rgb, #rrggbb(aa), rgb() o rgba(); altrimenti vuoto. */
@@ -98,14 +124,48 @@ function mo_sfondo_html( array $a ): string {
 		$testo = mo_colore( $a['colore_testi'] ?? '' );
 		$out .= '<style>' . ( $testo ? $sel . '{color:' . $testo . '}' : '' ) . $sel . ' > *{' . implode( ';', $vars ) . '}</style><span hidden data-mo-stile="' . $id . '" class="mo-bg-stile"></span>';
 	}
-	$img = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
+	$img   = absint( $a['sfondo_img'] ?? 0 ) ? mo_image( $a['sfondo_img'], '', '2048x2048' ) : null;
+	$video = mo_video_url( $a['sfondo_video'] ?? '' );
+	$dim   = in_array( $a['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $a['sfondo_dimensione'] : 'cover';
+	list( $x, $y ) = mo_focus( $a['sfondo_posizione'] ?? '50% 50%' );
+	// Sfumatura di video e immagine verso il colore di sfondo
+	$dove  = in_array( $a['sfondo_sfumatura'] ?? '', mo_sfumature_sfondo(), true ) ? (string) $a['sfondo_sfumatura'] : '';
+	$amp   = (string) ( $a['sfondo_sfumatura_ampiezza'] ?? '35' );
+	$amp   = in_array( $amp, array( '20', '35', '55' ), true ) ? $amp : '35';
+	$sfuma = $dove ? ' data-sfuma="' . $dove . '"' : '';
+	$amp   = $dove ? ';--mo-sf-amp:' . $amp . '%' : '';
 	if ( $img ) {
-		$op  = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
-		$dim = in_array( $a['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $a['sfondo_dimensione'] : 'cover';
-		list( $x, $y ) = mo_focus( $a['sfondo_posizione'] ?? '50% 50%' );
-		$out .= '<div class="mo-bg mo-bg--foto" aria-hidden="true" style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . '"></div>';
+		$op   = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
+		$out .= '<div class="mo-bg mo-bg--foto" aria-hidden="true"' . $sfuma . ' style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . $amp . '"></div>';
+	}
+	if ( $video ) {
+		// Il video parte solo quando la sezione è vicina allo schermo e si ferma quando esce (moveon.js)
+		$op   = max( 0, min( 100, (int) ( $a['sfondo_video_opacita'] ?? 40 ) ) ) / 100;
+		$tel  = 'no' === ( $a['sfondo_video_telefono'] ?? '' ) ? ' data-telefono="no"' : '';
+		$out .= '<div class="mo-bg mo-bg--video" aria-hidden="true"' . $sfuma . ' style="opacity:' . $op . $amp . '"><video class="mo-bg-video" muted loop playsinline disablepictureinpicture preload="none" tabindex="-1" data-src="' . esc_url( $video ) . '"' . $tel . ' style="object-fit:' . ( 'contain' === $dim ? 'contain' : 'cover' ) . ';object-position:' . $x . '% ' . $y . '%"></video></div>';
 	}
 	return $out;
+}
+
+/**
+ * Simboli dei timbri delle Garanzie (dentro il cerchio, viewBox 80×80, tratto del colore dei link).
+ * Senza scelta nel pannello, le garanzie li prendono in quest'ordine.
+ */
+function mo_simboli_garanzie(): array {
+	return array(
+		'documento'   => array( 'Documento (preventivo)', '<path d="M31 25h13l7 7v23H31z"/><path d="M44 25v7h7"/><path d="M35.5 40h11M35.5 45.5h11M35.5 51h6"/>' ),
+		'calendario'  => array( 'Calendario (tempi)', '<rect x="26" y="29" width="28" height="25" rx="3"/><path d="M26 37h28M33 25v7M47 25v7"/><path d="M34 45.5l4 4 8-8"/>' ),
+		'revisioni'   => array( 'Frecce in cerchio (revisioni)', '<path d="M51.5 36.5A12 12 0 0 0 29.5 33"/><path d="M28.5 43.5A12 12 0 0 0 50.5 47"/><path d="M29 26.5v6.5h6.5"/><path d="M51 53.5V47h-6.5"/>' ),
+		'cartella'    => array( 'Cartella (i file sono tuoi)', '<path d="M26 31a2 2 0 0 1 2-2h8l3 4h13a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H28a2 2 0 0 1-2-2z"/><path d="M40 37.5v10M35.5 43l4.5 4.5 4.5-4.5"/>' ),
+		'persona'     => array( 'Persona (un referente)', '<circle cx="40" cy="33" r="6.5"/><path d="M28 53.5c1.5-7 6.2-10.5 12-10.5s10.5 3.5 12 10.5"/>' ),
+		'assistenza'  => array( 'Cuffie (assistenza)', '<path d="M28 45v-5a12 12 0 0 1 24 0v5"/><rect x="25" y="43" width="7" height="11" rx="2.5"/><rect x="48" y="43" width="7" height="11" rx="2.5"/><path d="M51.5 54c0 2.5-3 4-8.5 4"/>' ),
+		'spunta'      => array( 'Spunta', '<path d="M28 41l8 8 16-17"/>' ),
+		'scudo'       => array( 'Scudo (sicurezza)', '<path d="M40 25l12 4.5v9c0 8-5.2 13.3-12 16.5-6.8-3.2-12-8.5-12-16.5v-9z"/><path d="M34.5 40.5l4 4 7.5-7.5"/>' ),
+		'stella'      => array( 'Stella (qualità)', '<path d="M40 26l4.2 8.6 9.4 1.4-6.8 6.6 1.6 9.4L40 47.6 31.6 52l1.6-9.4-6.8-6.6 9.4-1.4z"/>' ),
+		'euro'        => array( 'Euro (prezzo)', '<path d="M51 30.5a11 11 0 1 0 0 19"/><path d="M28 37.5h14M28 43h14"/>' ),
+		'lucchetto'   => array( 'Lucchetto (riservatezza)', '<rect x="29" y="38" width="22" height="16" rx="3"/><path d="M33.5 38v-4.5a6.5 6.5 0 0 1 13 0V38"/><path d="M40 44v4"/>' ),
+		'fulmine'     => array( 'Fulmine (velocità)', '<path d="M43 25L31 43h9l-3 12 12-18h-9z"/>' ),
+	);
 }
 
 /** Definizioni degli elementi: nome, descrizione, campi. */
@@ -115,6 +175,10 @@ function mo_blocks(): array {
 	$icone = array( 'Orologio (esperienza)' => 'orologio', 'Bussola (consulenza)' => 'bussola', 'Rete (contatti, partner)' => 'rete', 'Scatola (servizio completo)' => 'scatola', 'Lampadina (idee)' => 'lampadina', 'Stella (qualità)' => 'stella', 'Cuore (passione)' => 'cuore', 'Grafico (risultati)' => 'grafico' );
 	$colori = array( 'Bianco' => 'bianco', 'Grigio chiaro' => 'grigio', 'Blu' => 'blu', 'Navy' => 'navy' );
 	$illu  = array( 'Identità (rombo e cerchio)' => 'identita', 'Web (finestra con cursore)' => 'web', 'Social (telefono e cuori)' => 'social', 'App (sito che diventa app)' => 'app', 'Rete (pianeti in orbita)' => 'rete', 'Formazione (livelli)' => 'formazione' );
+	$simboli = array( 'Automatica' => '' );
+	foreach ( mo_simboli_garanzie() as $k => $v ) {
+		$simboli[ $v[0] ] = $k;
+	}
 	$fuoco = 'Il punto della foto da tenere sempre visibile, in percentuale orizzontale e verticale. Es. «50% 50%» = centro, «30% 40%» = un po’ a sinistra e in alto.';
 
 	$blocchi = array(
@@ -257,7 +321,7 @@ function mo_blocks(): array {
 				mo_p_text( 'titolo', 'Titolo', '', 'Testi', $d['garanzie']['titolo'] ),
 				mo_p_area( 'sottotitolo', 'Sottotitolo', '', 'Testi', $d['garanzie']['sottotitolo'] ),
 				mo_p_text( 'sigillo', 'Scritta del sigillo', 'Gira intorno allo scudo, ripetuta 2 volte. Separa le parti con una virgola.', 'Testi', $d['garanzie']['sigillo'] ),
-				mo_p_group( 'garanzie', 'Garanzie', array( mo_p_text( 'titolo', 'Titolo', '', '' ), mo_p_area( 'testo', 'Testo', '', '' ) ), $d['garanzie']['garanzie'], 'Da 3 a 6. Solo impegni che puoi mantenere: sostituisci i «[N]» con i numeri reali.' ),
+				mo_p_group( 'garanzie', 'Garanzie', array( mo_p_text( 'titolo', 'Titolo', '', '' ), mo_p_area( 'testo', 'Testo', '', '' ), mo_p_drop( 'icona', 'Icona del timbro', $simboli, '', '«Automatica»: ogni garanzia prende un’icona diversa, nell’ordine dell’elenco.', '' ) ), $d['garanzie']['garanzie'], 'Da 3 a 6. Solo impegni che puoi mantenere: sostituisci i «[N]» con i numeri reali.' ),
 				mo_p_anchor( $d['garanzie']['anchor'] ),
 				...mo_p_sfondo(),
 			),
@@ -559,8 +623,12 @@ function mo_render_carosello( $atts ): string {
 function mo_render_garanzie( $atts ): string {
 	$a   = mo_atts( 'garanzie', $atts );
 	$gar = array();
-	foreach ( mo_group( $a['garanzie'] ) as $g ) {
-		$gar[] = array( 'titolo' => mo_text( $g['titolo'] ?? '' ), 'testo' => mo_text( $g['testo'] ?? '' ) );
+	$sim = mo_simboli_garanzie();
+	$ord = array_keys( $sim );
+	foreach ( array_values( mo_group( $a['garanzie'] ) ) as $i => $g ) {
+		$k     = (string) ( $g['icona'] ?? '' );
+		$k     = isset( $sim[ $k ] ) ? $k : $ord[ $i % 6 ];
+		$gar[] = array( 'titolo' => mo_text( $g['titolo'] ?? '' ), 'testo' => mo_text( $g['testo'] ?? '' ), 'simbolo' => $sim[ $k ][1], 'icona' => $k );
 	}
 	return MO_Tpl::render(
 		'garanzie',

@@ -1,4 +1,4 @@
-{{! LE NOSTRE GARANZIE · anchor etichetta titolo sottotitolo sigillo shield; garanzie (titolo, testo); sfondo = immagine di sfondo (scheda Sfondo) }}
+{{! LE NOSTRE GARANZIE · anchor etichetta titolo sottotitolo sigillo shield; garanzie (titolo, testo, icona, simbolo); sfondo = immagine di sfondo (scheda Sfondo) }}
 <section class="mo-block mo-gar" id="{{anchor}}" aria-labelledby="{{anchor}}-titolo" data-mo-block="garanzie">
   {{{sfondo}}}
   <div class="mo-wrap">
@@ -15,7 +15,7 @@
     </div>
     <ul class="mo-gar-grid">
       {{#garanzie}}
-      <li class="mo-gar-card"><span class="mo-gar-stamp" aria-hidden="true">{{> timbro}}</span><h3>{{titolo}}</h3><p>{{testo}}</p></li>
+      <li class="mo-gar-card"><span class="mo-gar-stamp" data-icona="{{icona}}" aria-hidden="true">{{> timbro}}</span><h3>{{titolo}}</h3><p>{{testo}}</p></li>
       {{/garanzie}}
     </ul>
   </div>

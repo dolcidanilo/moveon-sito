@@ -217,7 +217,21 @@ function mo_sfondo_campi( string $zona, string $titolo, string $desc ): void {
 				<td><input type="number" min="0" max="600" step="10" class="small-text" id="<?php echo esc_attr( $id ); ?>-sfumatura" name="<?php echo esc_attr( $base ); ?>[sfumatura]" value="<?php echo (int) $v['sfumatura']; ?>"> px <span class="description">Per quanti pixel foto e colore della parte alta proseguono sotto il contenuto, svanendo. Il contenuto non si sposta. 0 = nessuna sfumatura (es. 200).</span></td></tr>
 			<?php endif; ?>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-posizione">Posizione dell’immagine</label></th>
-				<td><input type="text" style="width:9em" id="<?php echo esc_attr( $id ); ?>-posizione" name="<?php echo esc_attr( $base ); ?>[sfondo_posizione]" value="<?php echo esc_attr( $v['sfondo_posizione'] ); ?>"> <span class="description"><code>50% 50%</code> = centrata, <code>50% 0%</code> = in alto</span></td></tr>
+				<td><input type="text" style="width:9em" id="<?php echo esc_attr( $id ); ?>-posizione" name="<?php echo esc_attr( $base ); ?>[sfondo_posizione]" value="<?php echo esc_attr( $v['sfondo_posizione'] ); ?>"> <span class="description"><code>50% 50%</code> = centrata, <code>50% 0%</code> = in alto (vale anche per il video)</span></td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-video">Video di sfondo</label></th>
+				<td>
+					<input type="url" class="regular-text" id="<?php echo esc_attr( $id ); ?>-video" name="<?php echo esc_attr( $base ); ?>[sfondo_video]" value="<?php echo esc_attr( $v['sfondo_video'] ); ?>" placeholder="https://…/video.mp4">
+					<button type="button" class="button mo-scegli-video" data-target="<?php echo esc_attr( $id ); ?>-video">Scegli il video</button>
+					<button type="button" class="button-link mo-togli-video" data-target="<?php echo esc_attr( $id ); ?>-video">Rimuovi</button>
+					<p class="description">MP4, senza audio, 10–20 secondi (si ripete), al massimo 10–15 MB. Sta sopra l’immagine, che si vede mentre il video si carica.</p>
+				</td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-video-opacita">Opacità del video</label></th>
+				<td><input type="number" min="5" max="100" step="5" class="small-text" id="<?php echo esc_attr( $id ); ?>-video-opacita" name="<?php echo esc_attr( $base ); ?>[sfondo_video_opacita]" value="<?php echo (int) $v['sfondo_video_opacita']; ?>"> %</td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_video_telefono">Video sul telefono</label></th>
+				<td><?php $sel( 'sfondo_video_telefono', array( '' => 'Sì, anche sul telefono', 'no' => 'No: sul telefono solo l’immagine (risparmia dati)' ) ); ?></td></tr>
+			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_sfumatura">Sfumatura di video e immagine</label></th>
+				<td><?php $sel( 'sfondo_sfumatura', array_flip( mo_sfumature_sfondo() ) ); ?> <?php $sel( 'sfondo_sfumatura_ampiezza', array( '20' => 'Corta', '35' => 'Media', '55' => 'Lunga' ) ); ?>
+					<p class="description">Video e immagine svaniscono nel colore di sfondo verso i bordi scelti.</p></td></tr>
 		</table>
 	</div>
 	<?php

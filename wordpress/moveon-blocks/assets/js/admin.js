@@ -16,6 +16,18 @@ jQuery(function ($) {
     });
     frame.open();
   });
+  // Video di sfondo (sfondi delle pagine dei progetti): si salva l'indirizzo del file
+  $(document).on('click', '.mo-scegli-video', function (e) {
+    e.preventDefault();
+    var target = $(this).data('target');
+    var frame = wp.media({ title: 'Scegli un video', button: { text: 'Usa questo video' }, library: { type: 'video' }, multiple: false });
+    frame.on('select', function () { $('#' + target).val(frame.state().get('selection').first().toJSON().url); });
+    frame.open();
+  });
+  $(document).on('click', '.mo-togli-video', function (e) {
+    e.preventDefault();
+    $('#' + $(this).data('target')).val('');
+  });
   $(document).on('click', '.mo-togli-immagine', function (e) {
     e.preventDefault();
     var target = $(this).data('target');

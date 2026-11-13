@@ -603,6 +603,74 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.close();
 }
 
+/* ---------------- 1.5.0: Chi sono breve, situazioni, garanzie, titoli, video di sfondo ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.evaluate(() => document.querySelector('.mo-cb').scrollIntoView());
+  await page.waitForTimeout(2500);
+  const cb = await page.evaluate(() => {
+    const q = (s) => document.querySelector('.mo-cb ' + s), r = (s) => q(s).getBoundingClientRect();
+    const t = q('.mo-sec-title'), cs = getComputedStyle(t), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight);
+    const capTitolo = r('.mo-sec-title').top + (lh - fs * 1.219) / 2 + fs * 0.268;
+    const n = q('.mo-cb-n-txt'), fn = parseFloat(getComputedStyle(n).fontSize);
+    return {
+      etichettaSopra: r('.mo-overline-h2').bottom <= r('.mo-cb-grid').top && Math.abs(r('.mo-overline-h2').left - r('.mo-sec-title').left) > 100,
+      etichettaASinistra: Math.round(r('.mo-overline-h2').left - r('.mo-cb-num').left),
+      cima: Math.round(r('.mo-cb-n').top - capTitolo),
+      fondo: Math.round(r('.mo-cb-frase').bottom - r('.mo-btn').bottom),
+      dentro: Math.round(r('.mo-cb-num').right - (n.getBoundingClientRect().right - 0.1 * fn)),
+      grande: Math.round(fn),
+      anim: getComputedStyle(n).animationName + ' / ' + getComputedStyle(q('.mo-cb-n-luce')).animationName,
+      clip: getComputedStyle(n).backgroundClip || getComputedStyle(n).webkitBackgroundClip,
+    };
+  });
+  check('Chi sono breve: etichetta in alto a sinistra, sopra le due colonne', cb.etichettaSopra && cb.etichettaASinistra === 0, JSON.stringify(cb));
+  check('Chi sono breve: numero e frase alti quanto i testi a destra', Math.abs(cb.cima) <= 6 && Math.abs(cb.fondo) <= 6 && cb.grande > 220, JSON.stringify(cb));
+  check('Chi sono breve: il numero resta nella sua colonna', cb.dentro >= 0, JSON.stringify(cb));
+  check('Chi sono breve: «25» con colori che scorrono e bagliore in loop', cb.anim === 'mo-cb-scorre / mo-cb-respiro' && cb.clip === 'text', JSON.stringify(cb));
+  const si = await page.evaluate(() => { const c = [...document.querySelectorAll('.mo-si-card')]; return { n: c.length, righe: new Set(c.map((x) => Math.round(x.getBoundingClientRect().top))).size }; });
+  check('Non sai da dove partire?: 6 schede su due file da 3', si.n === 6 && si.righe === 2, JSON.stringify(si));
+  const gar = await page.evaluate(() => [...document.querySelectorAll('.mo-gar-stamp')].map((x) => x.getAttribute('data-icona') + ':' + x.querySelectorAll('g path, g rect, g circle').length));
+  check('Garanzie: un’icona diversa per ogni box', gar.length === 6 && new Set(gar.map((x) => x.split(':')[0])).size === 6 && gar.every((x) => +x.split(':')[1] > 0), gar.join(' '));
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.waitForTimeout(600);
+  const tab = await page.evaluate(() => ({ n: document.querySelector('.mo-cb-n').style.getPropertyValue('--mo-cb-n'), larga: document.documentElement.scrollWidth <= innerWidth }));
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.waitForTimeout(600);
+  const col = await page.evaluate(() => document.querySelector('.mo-cb-n').style.getPropertyValue('--mo-cb-n'));
+  check('Chi sono breve: si adatta alla finestra; su una colonna sola torna la grandezza di serie', tab.n !== '' && tab.larga && col === '', JSON.stringify({ tab, col }));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  // Pagina Grafica: il titolo «Un’immagine che lavora per te.» su una riga
+  await page.goto(URL + 'servizi/grafica/', { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  const tg = await page.evaluate(() => { const h = document.querySelector('.mo-pt .mo-sec-title'); return { t: h.textContent, h: h.offsetHeight, lh: parseFloat(getComputedStyle(h).lineHeight) }; });
+  check('Pagina Grafica: «Un’immagine che lavora per te.» su una riga', /lavora per te/.test(tg.t) && tg.h < tg.lh * 1.5, JSON.stringify(tg));
+  // Video di sfondo
+  await page.goto(URL + 'prova-video/', { waitUntil: 'load' });
+  await page.waitForTimeout(2500);
+  const v1 = await page.evaluate(() => [...document.querySelectorAll('.mo-bg-video')].map((v) => ({ src: !!v.getAttribute('src'), pronto: v.classList.contains('mo-pronto'), gira: !v.paused, muto: v.muted, op: getComputedStyle(v.parentElement).opacity, mask: getComputedStyle(v.parentElement).maskImage !== 'none' })));
+  check('Video di sfondo: parte sullo schermo, senza audio, con l’opacità scelta', v1.length === 3 && v1[0].src && v1[0].pronto && v1[0].gira && v1[0].muto && v1[0].op === '0.6', JSON.stringify(v1));
+  check('Video di sfondo: quello lontano dallo schermo non si scarica ancora', !v1[2].src, JSON.stringify(v1[2]));
+  check('Video di sfondo: sfumature (sotto la sezione dopo, in alto e in basso, in basso)', v1.every((x) => x.mask), JSON.stringify(v1.map((x) => x.mask)));
+  const foto = await page.evaluate(() => getComputedStyle(document.querySelector('#pv2 > .mo-bg--foto')).opacity);
+  check('Video di sfondo: l’immagine fa da copertina e sparisce quando il video è pronto', foto === '0', foto);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(1800);
+  const v2 = await page.evaluate(() => [...document.querySelectorAll('.mo-bg-video')].map((v) => ({ src: !!v.getAttribute('src'), gira: !v.paused })));
+  check('Video di sfondo: si ferma fuori dallo schermo e parte quando arrivi', !v2[0].gira && v2[2].src && v2[2].gira, JSON.stringify(v2));
+  check('Video di sfondo: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
+  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+  const m = await ctx.newPage();
+  await m.goto(URL + 'prova-video/', { waitUntil: 'load' });
+  await m.waitForTimeout(1200);
+  const tel = await m.evaluate(() => ({ n: document.querySelectorAll('.mo-bg-video').length, larga: document.documentElement.scrollWidth <= innerWidth }));
+  check('Video sul telefono: «solo l’immagine» non scarica il video', tel.n === 2 && tel.larga, JSON.stringify(tel));
+  await ctx.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
@@ -620,6 +688,12 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Movimento ridotto: niente caricamento, contenuti visibili, niente scorrimento bloccato', !r.loading && !r.hscroll && r.sub === '1' && r.gar === '1', JSON.stringify(r));
   const car = await page.evaluate(() => ({ treD: document.querySelector('.mo-car').classList.contains('mo-car--3d'), scorre: getComputedStyle(document.querySelector('.mo-car-track')).overflowX, op: getComputedStyle(document.querySelector('.mo-car-card')).opacity }));
   check('Movimento ridotto: il carosello diventa una fila da scorrere', !car.treD && car.scorre === 'auto' && car.op === '1', JSON.stringify(car));
+  const num = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-cb-n-txt')).animationName + ' / ' + getComputedStyle(document.querySelector('.mo-cb-n-luce')).animationName);
+  check('Movimento ridotto: il «25» resta fermo', num === 'none / none', num);
+  await page.goto(URL + 'prova-video/', { waitUntil: 'load' });
+  await page.waitForTimeout(2000);
+  const vr = await page.evaluate(() => { const v = document.querySelector('.mo-bg-video'); return { fermo: v.paused, t: v.currentTime, pronto: v.classList.contains('mo-pronto') }; });
+  check('Movimento ridotto: il video di sfondo resta fermo sul primo fotogramma', vr.fermo && vr.t === 0 && vr.pronto, JSON.stringify(vr));
   await ctx.close();
 }
 

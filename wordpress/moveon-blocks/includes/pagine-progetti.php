@@ -113,6 +113,11 @@ function mo_sfondo_pulito( $v ): array {
 		'sfondo_opacita'    => $op >= 5 && $op <= 100 ? $op : 30,
 		'sfondo_dimensione' => in_array( $v['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $v['sfondo_dimensione'] : 'cover',
 		'sfondo_posizione'  => sanitize_text_field( (string) ( $v['sfondo_posizione'] ?? '' ) ) ?: '50% 50%',
+		'sfondo_video'          => mo_video_url( $v['sfondo_video'] ?? '' ),
+		'sfondo_video_opacita'  => max( 5, min( 100, (int) ( $v['sfondo_video_opacita'] ?? 40 ) ) ),
+		'sfondo_video_telefono' => 'no' === ( $v['sfondo_video_telefono'] ?? '' ) ? 'no' : '',
+		'sfondo_sfumatura'          => in_array( $v['sfondo_sfumatura'] ?? '', mo_sfumature_sfondo(), true ) ? (string) $v['sfondo_sfumatura'] : '',
+		'sfondo_sfumatura_ampiezza' => in_array( (string) ( $v['sfondo_sfumatura_ampiezza'] ?? '' ), array( '20', '35', '55' ), true ) ? (string) $v['sfondo_sfumatura_ampiezza'] : '35',
 		// Solo per la parte alta: pixel in cui foto e colore proseguono sotto il contenuto, svanendo
 		'sfumatura'         => max( 0, min( 600, (int) ( $v['sfumatura'] ?? 0 ) ) ),
 	);

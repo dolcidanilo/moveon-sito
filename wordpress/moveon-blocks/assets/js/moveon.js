@@ -104,7 +104,7 @@ function initSite() {
   const env = { G, ST, reduce, fine, mobileQ, d, data, setMenu, getLenis: () => lenis, setHeroPlay: (f) => { heroPlay = f; } };
 
   /* ---------- Blocchi, nell'ordine in cui compaiono nella pagina ---------- */
-  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti, situazioni: initSituazioni };
+  const INIT = { hero: initHero, nastro: initNastro, chiSiamo: initChiSiamo, pausa: initPausa, servizi: initServizi, carosello: initCarosello, garanzie: initGaranzie, contatti: initContatti, progetto: initProgetto, progetti: initProgetti, situazioni: initSituazioni, 'chi-breve': initChiBreve };
   $$('[data-mo-block]').forEach((sec) => {
     const fn = INIT[sec.getAttribute('data-mo-block')];
     if (fn) fn(sec, env);
@@ -129,6 +129,7 @@ function initSite() {
   }
 
   sezioniAperte();
+  videoSfondi(reduce);
   initGeneric(env);
   initPointer(env);
 
@@ -1037,6 +1038,44 @@ function wordsOnScroll(el, G) {
    mo-words (il testo si accende parola per parola mentre scorri)
    mo-parallax / mo-parallax-forte (si muove più lento della pagina)
    mo-tilt (si inclina seguendo il mouse) · mo-magnetic (pulsante che segue il mouse)  */
+/* Video di sfondo (scheda Sfondo): si scarica solo quando la sezione si avvicina allo schermo, si ferma quando
+   esce. Con «riduci movimento» (e nell'editor) resta fermo sul primo fotogramma; con «risparmio dati», o sul
+   telefono se scelto nel pannello, non si scarica: resta l'immagine di sfondo. */
+function videoSfondi(reduce) {
+  const video = $$('.mo-bg-video[data-src]');
+  if (!video.length) return;
+  const risparmio = !!(navigator.connection && navigator.connection.saveData);
+  const telefono = window.matchMedia('(max-width: 767px)').matches;
+  const avvia = (v) => {
+    if (!v.getAttribute('src')) {
+      v.preload = reduce ? 'metadata' : 'auto';
+      v.src = v.getAttribute('data-src');
+      v.addEventListener('loadeddata', () => v.classList.add('mo-pronto'), { once: true });
+      v.addEventListener('error', () => v.remove(), { once: true });
+    }
+    if (!reduce) {
+      v.muted = true;
+      const pr = v.play();
+      if (pr && pr.catch) pr.catch(() => {});
+    }
+  };
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((voci) => {
+    voci.forEach((e) => { if (e.isIntersecting) avvia(e.target); else if (!e.target.paused) e.target.pause(); });
+  }, { rootMargin: '300px 0px' }) : null;
+  video.forEach((v) => {
+    if (risparmio || (telefono && v.getAttribute('data-telefono') === 'no')) { v.closest('.mo-bg--video')?.remove(); return; }
+    if (io) io.observe(v); else avvia(v);
+  });
+  // Scheda del browser nascosta: i video si fermano; quando torna, ripartono quelli sullo schermo
+  document.addEventListener('visibilitychange', () => {
+    video.forEach((v) => {
+      if (!v.isConnected || !v.getAttribute('src')) return;
+      if (document.hidden) v.pause();
+      else if (!reduce) { const r = v.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) { const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } }
+    });
+  });
+}
+
 /* La foto di un'intestazione con «sfumatura» prosegue sotto la sezione successiva: quella sezione diventa «aperta»
    (il suo sfondo passa sotto la sfumatura, i suoi testi restano sopra). */
 function sezioniAperte() {
@@ -1048,6 +1087,61 @@ function sezioniAperte() {
     dopo.style.setProperty('--mo-fondo-aperto', getComputedStyle(dopo).backgroundColor);
     dopo.classList.add('mo-aperta');
   });
+}
+
+/* Chi sono breve: numero e frase alti quanto i testi a destra. La cima delle cifre è allineata alla cima
+   delle maiuscole del titolo, la fine della frase alla fine del pulsante. Su una colonna sola (tablet,
+   telefono) resta la grandezza del CSS. */
+function initChiBreve(sec, { ST }) {
+  const col = $('.mo-cb-num', sec), n = $('.mo-cb-n', sec), testo = $('.mo-cb-testo', sec), titolo = $('.mo-sec-title', sec);
+  const frase = $('.mo-cb-frase', sec), cifre = $('.mo-cb-n-txt', sec);
+  if (!col || !n || !testo || !titolo || !frase || !cifre) return;
+  let ultimo = '';
+  const misura = () => {
+    n.style.removeProperty('--mo-cb-n');
+    n.style.removeProperty('--mo-cb-su');
+    frase.style.removeProperty('font-size');
+    col.classList.remove('mo-cb-alto');
+    if (getComputedStyle(sec.querySelector('.mo-cb-grid')).gridTemplateColumns.split(' ').length < 2) return;
+    // Cima delle maiuscole del titolo, dentro la sua prima riga (Montserrat: ascendente .968, maiuscole .70)
+    const cs = getComputedStyle(titolo), fs = parseFloat(cs.fontSize);
+    const lh = parseFloat(cs.lineHeight) || fs * 1.08;
+    const su = Math.max(0, (lh - fs * 1.219) / 2 + fs * 0.268);
+    const H = testo.offsetHeight;
+    const altezzaFrase = () => frase.offsetHeight + (parseFloat(getComputedStyle(frase).marginTop) || 0);
+    let fr = altezzaFrase();
+    // Cifre alte .70 em (riga del numero a .7): grandezza per l'altezza, poi limite della larghezza della colonna
+    const f0 = parseFloat(getComputedStyle(n).fontSize);
+    const perEm = (cifre.offsetWidth - 0.1 * f0) / f0; // le cifre sporgono di .06 em oltre la loro larghezza
+    let f = (H - su - fr) / 0.7;
+    const fMax = perEm ? col.clientWidth / perEm : f;
+    if (f > fMax) {
+      // Colonna troppo stretta per un numero così alto: la frase cresce un po' (fino a 30 px) per riempire
+      f = fMax;
+      const base = parseFloat(getComputedStyle(frase).fontSize);
+      for (let px = base + 1; px <= 30 && H - su - f * 0.7 - fr > 8; px++) {
+        frase.style.fontSize = px + 'px';
+        fr = altezzaFrase();
+        if (H - su - f * 0.7 - fr < 0) { frase.style.fontSize = (px - 1) + 'px'; break; }
+      }
+      col.classList.add('mo-cb-alto');
+    }
+    f = Math.max(80, Math.floor(f));
+    n.style.setProperty('--mo-cb-n', f + 'px');
+    n.style.setProperty('--mo-cb-su', Math.round(su) + 'px');
+  };
+  const aggiorna = () => {
+    misura();
+    const ora = n.style.getPropertyValue('--mo-cb-n');
+    if (ora !== ultimo) { ultimo = ora; ST.refresh(); }
+  };
+  let t = 0;
+  const presto = () => { cancelAnimationFrame(t); t = requestAnimationFrame(aggiorna); };
+  if ('ResizeObserver' in window) new ResizeObserver(presto).observe(testo);
+  window.addEventListener('resize', presto, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(presto);
+  misura();
+  ultimo = n.style.getPropertyValue('--mo-cb-n');
 }
 
 function initGeneric({ G, reduce, fine }) {

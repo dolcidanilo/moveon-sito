@@ -1,10 +1,10 @@
-{{! CHI SONO BREVE (home) · anchor sfondo etichetta numero frase_numero titolo; punti (righe); pulsante (testo, href) }}
+{{! CHI SONO BREVE (home) · anchor sfondo etichetta numero frase_numero animazione titolo; punti (righe); pulsante (testo, href) }}
 <section class="mo-block mo-sec mo-cb" id="{{anchor}}" data-mo-block="chi-breve">
   {{{sfondo}}}
+  {{#etichetta}}<div class="mo-wrap mo-sec-head"><p class="mo-overline-h2 mo-reveal">{{etichetta}}</p></div>{{/etichetta}}
   <div class="mo-wrap mo-cb-grid">
     <div class="mo-cb-num mo-reveal">
-      {{#etichetta}}<p class="mo-overline-h2">{{etichetta}}</p>{{/etichetta}}
-      <p class="mo-cb-n">{{numero}}</p>
+      <p class="mo-cb-n" data-anima="{{animazione}}"><span class="mo-cb-n-luce" aria-hidden="true">{{numero}}</span><span class="mo-cb-n-txt">{{numero}}</span></p>
       <p class="mo-cb-frase">{{frase_numero}}</p>
     </div>
     <div class="mo-cb-testo">

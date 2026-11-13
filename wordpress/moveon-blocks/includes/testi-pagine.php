@@ -16,6 +16,7 @@ function mo_defaults_sezioni(): array {
 			'etichetta'    => 'Chi sono',
 			'numero'       => '25',
 			'frase_numero' => 'anni di comunicazione, dall’idea al prodotto finito',
+			'animazione'   => 'tutto',
 			'titolo'       => 'Prima capisco cosa serve alla tua attività per avere più clienti. Poi lo realizzo.',
 			'punti'        => "Il metodo delle aziende grandi, per la tua attività\nPenso e realizzo io, senza passaggi di mano\nUna rete di professionisti, un solo referente",
 			'pulsante'     => 'Scopri come lavoro',
@@ -84,6 +85,7 @@ function mo_defaults_sezioni(): array {
 				array( 'situazione' => 'Voglio vendere online', 'consigli' => "Negozio online\nFoto dei prodotti\nPubblicità online\nNewsletter" ),
 				array( 'situazione' => 'La mia immagine è vecchia', 'consigli' => "Rinnovo del logo\nNuovo sito\nMateriali coordinati" ),
 				array( 'situazione' => 'Ho un evento o una fiera', 'consigli' => "Manifesti\nRoll-up\nAllestimento dello stand\nInviti\nPost e storie" ),
+				array( 'situazione' => 'Voglio imparare a fare da solo', 'consigli' => "Corso di WordPress\nGrafiche per i social\nFile pronti per la stampa\nCorsi per i collaboratori" ),
 			),
 		),
 		'faq'         => array(

@@ -20,7 +20,8 @@ function mo_sezioni_def( array $d ): array {
 			'params' => array(
 				mo_p_text( 'etichetta', 'Etichetta in alto', '', 'Testi', $d['chi_breve']['etichetta'] ),
 				mo_p_text( 'numero', 'Numero grande', 'Es. «25».', 'Testi', $d['chi_breve']['numero'] ),
-				mo_p_text( 'frase_numero', 'Frase sotto il numero', '', 'Testi', $d['chi_breve']['frase_numero'] ),
+				mo_p_text( 'frase_numero', 'Frase sotto il numero', 'Numero e frase insieme sono alti quanto i testi a destra (su computer).', 'Testi', $d['chi_breve']['frase_numero'] ),
+				mo_p_drop( 'animazione', 'Animazione del numero', array( 'Colori che scorrono e bagliore' => 'tutto', 'Solo colori che scorrono' => 'colori', 'Solo bagliore' => 'bagliore', 'Nessuna' => 'nessuna' ), 'tutto', 'Un movimento leggero e continuo dentro il numero. Si ferma da solo per chi ha scelto «riduci movimento».', 'Testi' ),
 				mo_p_area( 'titolo', 'Frase principale', 'Una o due frasi, in parole semplici.', 'Testi', $d['chi_breve']['titolo'] ),
 				mo_p_area( 'punti', 'Tre punti di forza', 'Uno per riga, brevi.', 'Testi', $d['chi_breve']['punti'] ),
 				mo_p_text( 'pulsante', 'Pulsante: testo', $trattino, 'Testi', $d['chi_breve']['pulsante'] ),
@@ -185,6 +186,7 @@ function mo_render_chi_breve( $atts ): string {
 			array(
 				'numero'       => mo_text( $a['numero'] ),
 				'frase_numero' => mo_text( $a['frase_numero'] ),
+				'animazione'   => in_array( $a['animazione'], array( 'tutto', 'colori', 'bagliore', 'nessuna' ), true ) ? $a['animazione'] : 'tutto',
 				'punti'        => mo_lines( $a['punti'] ),
 				'pulsante'     => '' !== $btn ? array( 'testo' => $btn, 'href' => mo_href( $a['link'] ) ) : null,
 			)

@@ -567,6 +567,19 @@ img,svg{max-width:100%}
 .mo-block{position:relative;isolation:isolate}
 .mo-block > .mo-bg{position:absolute;inset:0;z-index:-1;background-repeat:no-repeat;pointer-events:none}
 .mo-block > .mo-bg--colore{z-index:-2}
+/* Video di sfondo: compare con una dissolvenza quando è pronto (moveon.js aggiunge .mo-pronto) */
+.mo-bg--video{overflow:hidden}
+.mo-block .mo-bg-video{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;border:0;opacity:0;transition:opacity .9s ease}
+.mo-block .mo-bg-video.mo-pronto{opacity:1}
+/* L'immagine di sfondo fa da «copertina»: quando il video è pronto, sfuma via */
+.mo-block > .mo-bg--foto{transition:opacity .9s ease}
+.mo-block:has(> .mo-bg--video .mo-bg-video.mo-pronto) > .mo-bg--foto{opacity:0!important}
+/* Sfumatura di video e immagine verso il colore di sfondo (--mo-sf-amp = quanta parte della sezione) */
+.mo-bg[data-sfuma]{--mo-sf-giu:linear-gradient(to bottom,#000 calc(100% - var(--mo-sf-amp,35%)),rgba(0,0,0,.62) calc(100% - var(--mo-sf-amp,35%) * .6),rgba(0,0,0,.22) calc(100% - var(--mo-sf-amp,35%) * .28),transparent);--mo-sf-su:linear-gradient(to top,#000 calc(100% - var(--mo-sf-amp,35%)),rgba(0,0,0,.62) calc(100% - var(--mo-sf-amp,35%) * .6),rgba(0,0,0,.22) calc(100% - var(--mo-sf-amp,35%) * .28),transparent);--mo-sf-lati:linear-gradient(to right,transparent,rgba(0,0,0,.22) calc(var(--mo-sf-amp,35%) * .28),rgba(0,0,0,.62) calc(var(--mo-sf-amp,35%) * .6),#000 var(--mo-sf-amp,35%),#000 calc(100% - var(--mo-sf-amp,35%)),rgba(0,0,0,.62) calc(100% - var(--mo-sf-amp,35%) * .6),rgba(0,0,0,.22) calc(100% - var(--mo-sf-amp,35%) * .28),transparent)}
+.mo-bg[data-sfuma="basso"]{-webkit-mask-image:var(--mo-sf-giu);mask-image:var(--mo-sf-giu)}
+.mo-bg[data-sfuma="alto"]{-webkit-mask-image:var(--mo-sf-su);mask-image:var(--mo-sf-su)}
+.mo-bg:is([data-sfuma="entrambi"],[data-sfuma="bordi"]){-webkit-mask-image:var(--mo-sf-giu),var(--mo-sf-su);mask-image:var(--mo-sf-giu),var(--mo-sf-su);-webkit-mask-composite:source-in;mask-composite:intersect}
+.mo-bg[data-sfuma="bordi"]{-webkit-mask-image:var(--mo-sf-giu),var(--mo-sf-su),var(--mo-sf-lati);mask-image:var(--mo-sf-giu),var(--mo-sf-su),var(--mo-sf-lati)}
 /* Stile dei testi e delle card scelto nella scheda Sfondo */
 .mo-block:has(> .mo-bg[data-testi="chiari"]){--mo-surface:#0f172a;--mo-surface-alt:#182343;--mo-ink:#f8fafc;--mo-body:#e2e8f0;--mo-muted:#e2e8f0;--mo-border:#334155;--mo-link:#60a5fa;--mo-brand-tint:#172554;--mo-chip-ink:#93c5fd;--mo-tone-b:#93c5fd;--mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color:var(--mo-body)}
 .mo-block:has(> .mo-bg[data-testi="scuri"]){--mo-surface:#ffffff;--mo-surface-alt:#f8fafc;--mo-ink:#0f172a;--mo-body:#182343;--mo-muted:#182343;--mo-border:#e2e8f0;--mo-link:#2563eb;--mo-brand-tint:#eff6ff;--mo-chip-ink:#1d4ed8;--mo-tone-b:#60a5fa;--mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08);color:var(--mo-body)}
@@ -769,14 +782,31 @@ img,svg{max-width:100%}
 .mo-sec{position:relative;padding:112px 0;background:var(--mo-surface);color:var(--mo-body)}
 .mo-sec-head{margin-bottom:48px}
 .mo-sec-head .mo-overline-h2{margin-bottom:16px}
-.mo-block .mo-sec-title{margin:0;max-width:22ch;font:800 clamp(30px,3.6vw,52px)/1.08 var(--mo-font);letter-spacing:-.025em;color:var(--mo-ink)}
+.mo-block .mo-sec-title{margin:0;max-width:30ch;text-wrap:balance;font:800 clamp(30px,3.6vw,52px)/1.08 var(--mo-font);letter-spacing:-.025em;color:var(--mo-ink)}
 .mo-sec :where(h3){margin:0 0 8px;font:700 20px/1.3 var(--mo-font);letter-spacing:0;color:var(--mo-ink)}
 .mo-sec :where(p){margin:0} /* i margini voluti li danno le classi dei singoli elementi */
 
 /* Chi sono breve (home) */
-.mo-cb-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center}
-.mo-block .mo-cb-n{margin:8px 0 0;font:800 clamp(120px,16vw,220px)/.85 var(--mo-font);letter-spacing:-.06em;color:var(--mo-brand)}
-.mo-block .mo-cb-frase{margin:16px 0 0;max-width:22ch;font:700 20px/1.35 var(--mo-font);color:var(--mo-ink)}
+/* Etichetta in alto a sinistra come nelle altre sezioni; numero + frase alti quanto i testi a destra:
+   la grandezza del numero la calcola moveon.js (--mo-cb-n), qui c'è quella di partenza. */
+.mo-cb-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:start}
+.mo-cb-num{display:flex;flex-direction:column;align-self:stretch;min-width:0}
+.mo-block .mo-cb-n{--mo-cb-c1:var(--mo-link);--mo-cb-c2:var(--mo-tone-b);--mo-cb-c3:#a78bfa;--mo-cb-c4:var(--mo-accent);position:relative;isolation:isolate;display:flow-root;align-self:flex-start;margin:var(--mo-cb-su,0px) 0 0;font:800 var(--mo-cb-n,clamp(120px,16vw,220px))/.7 var(--mo-font);letter-spacing:-.06em;color:var(--mo-cb-c1);white-space:nowrap}
+.mo-cb-n-txt,.mo-cb-n-luce{display:block;padding:.22em .16em .22em 0} /* margine per le parti delle cifre fuori dalla riga */
+.mo-cb-n-txt{margin:-.22em 0}
+.mo-cb-n-luce{position:absolute;top:-.22em;left:0;z-index:-1;color:var(--mo-cb-c1);filter:blur(.09em);opacity:0;pointer-events:none;user-select:none}
+.mo-block .mo-cb-frase{margin:20px 0 0;max-width:24ch;font:700 22px/1.35 var(--mo-font);color:var(--mo-ink)}
+.mo-cb-num.mo-cb-alto .mo-cb-frase{margin-top:auto;padding-top:20px}
+@property --mo-cb-pos{syntax:'<percentage>';inherits:false;initial-value:0%}
+@keyframes mo-cb-scorre{to{--mo-cb-pos:200%}}
+@keyframes mo-cb-respiro{0%,100%{opacity:.14}50%{opacity:.55}}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .mo-cb-n:is([data-anima="tutto"],[data-anima="colori"]) .mo-cb-n-txt{color:transparent;background:linear-gradient(105deg in oklch,var(--mo-cb-c1) 0%,var(--mo-cb-c1) 20%,var(--mo-cb-c2) 34%,var(--mo-cb-c3) 43%,var(--mo-cb-c4) 50%,var(--mo-cb-c3) 57%,var(--mo-cb-c2) 66%,var(--mo-cb-c1) 80%,var(--mo-cb-c1) 100%) var(--mo-cb-pos) 50%/200% 100% repeat-x;-webkit-background-clip:text;background-clip:text}
+}
+@media (prefers-reduced-motion:no-preference){
+  .mo-cb-n:is([data-anima="tutto"],[data-anima="colori"]) .mo-cb-n-txt{animation:mo-cb-scorre 9s linear infinite}
+  .mo-cb-n:is([data-anima="tutto"],[data-anima="bagliore"]) .mo-cb-n-luce{animation:mo-cb-respiro 3.5s ease-in-out infinite}
+}
 .mo-cb-testo .mo-sec-title{max-width:24ch}
 .mo-block .mo-cb-punti{display:grid;gap:14px;margin:32px 0 40px;padding:0;list-style:none}
 .mo-block .mo-cb-punti li{position:relative;padding-left:36px;font:600 18px/1.45 var(--mo-font);color:var(--mo-ink)}
@@ -878,6 +908,7 @@ img,svg{max-width:100%}
   .mo-pt-grid,.mo-si-grid,.mo-rc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .mo-block .mo-ps-list{grid-template-columns:repeat(2,minmax(0,1fr))}
   .mo-cb-grid{grid-template-columns:1fr;gap:32px}
+  .mo-cb-num{align-self:auto}
 }
 @media (max-width:767px){
   .mo-sec{padding:72px 0}
