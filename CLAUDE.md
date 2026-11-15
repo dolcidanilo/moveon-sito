@@ -109,6 +109,7 @@ Inciampi già visti:
 - **W4** — spostamento da /nuovo al sito principale.
 - **Dopo**: social (Instagram, Facebook, LinkedIn): idee nel piano W3, in fondo.
 - Idea futura: un **e-commerce** con lo stesso metodo (WooCommerce + plugin di design proprio).
+- **Skill «moveon-studio»** (15/11/2026, su richiesta del cliente, per la parte social dopo il sito): sorgente in `skill/moveon-studio/` (SKILL.md + `riferimenti/` servizi, marchio, social), zip pronto in `dist/skill-moveon-studio.zip` (cartella al primo livello). Il cliente la carica su claude.ai (Personalizza → Skill → + → Carica una skill). È la prima versione del profilo qui sotto: se cambiano servizi, testi approvati, colori o piano social, aggiorna i file **e** rigenera lo zip, poi digli di ricaricarla.
 - **Promemoria da dare al cliente alla fine del progetto** (dopo la W4, prima di chiudere): scrivere insieme il suo **profilo professionale** (chi è, come lavora e decide, gusti estetici, qualità richiesta, vincoli) da usare in ogni lavoro futuro (siti, social, grafica). Piano già concordato:
   1. Claude scrive una bozza partendo da tutto il progetto; il cliente la corregge (sui gusti l'ultima parola è sua).
   2. Tre versioni/posti: **breve** (~10 righe) nelle *preferenze personali* di claude.ai; **completa** nelle istruzioni di un *Progetto* claude.ai («Lavori MoveOn Studio») per social/grafica/testi; **file** in un repository GitHub **privato** da collegare al `CLAUDE.md` dei progetti di codice.
