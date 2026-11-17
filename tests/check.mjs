@@ -749,6 +749,32 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- 1.6.1: tema scuro con sezioni bianche, garanzie senza bordo, linee dei contatti e del footer ---------------- */
+{
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
+  const page = await ctx.newPage();
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  const k = await page.evaluate(() => {
+    const bg = (s) => getComputedStyle(document.querySelector(s)).backgroundColor;
+    const card = getComputedStyle(document.querySelector('.mo-gar-card')).boxShadow;
+    const side = getComputedStyle(document.querySelector('.mo-ct-side')).borderLeftColor, item = getComputedStyle(document.querySelector('.mo-ct-item')).borderTopColor;
+    const wrap = document.querySelector('.mo-foot > .mo-wrap'), linea = getComputedStyle(wrap, '::before');
+    const ct = document.querySelector('.mo-contact .mo-wrap'), pad = parseFloat(getComputedStyle(ct).paddingLeft);
+    const cr = ct.getBoundingClientRect();
+    return {
+      chiare: [bg('.mo-cb'), bg('.mo-si'), bg('.mo-gar')], blu: [bg('.mo-emo'), bg('.mo-car'), bg('.mo-contact')], titolo: getComputedStyle(document.querySelector('.mo-gar .mo-statement')).color,
+      cardBordo: /inset/.test(card), side, item,
+      linea: { w: Math.round(parseFloat(linea.width)), contenuto: Math.round(cr.width - 2 * pad), colore: linea.backgroundColor }, bordoFooter: getComputedStyle(document.querySelector('.mo-foot')).borderTopWidth,
+    };
+  });
+  check('Tema scuro: Chi sono, Non sai da dove partire? e Garanzie restano bianche, le altre blu', k.chiare.every((c) => c === 'rgb(244, 245, 247)' || c === 'rgb(248, 250, 252)') && k.blu.every((c) => c === 'rgb(34, 58, 184)') && k.titolo === 'rgb(34, 58, 184)', JSON.stringify({ chiare: k.chiare, blu: k.blu, titolo: k.titolo }));
+  check('Garanzie: card senza bordo', !k.cardBordo);
+  check('Contatti: linea verticale e bordi delle icone chiari, visibili sul blu', /rgba\(244, 245, 247/.test(k.side) && /rgba\(244, 245, 247/.test(k.item), `${k.side} · ${k.item}`);
+  check('Footer: linea leggera larga quanto i contenuti, non a tutto schermo', k.linea.w === k.linea.contenuto && /rgba\(244, 245, 247, 0\.16\)/.test(k.linea.colore) && k.bordoFooter === '0px', JSON.stringify(k.linea) + ' ' + k.bordoFooter);
+  await ctx.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

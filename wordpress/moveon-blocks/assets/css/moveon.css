@@ -46,6 +46,13 @@
   --mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); --mo-shadow-hover:0 12px 32px rgba(0,0,0,.5);
   color-scheme:dark;
 }
+/* Sezioni sempre chiare: «Chi sono» breve, «Non sai da dove partire?» e «Garanzie» restano chiare anche con il tema scuro,
+   così le sezioni bianche e blu si alternano per tutti (e il cambio di sfondo scorrendo si vede). Per farne una blu:
+   scheda Sfondo → colore #223ab8 e «Testi chiari» (le scelte della scheda Sfondo vincono su questa regola). */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) :is(.mo-cb,.mo-si,.mo-gar){--mo-surface:#f4f5f7; --mo-surface-alt:#f8fafc; --mo-ink:#223ab8; --mo-body:#334155; --mo-muted:#64748b; --mo-border:#e2e8f0; --mo-link:#2563eb; --mo-brand-tint:#eff6ff; --mo-chip-ink:#1d4ed8; --mo-focus:#2563eb; --mo-tone-b:#60a5fa; --mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08); --mo-shadow-hover:0 12px 32px rgba(37,99,235,.18); color-scheme:light; color:var(--mo-body);}
+}
+:root[data-theme="dark"] :is(.mo-cb,.mo-si,.mo-gar){--mo-surface:#f4f5f7; --mo-surface-alt:#f8fafc; --mo-ink:#223ab8; --mo-body:#334155; --mo-muted:#64748b; --mo-border:#e2e8f0; --mo-link:#2563eb; --mo-brand-tint:#eff6ff; --mo-chip-ink:#1d4ed8; --mo-focus:#2563eb; --mo-tone-b:#60a5fa; --mo-shadow-card:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.08); --mo-shadow-hover:0 12px 32px rgba(37,99,235,.18); color-scheme:light; color:var(--mo-body);}
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + var(--mo-header-h))}
 @media (prefers-reduced-motion: no-preference){ html:not(.lenis){scroll-behavior:smooth} }
@@ -99,7 +106,7 @@ img,svg{max-width:100%}
 .mo-shield .mo-px i{border-radius:3px;transition:box-shadow .6s}
 .mo-gar-art.mo-is-done .mo-px-ck i{box-shadow:0 0 14px 2px rgba(245,158,11,.75)}
 .mo-gar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0;padding:0;list-style:none}
-.mo-gar-card{position:relative;padding:32px 28px 28px;border-radius:12px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card),inset 0 0 0 1px var(--mo-border)}
+.mo-gar-card{position:relative;padding:32px 28px 28px;border-radius:12px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card)}
 .mo-gar-stamp{display:block;width:76px;height:76px;margin-bottom:24px;color:var(--mo-link)}
 .mo-gar-stamp svg{display:block;width:100%;height:100%;overflow:visible}
 .mo-gar-card h3{margin:0 0 8px;font:700 20px/28px var(--mo-font);color:var(--mo-ink)}
@@ -324,7 +331,7 @@ img,svg{max-width:100%}
 .mo-ct-head .mo-ct-big{font-size:clamp(44px,6vw,96px)}
 .mo-ct-layout{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--mo-gutter);row-gap:48px;align-items:start}
 .mo-ct-main{grid-column:1 / span 7}
-.mo-ct-side{grid-column:8 / span 5;align-self:stretch;padding-left:48px;border-left:1px solid #334155}
+.mo-ct-side{grid-column:8 / span 5;align-self:stretch;padding-left:48px;border-left:1px solid var(--mo-ct-linea,rgba(244,245,247,.28))}
 .mo-ct-side-title{margin:0 0 16px;font:700 20px/28px var(--mo-font);color:#f4f5f7}
 .mo-ct-figure{grid-column:1 / span 5;position:relative;margin:0}
 .mo-ct-img-wrap{position:relative;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:#7fb3c4}
@@ -334,7 +341,7 @@ img,svg{max-width:100%}
 .mo-ct-badge .mo-ring-text{animation:spin 16s linear infinite;transform-origin:100px 100px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .mo-ct-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.mo-ct-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 8px;border:1px solid #334155;border-radius:12px;text-align:center;text-decoration:none;transition:border-color .2s,background .2s}
+.mo-ct-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 8px;border:1px solid var(--mo-ct-linea,rgba(244,245,247,.28));border-radius:12px;text-align:center;text-decoration:none;transition:border-color .2s,background .2s}
 .mo-ct-ico{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:rgba(96,165,250,.14);color:#60a5fa;transition:background .2s,color .2s}
 .mo-ct-ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mo-ct-item:hover .mo-ct-ico{background:#2563eb;color:#f4f5f7}
@@ -361,7 +368,9 @@ img,svg{max-width:100%}
 .mo-ok-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:#10b981}
 .mo-form-done h3{margin:16px 0 8px;font:800 28px/36px var(--mo-font);color:#f4f5f7}
 .mo-form-done p{margin:0}
-.mo-foot{padding:40px 0;background:var(--mo-navy);color:#94a3b8;border-top:1px solid #182343}
+.mo-foot{padding:40px 0;background:var(--mo-navy);color:#94a3b8}
+.mo-foot > .mo-wrap{position:relative}
+.mo-foot > .mo-wrap::before{content:"";position:absolute;left:var(--mo-margin);right:var(--mo-margin);top:-40px;height:1px;background:var(--mo-foot-linea,rgba(244,245,247,.16));pointer-events:none}
 .mo-foot-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
 .mo-foot .mo-logo{color:#f4f5f7;width:150px}
 .mo-foot p{margin:0;font:500 13px/18px var(--mo-font)}
@@ -380,7 +389,7 @@ img,svg{max-width:100%}
   .mo-gar-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .mo-gar-copy,.mo-gar-art{grid-column:1 / -1}
   .mo-ct-main,.mo-ct-side{grid-column:1 / -1}
-  .mo-ct-side{padding:40px 0 0;border-left:0;border-top:1px solid #334155}
+  .mo-ct-side{padding:40px 0 0;border-left:0;border-top:1px solid var(--mo-ct-linea,rgba(244,245,247,.28))}
   .mo-ct-top{grid-template-columns:1fr;row-gap:40px;margin-bottom:64px}
   .mo-ct-figure,.mo-ct-head{grid-column:1 / -1}
   .mo-ct-figure{max-width:380px}
