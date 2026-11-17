@@ -724,9 +724,10 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await m.waitForTimeout(1200);
   const menu = await m.evaluate(() => {
     const mm = document.getElementById('mo-mobile-menu'), sub = mm.querySelector('.mo-mm-sub'), pr = getComputedStyle(sub, '::before');
-    return { fondo: getComputedStyle(mm).backgroundColor, freccia: pr.content !== 'none' && /svg/.test(pr.maskImage || pr.webkitMaskImage), voci: mm.querySelectorAll('.mo-mm-sub').length, testo: getComputedStyle(sub).color, btn: getComputedStyle(mm.querySelector('.mo-btn')).backgroundColor };
+    return { fondo: getComputedStyle(mm).backgroundColor, freccia: pr.content !== 'none' && /svg/.test(pr.maskImage || pr.webkitMaskImage), voci: mm.querySelectorAll('.mo-mm-sub').length, testo: getComputedStyle(sub).color, btn: getComputedStyle(mm.querySelector('.mo-btn')).backgroundColor, testa: getComputedStyle(document.querySelector('.mo-site-header')).backgroundColor, progresso: getComputedStyle(document.querySelector('.mo-progress')).visibility };
   });
   check('Menu del telefono: sfondo #223ab8, freccia davanti a ogni servizio, pulsante chiaro', menu.fondo === 'rgb(34, 58, 184)' && menu.freccia && menu.voci === 5 && menu.testo === 'rgb(244, 245, 247)' && menu.btn === 'rgb(244, 245, 247)', JSON.stringify(menu));
+  check('Menu del telefono: fascia del logo blu scuro #182343, senza barra di avanzamento', menu.testa === 'rgb(24, 35, 67)' && menu.progresso === 'hidden', JSON.stringify(menu));
   await m.click('.mo-menu-btn');
   await m.waitForTimeout(800);
   const misuraTel = () => m.evaluate(() => {
