@@ -6,6 +6,6 @@
     {{#titolo}}<h2 class="mo-sec-title">{{titolo}}</h2>{{/titolo}}
   </div>
   <div class="mo-wrap mo-si-grid mo-stagger">
-    {{#situazioni}}<article class="mo-si-card"><h3 class="mo-si-q">«{{situazione}}»</h3><p class="mo-si-label">Ti consiglio</p><ul class="mo-si-voci">{{#consigli}}<li>{{.}}</li>{{/consigli}}</ul>{{#pulsante}}<a class="mo-si-btn" href="{{href}}" data-messaggio="{{messaggio}}">{{pulsante}}<span aria-hidden="true">→</span></a>{{/pulsante}}</article>{{/situazioni}}
+    {{#situazioni}}<article class="mo-si-card"><h3 class="mo-si-q"><span class="mo-si-virg" aria-hidden="true">«</span>{{situazione}}<span class="mo-si-virg" aria-hidden="true">»</span></h3><p class="mo-si-label">Ti consiglio</p><ul class="mo-si-voci">{{#consigli}}<li>{{.}}</li>{{/consigli}}</ul>{{#pulsante}}<a class="mo-si-btn" href="{{href}}" data-messaggio="{{messaggio}}">{{pulsante}}<span aria-hidden="true">→</span></a>{{/pulsante}}</article>{{/situazioni}}
   </div>
 </section>

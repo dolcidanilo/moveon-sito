@@ -311,7 +311,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     };
   });
   check('Stili di Porto caricati come file: esclusi', !r.portoFile);
-  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', statement: 'rgb(34,58,184)', ctText: 'rgb(203,213,225)', secTitle: 'rgb(34,58,184)', siQ: 'rgb(34,58,184)' };
+  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', statement: 'rgb(34,58,184)', ctText: 'rgb(203,213,225)', secTitle: 'rgb(34,58,184)', siQ: 'rgb(24,35,67)' };
   const sbagliati = Object.entries(atteso).filter(([k, v]) => rgb(r.colori[k] || '') !== v).map(([k]) => `${k}=${r.colori[k]}`);
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
   check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(24,35,67)'), [...new Set(r.campi)].join(' | '));
@@ -320,11 +320,11 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
   check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
   check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(244,245,247)', r.sfondoBody);
-  // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
+  // Pulsante al passaggio del mouse: testo blu sul giallo e niente sottolineatura
   await page.hover('.mo-header-cta');
   await page.waitForTimeout(400);
   const hov = await page.evaluate(() => { const s = getComputedStyle(document.querySelector('.mo-header-cta')); return { c: s.color, d: s.textDecorationLine }; });
-  check('Pulsante leggibile al passaggio del mouse', rgb(hov.c) === 'rgb(244,245,247)' && hov.d === 'none', JSON.stringify(hov));
+  check('Pulsante leggibile al passaggio del mouse (giallo con testo blu, come «Invia Richiesta»)', rgb(hov.c) === 'rgb(34,58,184)' && hov.d === 'none', JSON.stringify(hov));
   // «Chi siamo» lungo (elemento ancora disponibile, provato nella sua pagina di prova)
   await page.goto(URL + 'prova-chi-siamo/', { waitUntil: 'load' });
   await page.waitForTimeout(1500);
@@ -726,7 +726,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     const mm = document.getElementById('mo-mobile-menu'), sub = mm.querySelector('.mo-mm-sub'), pr = getComputedStyle(sub, '::before');
     return { fondo: getComputedStyle(mm).backgroundColor, freccia: pr.content !== 'none' && /svg/.test(pr.maskImage || pr.webkitMaskImage), voci: mm.querySelectorAll('.mo-mm-sub').length, testo: getComputedStyle(sub).color, btn: getComputedStyle(mm.querySelector('.mo-btn')).backgroundColor, testa: getComputedStyle(document.querySelector('.mo-site-header')).backgroundColor, progresso: getComputedStyle(document.querySelector('.mo-progress')).visibility };
   });
-  check('Menu del telefono: sfondo #223ab8, freccia davanti a ogni servizio, pulsante chiaro', menu.fondo === 'rgb(34, 58, 184)' && menu.freccia && menu.voci === 5 && menu.testo === 'rgb(244, 245, 247)' && menu.btn === 'rgb(244, 245, 247)', JSON.stringify(menu));
+  check('Menu del telefono: sfondo #223ab8, freccia davanti a ogni servizio, pulsante giallo come «Invia Richiesta»', menu.fondo === 'rgb(34, 58, 184)' && menu.freccia && menu.voci === 5 && menu.testo === 'rgb(244, 245, 247)' && menu.btn === 'rgb(245, 158, 11)', JSON.stringify(menu));
   check('Menu del telefono: fascia del logo blu scuro #182343, senza barra di avanzamento', menu.testa === 'rgb(24, 35, 67)' && menu.progresso === 'hidden', JSON.stringify(menu));
   await m.click('.mo-menu-btn');
   await m.waitForTimeout(800);
@@ -771,8 +771,15 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   });
   check('Tema scuro: Chi sono, Non sai da dove partire? e Garanzie restano bianche, le altre blu', k.chiare.every((c) => c === 'rgb(244, 245, 247)' || c === 'rgb(248, 250, 252)') && k.blu.every((c) => c === 'rgb(34, 58, 184)') && k.titolo === 'rgb(34, 58, 184)', JSON.stringify({ chiare: k.chiare, blu: k.blu, titolo: k.titolo }));
   check('Garanzie: card senza bordo', !k.cardBordo);
-  const et = await page.evaluate(() => { const li = document.querySelector('.mo-si-voci li'); return { fondo: getComputedStyle(li).backgroundColor, testo: getComputedStyle(li).color, titolo: getComputedStyle(document.querySelector('.mo-si-q')).color }; });
-  check('Non sai da dove partire?: etichette del colore del titolo, con le scritte bianche', et.fondo === et.titolo && et.fondo === 'rgb(34, 58, 184)' && et.testo === 'rgb(244, 245, 247)', JSON.stringify(et));
+  const et = await page.evaluate(() => {
+    const c = [...document.querySelectorAll('.mo-si-card')], cs = (el, p) => getComputedStyle(el)[p];
+    const info = (card) => ({ fondo: cs(card, 'backgroundColor'), titolo: cs(card.querySelector('.mo-si-q'), 'color'), virg: cs(card.querySelector('.mo-si-virg'), 'color'), voce: cs(card.querySelector('.mo-si-voci li'), 'backgroundColor'), voceTesto: cs(card.querySelector('.mo-si-voci li'), 'color'), btn: cs(card.querySelector('.mo-si-btn'), 'backgroundColor') });
+    return { chiara: info(c[0]), scura: info(c[1]), quinta: cs(c[4], 'backgroundColor'), sesta: cs(c[5], 'backgroundColor') };
+  });
+  check('Non sai da dove partire?: card a scacchiera chiare e blu notte', et.chiara.fondo !== et.scura.fondo && et.scura.fondo === 'rgb(24, 35, 67)' && et.quinta === et.chiara.fondo && et.sesta === et.scura.fondo, JSON.stringify({ chiara: et.chiara.fondo, scura: et.scura.fondo }));
+  check('Non sai da dove partire?: gerarchia (titolo scuro o chiaro, virgolette gialle, consigli blu con scritte bianche, pulsante giallo)', et.chiara.titolo === 'rgb(24, 35, 67)' && et.scura.titolo === 'rgb(244, 245, 247)' && et.chiara.virg === 'rgb(245, 158, 11)' && et.chiara.voce === 'rgb(34, 58, 184)' && et.scura.voce === 'rgb(37, 99, 235)' && et.chiara.voceTesto === 'rgb(244, 245, 247)' && et.chiara.btn === 'rgb(245, 158, 11)' && et.scura.btn === 'rgb(245, 158, 11)', JSON.stringify(et));
+  const pu = await page.evaluate(() => { const cs = (s) => getComputedStyle(document.querySelector(s)); return { cta: cs('.mo-header-cta').backgroundColor, ctaT: cs('.mo-header-cta').color, invia: cs('.mo-ct-form .mo-btn').backgroundColor, inviaT: cs('.mo-ct-form .mo-btn').color, barra: cs('.mo-progress').backgroundColor }; });
+  check('«Richiedi Preventivo» con gli stessi colori di «Invia Richiesta»; barra di avanzamento gialla', pu.cta === pu.invia && pu.ctaT === pu.inviaT && pu.cta === 'rgb(245, 158, 11)' && pu.barra === 'rgb(245, 158, 11)', JSON.stringify(pu));
   check('Contatti: linea verticale e bordi delle icone chiari, visibili sul blu', /rgba\(244, 245, 247/.test(k.side) && /rgba\(244, 245, 247/.test(k.item), `${k.side} · ${k.item}`);
   check('Footer: linea leggera larga quanto i contenuti, non a tutto schermo', k.linea.w === k.linea.contenuto && /rgba\(244, 245, 247, 0\.16\)/.test(k.linea.colore) && k.bordoFooter === '0px', JSON.stringify(k.linea) + ' ' + k.bordoFooter);
   await ctx.close();

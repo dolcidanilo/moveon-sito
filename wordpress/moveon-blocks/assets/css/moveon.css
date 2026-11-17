@@ -154,7 +154,7 @@ img,svg{max-width:100%}
 .mo-nav a{position:relative;padding:8px 0;color:inherit;text-decoration:none;font:700 12px/16px var(--mo-font);letter-spacing:.12em;text-transform:uppercase}
 .mo-nav a::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--mo-accent);transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.7,0,.3,1)}
 .mo-nav a:hover::after,.mo-nav a.mo-is-active::after{transform:scaleX(1);transform-origin:left}
-.mo-progress{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--mo-brand);transform:scaleX(0);transform-origin:left}
+.mo-progress{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--mo-accent);transform:scaleX(0);transform-origin:left}
 .mo-menu-btn{display:none;width:48px;height:48px;margin-left:auto;border:0;border-radius:8px;background:transparent;color:inherit;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}
 .mo-menu-btn span{display:block;width:24px;height:2px;background:currentColor;transition:transform .3s}
 .mo-menu-open .mo-menu-btn span:first-child{transform:translateY(4px) rotate(45deg)}
@@ -872,13 +872,19 @@ img,svg{max-width:100%}
 .mo-si{background:var(--mo-surface-alt)}
 .mo-si-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .mo-si-card{display:flex;flex-direction:column;padding:32px;border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card)}
-.mo-block .mo-si-q{margin-bottom:20px;font:800 24px/1.25 var(--mo-font);letter-spacing:-.01em;color:var(--mo-ink)}
-.mo-block .mo-si-label{margin-bottom:10px;font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:var(--mo-muted)}
+/* Card a scacchiera: chiare (titolo blu notte, consigli blu) e blu notte (titolo chiaro, consigli blu acceso);
+   virgolette gialle, «Ti consiglio» piccolo e grigio, «Chiedimi un consiglio» pulsante giallo come «Invia Richiesta». */
+.mo-si-card{--mo-si-titolo:#182343;--mo-si-label:#64748b;--mo-si-etichetta:#223ab8;--mo-si-etichetta-testo:#f4f5f7}
+.mo-block .mo-si-grid > .mo-si-card:nth-child(even){--mo-si-titolo:#f4f5f7;--mo-si-label:#94a3b8;--mo-si-etichetta:#2563eb;--mo-si-etichetta-testo:#f4f5f7;background:#182343;box-shadow:0 1px 2px rgba(0,0,0,.2),0 12px 28px rgba(24,35,67,.28)}
+.mo-block .mo-si-q{margin-bottom:20px;font:800 24px/1.25 var(--mo-font);letter-spacing:-.01em;color:var(--mo-si-titolo)}
+.mo-si-virg{color:var(--mo-accent)}
+.mo-block .mo-si-label{margin-bottom:10px;font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:var(--mo-si-label)}
 .mo-block .mo-si-voci{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px;padding:0;list-style:none}
 /* Etichette dei consigli: stesso colore del titolo della card, testo del colore della card (bianco sui fondi chiari) */
 .mo-block .mo-si-voci li{margin:0;padding:7px 12px;border-radius:999px;background:var(--mo-si-etichetta,var(--mo-ink));color:var(--mo-si-etichetta-testo,var(--mo-surface));font:600 14px/1.3 var(--mo-font)}
-.mo-block .mo-si-btn{display:inline-flex;align-items:center;gap:8px;margin-top:auto;font:700 15px/1.3 var(--mo-font);color:var(--mo-link);text-decoration:none}
-.mo-block .mo-si-btn:is(:hover,:focus){color:var(--mo-link);text-decoration:underline}
+.mo-block .mo-si-btn{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;margin-top:auto;padding:10px 16px;border-radius:8px;background:var(--mo-accent);font:700 14px/1.3 var(--mo-font);color:var(--mo-on-accent);text-decoration:none;transition:box-shadow .2s}
+.mo-block .mo-si-btn:is(:link,:visited,:hover,:focus,:active){color:var(--mo-on-accent);text-decoration:none}
+.mo-block .mo-si-btn:hover{box-shadow:var(--mo-shadow-hover)}
 .mo-si-btn span{transition:transform .3s}
 .mo-si-btn:hover span{transform:translateX(4px)}
 
@@ -924,7 +930,8 @@ img,svg{max-width:100%}
 /* Voci del sottomenu: freccia «a gomito» che parte dalla voce madre (Servizi) */
 .mo-mm-sub::before{content:"";flex:none;width:18px;height:18px;background:currentColor;opacity:.75;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3v9a4 4 0 0 0 4 4h11'/%3E%3Cpath d='M15 11l5 5-5 5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3v9a4 4 0 0 0 4 4h11'/%3E%3Cpath d='M15 11l5 5-5 5'/%3E%3C/svg%3E") center/contain no-repeat}
 /* Sul blu del menu il pulsante blu non si vedrebbe: diventa chiaro con il testo blu */
-.mo-mobile-menu .mo-btn.mo-btn-primary.mo-btn-primary{background:#f4f5f7;color:#223ab8;border-color:#f4f5f7}
+/* «Richiedi Preventivo» (header e menu del telefono) con gli stessi colori di «Invia Richiesta», anche con modelli salvati prima */
+:is(.mo-mobile-menu,.mo-site-header) .mo-btn.mo-btn-primary.mo-btn-primary:is(*,:link,:visited,:hover,:focus,:active){background:var(--mo-accent);color:var(--mo-on-accent);border-color:transparent}
 
 @media (max-width:1023px){
   .mo-pt-grid,.mo-si-grid,.mo-rc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
