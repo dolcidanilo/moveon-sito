@@ -311,7 +311,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     };
   });
   check('Stili di Porto caricati come file: esclusi', !r.portoFile);
-  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', statement: 'rgb(15,23,42)', ctText: 'rgb(203,213,225)', secTitle: 'rgb(15,23,42)', siQ: 'rgb(15,23,42)' };
+  const atteso = { garSub: 'rgb(51,65,85)', heroSub: 'rgb(226,232,240)', statement: 'rgb(34,58,184)', ctText: 'rgb(203,213,225)', secTitle: 'rgb(34,58,184)', siQ: 'rgb(34,58,184)' };
   const sbagliati = Object.entries(atteso).filter(([k, v]) => rgb(r.colori[k] || '') !== v).map(([k]) => `${k}=${r.colori[k]}`);
   check('Colori dei testi del prototipo, non quelli del tema', !sbagliati.length, sbagliati.join(' '));
   check('Campi del modulo tutti con sfondo scuro', r.campi.length >= 4 && r.campi.every((c) => rgb(c) === 'rgb(24,35,67)'), [...new Set(r.campi)].join(' | '));
@@ -319,12 +319,12 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const pin = await page.evaluate(() => { const sp = document.querySelector('.mo-svc')?.parentElement; return sp && sp.classList.contains('pin-spacer') ? parseFloat(getComputedStyle(sp).paddingBottom) : -1; });
   check('Servizi: lo spazio per lo scorrimento bloccato resta', pin > 500, `${pin}px`);
   check('Nessuna linea sotto il nastro', r.lineaNastro === '0px', r.lineaNastro);
-  check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(255,255,255)', r.sfondoBody);
+  check('Sfondo della pagina del sito, non del tema', rgb(r.sfondoBody) === 'rgb(244,245,247)', r.sfondoBody);
   // Pulsante al passaggio del mouse: testo bianco e niente sottolineatura
   await page.hover('.mo-header-cta');
   await page.waitForTimeout(400);
   const hov = await page.evaluate(() => { const s = getComputedStyle(document.querySelector('.mo-header-cta')); return { c: s.color, d: s.textDecorationLine }; });
-  check('Pulsante leggibile al passaggio del mouse', rgb(hov.c) === 'rgb(255,255,255)' && hov.d === 'none', JSON.stringify(hov));
+  check('Pulsante leggibile al passaggio del mouse', rgb(hov.c) === 'rgb(244,245,247)' && hov.d === 'none', JSON.stringify(hov));
   // «Chi siamo» lungo (elemento ancora disponibile, provato nella sua pagina di prova)
   await page.goto(URL + 'prova-chi-siamo/', { waitUntil: 'load' });
   await page.waitForTimeout(1500);
@@ -411,8 +411,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       return { titolo: st('.mo-statement'), testo: st('.mo-car-sub'), etichetta: st('.mo-overline-h2'), attivoFondo: cs.backgroundColor, attivoTesto: cs.color };
     });
     check('Colori dei testi scelti a mano (titoli, testi, etichette)', rgb(m.titolo) === 'rgb(124,45,18)' && rgb(m.testo) === 'rgb(67,20,7)' && rgb(m.etichetta) === 'rgb(29,78,216)', JSON.stringify(m));
-    check('Colori a mano: i pulsanti selezionati restano leggibili', rgb(m.attivoFondo) === 'rgb(15,23,42)' && rgb(m.attivoTesto) === 'rgb(255,255,255)', `${m.attivoFondo} ${m.attivoTesto}`);
-    check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(15,23,42)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
+    check('Colori a mano: i pulsanti selezionati restano leggibili', rgb(m.attivoFondo) === 'rgb(34,58,184)' && rgb(m.attivoTesto) === 'rgb(244,245,247)', `${m.attivoFondo} ${m.attivoTesto}`);
+    check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(34,58,184)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {
     console.log('… pagina "prova-sfondo" assente: controlli sullo sfondo saltati');
@@ -598,7 +598,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     };
   });
   check('Sfumatura dell’intestazione sotto i testi della sezione dopo', sf.aperta && sf.isol === 'auto' && sf.etichettaDavanti, JSON.stringify(sf));
-  check('Invito finale su sfondo bianco con «testi scuri»: titolo e testo scuri', sf.titoloInvito === 'rgb(15, 23, 42)' && sf.testoInvito === 'rgb(24, 35, 67)', `${sf.titoloInvito} · ${sf.testoInvito}`);
+  check('Invito finale su sfondo bianco con «testi scuri»: titolo e testo scuri', sf.titoloInvito === 'rgb(34, 58, 184)' && sf.testoInvito === 'rgb(24, 35, 67)', `${sf.titoloInvito} · ${sf.testoInvito}`);
   check('Pagine nuove: nessun errore nella console', errori.length === 0, errori.join(' | '));
   await page.close();
 }
@@ -620,7 +620,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       etichettaASinistra: Math.round(r('.mo-overline-h2').left - r('.mo-cb-num').left),
       cima: Math.round(r('.mo-cb-n').top - capTitolo),
       fondo: Math.round(r('.mo-cb-frase').bottom - r('.mo-btn').bottom),
-      dentro: Math.round(r('.mo-cb-num').right - (n.getBoundingClientRect().right - 0.1 * fn)),
+      dentro: (() => { const cs = getComputedStyle(n), c = document.createElement('canvas').getContext('2d'); c.font = cs.fontWeight + ' ' + fn + 'px ' + cs.fontFamily; c.letterSpacing = cs.letterSpacing; return Math.round(r('.mo-cb-num').right - (n.getBoundingClientRect().left + c.measureText(n.textContent.trim()).actualBoundingBoxRight)); })(),
       grande: Math.round(fn),
       anim: getComputedStyle(n).animationName + ' / ' + getComputedStyle(q('.mo-cb-n-luce')).animationName,
       clip: getComputedStyle(n).backgroundClip || getComputedStyle(n).webkitBackgroundClip,
@@ -640,7 +640,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.setViewportSize({ width: 900, height: 900 });
   await page.waitForTimeout(600);
   const col = await page.evaluate(() => document.querySelector('.mo-cb-n').style.getPropertyValue('--mo-cb-n'));
-  check('Chi sono breve: si adatta alla finestra; su una colonna sola torna la grandezza di serie', tab.n !== '' && tab.larga && col === '', JSON.stringify({ tab, col }));
+  check('Chi sono breve: si adatta alla finestra; su una colonna sola il numero si misura sulla frase', tab.n !== '' && tab.larga && col !== '' && col !== tab.n, JSON.stringify({ tab, col }));
   await page.setViewportSize({ width: 1440, height: 900 });
   // Pagina Grafica: il titolo «Un’immagine che lavora per te.» su una riga
   await page.goto(URL + 'servizi/grafica/', { waitUntil: 'load' });
@@ -668,6 +668,84 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await m.waitForTimeout(1200);
   const tel = await m.evaluate(() => ({ n: document.querySelectorAll('.mo-bg-video').length, larga: document.documentElement.scrollWidth <= innerWidth }));
   check('Video sul telefono: «solo l’immagine» non scarica il video', tel.n === 2 && tel.larga, JSON.stringify(tel));
+  await ctx.close();
+}
+
+/* ---------------- 1.6.0: colori, menu del telefono, Chi sono con foto, sfondo che cambia scorrendo ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  const col = await page.evaluate(() => {
+    const cs = getComputedStyle(document.documentElement);
+    const sheet = [...document.styleSheets].find((x) => /moveon\.css/.test(x.href || ''));
+    const testo = sheet ? [...sheet.cssRules].map((r) => r.cssText).join(' ') : '';
+    return { navy: cs.getPropertyValue('--mo-navy').trim(), bianco: cs.getPropertyValue('--mo-surface').trim(), vecchi: (testo.match(/rgb\(15, 23, 42\)|#0f172a|rgb\(255, 255, 255\)[^,]|#fff\b|#ffffff/gi) || []).length };
+  });
+  check('Colori: #0f172a diventa #223ab8, #ffffff diventa #f4f5f7', col.navy === '#223ab8' && col.bianco === '#f4f5f7' && col.vecchi === 0, JSON.stringify(col));
+  // Chi sono con la foto, su computer: la foto finisce dove finisce il pulsante
+  await page.goto(URL + 'prova-chi-breve/', { waitUntil: 'load' });
+  await page.evaluate(() => document.querySelector('.mo-cb').scrollIntoView());
+  await page.waitForTimeout(1800);
+  const cf = await page.evaluate(() => {
+    const r = (s) => document.querySelector('.mo-cb ' + s).getBoundingClientRect();
+    return { foto: Math.round(r('.mo-cb-img').bottom), pulsante: Math.round(r('.mo-btn').bottom), raggio: getComputedStyle(document.querySelector('.mo-cb-img')).borderRadius, sopra: r('.mo-cb-img').top > r('.mo-cb-frase').bottom };
+  });
+  check('Chi sono con foto (computer): foto con angoli arrotondati, sotto la frase, fino alla fine del pulsante', Math.abs(cf.foto - cf.pulsante) <= 3 && cf.raggio === '12px' && cf.sopra, JSON.stringify(cf));
+  // Sfondo che cambia scorrendo (anteprima ?mo_scorre=1)
+  await page.goto(URL + '?mo_scorre=1', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const sc0 = await page.evaluate(() => ({ attivo: document.documentElement.classList.contains('mo-scorre-attivo'), sezioni: document.querySelectorAll('.mo-content .mo-block.mo-sc').length }));
+  const passo = async (sel) => {
+    await page.evaluate((sel) => { const el = document.querySelector(sel); window.scrollTo(0, el.getBoundingClientRect().top + scrollY + Math.min(el.offsetHeight, 900) / 2 - 450); }, sel);
+    await page.waitForTimeout(1400);
+    return page.evaluate((sel) => {
+      const cs = getComputedStyle(document.documentElement), sec = document.querySelector(sel), t = sec.querySelector('.mo-sec-title, .mo-statement, h2');
+      return { fondo: getComputedStyle(document.querySelector('.mo-content')).backgroundColor, sezione: getComputedStyle(sec).backgroundColor, titolo: t ? getComputedStyle(t).color : '', ink: cs.getPropertyValue('--mo-sc-ink') };
+    }, sel);
+  };
+  const a = await passo('.mo-cb'), b = await passo('.mo-emo'), c = await passo('.mo-si');
+  check('Sfondo che cambia scorrendo: attivo su tutte le sezioni della pagina', sc0.attivo && sc0.sezioni >= 8, JSON.stringify(sc0));
+  check('Sfondo che cambia scorrendo: la pagina prende il colore della sezione a metà schermo', a.fondo === 'rgb(244, 245, 247)' && b.fondo === 'rgb(34, 58, 184)' && c.fondo === 'rgb(248, 250, 252)' && a.sezione === 'rgba(0, 0, 0, 0)', JSON.stringify({ a: a.fondo, b: b.fondo, c: c.fondo, sezione: a.sezione }));
+  check('Sfondo che cambia scorrendo: testi leggibili (scuri sul chiaro, chiari sulla Pausa blu)', a.titolo === 'rgb(34, 58, 184)' && b.ink === 'rgb(248, 250, 252)', JSON.stringify({ a: a.titolo, b: b.ink }));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(800);
+  const spento = await page.evaluate(() => document.documentElement.classList.contains('mo-scorre'));
+  check('Sfondo che cambia scorrendo: spento di serie', !spento);
+  check('1.6.0: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
+  // Telefono: menu blu con le frecce sui servizi; Chi sono con il 25 largo quanto la frase e la foto tra frase e titolo
+  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+  const m = await ctx.newPage();
+  await m.goto(URL, { waitUntil: 'load' });
+  await m.waitForTimeout(1200);
+  await m.click('.mo-menu-btn');
+  await m.waitForTimeout(1200);
+  const menu = await m.evaluate(() => {
+    const mm = document.getElementById('mo-mobile-menu'), sub = mm.querySelector('.mo-mm-sub'), pr = getComputedStyle(sub, '::before');
+    return { fondo: getComputedStyle(mm).backgroundColor, freccia: pr.content !== 'none' && /svg/.test(pr.maskImage || pr.webkitMaskImage), voci: mm.querySelectorAll('.mo-mm-sub').length, testo: getComputedStyle(sub).color, btn: getComputedStyle(mm.querySelector('.mo-btn')).backgroundColor };
+  });
+  check('Menu del telefono: sfondo #223ab8, freccia davanti a ogni servizio, pulsante chiaro', menu.fondo === 'rgb(34, 58, 184)' && menu.freccia && menu.voci === 5 && menu.testo === 'rgb(244, 245, 247)' && menu.btn === 'rgb(244, 245, 247)', JSON.stringify(menu));
+  await m.click('.mo-menu-btn');
+  await m.waitForTimeout(800);
+  const misuraTel = () => m.evaluate(() => {
+    const t = document.querySelector('.mo-cb-n-txt'), cs = getComputedStyle(t), f = parseFloat(cs.fontSize);
+    const c = document.createElement('canvas').getContext('2d'); c.font = cs.fontWeight + ' ' + f + 'px ' + cs.fontFamily; c.letterSpacing = cs.letterSpacing;
+    const mt = c.measureText(t.textContent.trim()), r = t.getBoundingClientRect();
+    const rg = document.createRange(); rg.selectNodeContents(document.querySelector('.mo-cb-frase'));
+    const img = document.querySelector('.mo-cb-img'), tit = document.querySelector('.mo-cb .mo-sec-title').getBoundingClientRect(), fr = document.querySelector('.mo-cb-frase').getBoundingClientRect();
+    return { numero: Math.round(r.left + mt.actualBoundingBoxRight), frase: Math.round(Math.max(...[...rg.getClientRects()].map((x) => x.right))), foto: img ? img.getBoundingClientRect().top > fr.bottom && img.getBoundingClientRect().bottom < tit.top : null, larga: document.documentElement.scrollWidth <= innerWidth };
+  });
+  await m.evaluate(() => document.querySelector('.mo-cb').scrollIntoView());
+  await m.waitForTimeout(1500);
+  const t1 = await misuraTel();
+  await m.goto(URL + 'prova-chi-breve/', { waitUntil: 'load' });
+  await m.evaluate(() => document.querySelector('.mo-cb').scrollIntoView());
+  await m.waitForTimeout(1500);
+  const t2 = await misuraTel();
+  check('Chi sono sul telefono: il «25» è largo quanto la frase sotto', Math.abs(t1.numero - t1.frase) <= 4 && Math.abs(t2.numero - t2.frase) <= 4 && t1.larga, JSON.stringify({ t1, t2 }));
+  check('Chi sono sul telefono: la foto sta tra la frase e il titolo', t2.foto === true && t1.foto === null, JSON.stringify({ t1: t1.foto, t2: t2.foto }));
   await ctx.close();
 }
 

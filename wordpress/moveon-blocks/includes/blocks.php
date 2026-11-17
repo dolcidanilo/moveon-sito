@@ -47,7 +47,7 @@ function mo_p_sfondo(): array {
 		$opacita[ $n . '%' ] = (string) $n;
 	}
 	return array(
-		mo_p( 'colorpicker', 'sfondo_colore', 'Colore di sfondo (facoltativo)', 'Sostituisce il colore della sezione. Colori del sito: blu #2563eb, navy #0f172a, grigio chiaro #f8fafc, azzurro chiaro #eff6ff, giallo #f59e0b. Lascia vuoto per il colore originale.', 'Sfondo' ),
+		mo_p( 'colorpicker', 'sfondo_colore', 'Colore di sfondo (facoltativo)', 'Sostituisce il colore della sezione. Colori del sito: blu #2563eb, blu notte #223ab8, navy #182343, grigio chiaro #f8fafc, bianco #f4f5f7, azzurro chiaro #eff6ff, giallo #f59e0b. Lascia vuoto per il colore originale.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_testi', 'Stile dei testi e delle card', array( 'Automatico (come la sezione)' => '', 'Chiari, per sfondi scuri' => 'chiari', 'Scuri, per sfondi chiari' => 'scuri' ), '', 'Se cambi il colore di sfondo, scegli i testi adatti perché restino leggibili. Funziona sulle sezioni chiare (Nastro, Chi siamo, Servizi, Portfolio, Garanzie); Hero, Pausa e Contatti hanno già testi chiari.', 'Sfondo' ),
 		mo_p( 'colorpicker', 'colore_titoli', 'Colore dei titoli (facoltativo)', 'Titoli e frasi grandi della sezione. Lascia vuoto per il colore automatico.', 'Sfondo' ),
 		mo_p( 'colorpicker', 'colore_testi', 'Colore dei testi (facoltativo)', 'Paragrafi, frasi sotto i titoli, note. Lascia vuoto per il colore automatico.', 'Sfondo' ),

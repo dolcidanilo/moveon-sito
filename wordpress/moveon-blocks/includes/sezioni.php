@@ -23,6 +23,8 @@ function mo_sezioni_def( array $d ): array {
 				mo_p_text( 'frase_numero', 'Frase sotto il numero', 'Numero e frase insieme sono alti quanto i testi a destra (su computer).', 'Testi', $d['chi_breve']['frase_numero'] ),
 				mo_p_drop( 'animazione', 'Animazione del numero', array( 'Colori che scorrono e bagliore' => 'tutto', 'Solo colori che scorrono' => 'colori', 'Solo bagliore' => 'bagliore', 'Nessuna' => 'nessuna' ), 'tutto', 'Un movimento leggero e continuo dentro il numero. Si ferma da solo per chi ha scelto «riduci movimento».', 'Testi' ),
 				mo_p_area( 'titolo', 'Frase principale', 'Una o due frasi, in parole semplici.', 'Testi', $d['chi_breve']['titolo'] ),
+				mo_p_img( 'immagine', 'Foto (facoltativa)', 'JPG o PNG, almeno 1200 px di larghezza. Con angoli arrotondati, sotto la frase del numero: su telefono e tablet sta tra la frase e il titolo; su computer riempie la colonna di sinistra sotto la frase.' ),
+				mo_p_text( 'immagine_pos', 'Punto focale della foto', 'Il punto da tenere sempre visibile, in percentuale orizzontale e verticale: «50% 50%» = centro, «50% 30%» = un po’ più in alto.', 'Immagini', $d['chi_breve']['immagine_pos'] ),
 				mo_p_area( 'punti', 'Tre punti di forza', 'Uno per riga, brevi.', 'Testi', $d['chi_breve']['punti'] ),
 				mo_p_text( 'pulsante', 'Pulsante: testo', $trattino, 'Testi', $d['chi_breve']['pulsante'] ),
 				mo_p_text( 'link', 'Pulsante: porta a', 'Es. /chi-sono/ (pagina del sito) oppure #contatti.', 'Testi', $d['chi_breve']['link'] ),
@@ -179,6 +181,10 @@ function mo_testa_sezione( array $a, string $anchor ): array {
 function mo_render_chi_breve( $atts ): string {
 	$a   = mo_atts( 'chi_breve', $atts );
 	$btn = mo_facoltativo( $a['pulsante'] );
+	$img = mo_image( $a['immagine'] ?? '', '', 'large' );
+	if ( $img ) {
+		$img['pos'] = implode( '% ', mo_focus( $a['immagine_pos'] ?? '50% 50%' ) ) . '%';
+	}
 	return MO_Tpl::render(
 		'chi-breve',
 		array_merge(
@@ -186,6 +192,7 @@ function mo_render_chi_breve( $atts ): string {
 			array(
 				'numero'       => mo_text( $a['numero'] ),
 				'frase_numero' => mo_text( $a['frase_numero'] ),
+				'immagine'     => $img,
 				'animazione'   => in_array( $a['animazione'], array( 'tutto', 'colori', 'bagliore', 'nessuna' ), true ) ? $a['animazione'] : 'tutto',
 				'punti'        => mo_lines( $a['punti'] ),
 				'pulsante'     => '' !== $btn ? array( 'testo' => $btn, 'href' => mo_href( $a['link'] ) ) : null,

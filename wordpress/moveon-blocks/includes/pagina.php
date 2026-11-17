@@ -276,3 +276,12 @@ add_action(
 	},
 	20
 );
+
+/** Sfondo che cambia scorrendo: dalle Impostazioni, oppure in anteprima con ?mo_scorre=1 (e ?mo_scorre=0 per spegnerlo). */
+function mo_sfondo_scorre(): bool {
+	$anteprima = isset( $_GET['mo_scorre'] ) ? sanitize_key( wp_unslash( $_GET['mo_scorre'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+	if ( '' !== $anteprima ) {
+		return '1' === $anteprima;
+	}
+	return ! empty( mo_settings()['sfondo_scorre'] );
+}

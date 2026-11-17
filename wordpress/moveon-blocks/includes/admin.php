@@ -51,7 +51,7 @@ add_action(
 			$val = $in[ $k ] ?? '';
 			if ( in_array( $k, array( 'logo_chiaro_id', 'logo_scuro_id' ), true ) ) {
 				$out[ $k ] = absint( $val );
-			} elseif ( in_array( $k, array( 'carica_tema', 'salva_richieste', 'tema_scuro' ), true ) ) {
+			} elseif ( in_array( $k, array( 'carica_tema', 'salva_richieste', 'tema_scuro', 'sfondo_scorre' ), true ) ) {
 				$out[ $k ] = empty( $val ) ? 0 : 1;
 			} elseif ( in_array( $k, array( 'privacy_url', 'cookie_url' ), true ) ) {
 				$out[ $k ] = esc_url_raw( trim( (string) $val ) );
@@ -307,6 +307,7 @@ function mo_admin_impostazioni(): void {
 		<table class="form-table" role="presentation">
 			<tr><th>Richieste del modulo</th><td><label><input type="checkbox" name="mo[salva_richieste]" value="1" <?php checked( ! empty( $s['salva_richieste'] ) ); ?>> Salva una copia di ogni richiesta in «Richieste dal sito» (utile se un’email non arriva)</label></td></tr>
 			<tr><th>Tema scuro</th><td><label><input type="checkbox" name="mo[tema_scuro]" value="1" <?php checked( ! empty( $s['tema_scuro'] ) ); ?>> Tema scuro automatico</label><p class="description">Acceso: chi ha il telefono o il computer impostato sul tema scuro vede il sito con sfondi scuri, come nel prototipo. Spento: il sito è sempre chiaro.</p></td></tr>
+			<tr><th>Sfondo che cambia scorrendo</th><td><label><input type="checkbox" name="mo[sfondo_scorre]" value="1" <?php checked( ! empty( $s['sfondo_scorre'] ) ); ?>> Il colore di sfondo della pagina cambia con una dissolvenza quando una sezione arriva a metà schermo</label><p class="description">Ogni sezione porta il suo colore di sfondo e i suoi colori dei testi (quelli di serie o scelti nella scheda Sfondo): scorrendo, tutta la pagina passa da un colore all’altro, come nel prototipo. Foto e video di sfondo restano. Spento: ogni sezione ha il suo colore fisso.</p></td></tr>
 			<tr><th>Tema</th><td><label><input type="checkbox" name="mo[carica_tema]" value="1" <?php checked( ! empty( $s['carica_tema'] ) ); ?>> Carica anche stili e script del tema (Porto) sulle pagine MoveOn</label><p class="description">Di serie sono esclusi, così niente interferisce con il design. Attivalo solo se usi elementi propri di Porto in quelle pagine.</p></td></tr>
 		</table>
 		<?php submit_button( 'Salva le impostazioni' ); ?>

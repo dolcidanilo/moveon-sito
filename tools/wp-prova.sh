@@ -131,6 +131,14 @@ $a = mo_alleggerisci_home();
 if ( ! empty( $a["fatto"] ) ) { echo "· Home alleggerita\n"; }
 flush_rewrite_rules( false );
 ' 2>/dev/null
+php wpcli.php '
+if ( ! get_page_by_path( "prova-chi-breve" ) ) {
+  $img = mo_importa_immagine( "contatti-lettore.jpg", "Foto di prova per Chi sono" );
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova Chi sono breve", "post_name" => "prova-chi-breve", "post_content" => mo_riga( "[mo_chi_breve immagine=\"$img\" immagine_pos=\"50% 40%\"]" ) ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-chi-breve creata\n";
+}
+' 2>/dev/null
 # Video di sfondo: un breve video di prova (serve ffmpeg) e la pagina prova-video
 if command -v ffmpeg >/dev/null && [ ! -f wp/wp-content/uploads/prova-video.mp4 ]; then
   mkdir -p wp/wp-content/uploads

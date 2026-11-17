@@ -305,5 +305,16 @@ $zp = mo_sfondo_pulito( array( 'sfondo_video' => 'javascript:x', 'sfondo_video_o
 check( 'Sfondi dei progetti: video, opacità e sfumatura ripuliti', '' === $zp['sfondo_video'] && 100 === $zp['sfondo_video_opacita'] && '' === $zp['sfondo_sfumatura'] && '35' === $zp['sfondo_sfumatura_ampiezza'] );
 check( 'Impostazioni: video e sfumatura in ognuna delle 4 zone', 4 === substr_count( $imp, '[sfondo_video]' ) && 4 === substr_count( $imp, 'mo-scegli-video' ) && 4 === substr_count( $imp, '[sfondo_sfumatura]' ) );
 
+// 1.6.0: Chi sono con foto, sfondo che cambia scorrendo
+$cbf = mo_render_chi_breve( array( 'immagine' => (string) $img_id, 'immagine_pos' => '40% 20%' ) );
+check( 'Chi sono breve: foto tra la frase e il titolo, con il punto focale', str_contains( $cbf, 'class="mo-cb-img"' ) && str_contains( $cbf, 'object-position:40% 20%' ) && strpos( $cbf, 'mo-cb-frase' ) < strpos( $cbf, 'mo-cb-img' ) && strpos( $cbf, 'mo-cb-img' ) < strpos( $cbf, 'mo-sec-title' ) );
+check( 'Chi sono breve: senza foto niente riquadro', ! str_contains( mo_render_chi_breve( array() ), 'mo-cb-img' ) );
+check( 'Sfondo che cambia scorrendo: spento di serie', 0 === mo_defaults()['settings']['sfondo_scorre'] && ! mo_sfondo_scorre() );
+$_GET['mo_scorre'] = '1';
+$anteprima = mo_sfondo_scorre();
+unset( $_GET['mo_scorre'] );
+check( 'Sfondo che cambia scorrendo: anteprima con ?mo_scorre=1', $anteprima );
+check( 'Impostazioni: casella «Sfondo che cambia scorrendo»', str_contains( $imp, 'name="mo[sfondo_scorre]"' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

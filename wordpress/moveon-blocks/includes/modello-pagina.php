@@ -6,7 +6,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?><!doctype html>
-<html <?php language_attributes(); ?><?php echo empty( mo_settings()['tema_scuro'] ) ? ' data-theme="light"' : ''; ?><?php echo mo_testa_chiara() ? ' class="mo-testa-chiara"' : ''; ?>>
+<html <?php language_attributes(); ?><?php echo empty( mo_settings()['tema_scuro'] ) ? ' data-theme="light"' : ''; ?><?php $mo_classi = trim( ( mo_testa_chiara() ? 'mo-testa-chiara ' : '' ) . ( mo_sfondo_scorre() ? 'mo-scorre' : '' ) ); echo $mo_classi ? ' class="' . esc_attr( $mo_classi ) . '"' : ''; ?>>
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

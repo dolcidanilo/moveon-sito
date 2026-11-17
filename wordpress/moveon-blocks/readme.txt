@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,12 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.6.0 =
+* Colori in tutto il sito: il blu notte #0f172a diventa #223ab8 e il bianco #ffffff diventa #f4f5f7.
+* Menu del telefono su sfondo #223ab8, con una freccia davanti alle voci del sottomenu dei Servizi e il pulsante chiaro.
+* Chi sono (breve): su telefono il «25» è largo quanto la frase sotto; nuova foto facoltativa con angoli arrotondati (tra la frase e il titolo su telefono, nella colonna di sinistra su computer).
+* Sfondo che cambia scorrendo (MoveOn → Impostazioni): la pagina prende con una dissolvenza il colore e i testi della sezione a metà schermo, come nel prototipo. Anteprima con ?mo_scorre=1.
 
 = 1.5.0 =
 * Video di sfondo in tutte le sezioni (scheda Sfondo) e negli sfondi delle pagine dei progetti: opacità, scelta per il telefono, l'immagine fa da copertina. Il video parte solo quando la sezione è sullo schermo e si ferma quando esce; fermo con «riduci movimento».

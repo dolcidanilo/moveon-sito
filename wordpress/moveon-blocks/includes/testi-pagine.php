@@ -17,6 +17,7 @@ function mo_defaults_sezioni(): array {
 			'numero'       => '25',
 			'frase_numero' => 'anni di comunicazione, dall’idea al prodotto finito',
 			'animazione'   => 'tutto',
+			'immagine_pos' => '50% 50%',
 			'titolo'       => 'Prima capisco cosa serve alla tua attività per avere più clienti. Poi lo realizzo.',
 			'punti'        => "Il metodo delle aziende grandi, per la tua attività\nPenso e realizzo io, senza passaggi di mano\nUna rete di professionisti, un solo referente",
 			'pulsante'     => 'Scopri come lavoro',

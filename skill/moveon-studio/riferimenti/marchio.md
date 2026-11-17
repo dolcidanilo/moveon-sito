@@ -4,14 +4,15 @@
 | Ruolo | Colore |
 | --- | --- |
 | Blu principale (pulsanti, etichette, numeri) | #2563eb |
-| Blu notte (sfondi scuri, testi principali) | #0f172a |
+| Blu intenso (sfondi scuri, menu del telefono, titoli sui fondi chiari) | #223ab8 |
 | Navy secondario (sfondi di sezione e card scure) | #182343 |
 | Azzurro (dettagli su sfondo scuro, sfumature) | #60a5fa |
 | Giallo arancio (accento: spunte, bollini, un solo dettaglio per volta) | #f59e0b |
+| Bianco del sito (al posto del bianco puro #ffffff) | #f4f5f7 |
 | Grigio chiaro (sfondi chiari) | #f8fafc |
 | Azzurro chiarissimo (fondi di etichette e timbri) | #eff6ff |
 
-Il vecchio #1e293b non si usa più: al suo posto #182343.
+Colori non più usati: #1e293b (ora #182343), #0f172a (ora #223ab8), bianco puro #ffffff (ora #f4f5f7).
 Nelle animazioni del «25» il blu passa per l'azzurro e un lilla tenue (#a78bfa) prima dell'arancio, perché tra azzurro e arancio la sfumatura diventa grigia.
 
 ## Carattere

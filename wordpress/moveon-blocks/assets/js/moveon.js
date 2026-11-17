@@ -129,6 +129,7 @@ function initSite() {
   }
 
   sezioniAperte();
+  sfondoScorre(ST, editor);
   videoSfondi(reduce);
   initGeneric(env);
   initPointer(env);
@@ -1038,6 +1039,64 @@ function wordsOnScroll(el, G) {
    mo-words (il testo si accende parola per parola mentre scorri)
    mo-parallax / mo-parallax-forte (si muove più lento della pagina)
    mo-tilt (si inclina seguendo il mouse) · mo-magnetic (pulsante che segue il mouse)  */
+/* Sfondo che cambia scorrendo (MoveOn → Impostazioni): quando una sezione arriva a metà schermo tutta la pagina
+   prende il suo colore di sfondo e i suoi colori dei testi, con una dissolvenza (transizione CSS sulle variabili
+   --mo-sc-…). I colori si leggono dalle sezioni prima di renderle trasparenti. Spento nell'editor di WPBakery. */
+function sfondoScorre(ST, editor) {
+  const d = document.documentElement;
+  if (!d.classList.contains('mo-scorre') || editor) return;
+  const sezioni = $$('.mo-content .mo-block').filter((b) => !b.parentElement.closest('.mo-block'));
+  if (sezioni.length < 2) return;
+  const NOMI = ['surface', 'surface-alt', 'ink', 'body', 'muted', 'link', 'chip-ink', 'border', 'brand-tint'];
+  const vuoto = (c) => !c || c === 'transparent' || /^rgba\(.*,\s*0\)$/.test(c);
+  let prima = getComputedStyle(d).getPropertyValue('--mo-surface').trim();
+  // Colori dei testi di riserva (gli stessi di «testi chiari» e «testi scuri» della scheda Sfondo): servono alle
+  // sezioni che scrivono i testi con colori fissi (es. Pausa, Contatti), perché la sezione vicina li erediti leggibili.
+  const CHIARI = { surface: '#223ab8', 'surface-alt': '#182343', ink: '#f8fafc', body: '#e2e8f0', muted: '#e2e8f0', link: '#60a5fa', 'chip-ink': '#93c5fd', border: '#334155', 'brand-tint': '#172554' };
+  const SCURI = { surface: '#f4f5f7', 'surface-alt': '#f8fafc', ink: '#223ab8', body: '#182343', muted: '#182343', link: '#2563eb', 'chip-ink': '#1d4ed8', border: '#e2e8f0', 'brand-tint': '#eff6ff' };
+  const tela = document.createElement('canvas').getContext('2d');
+  const luce = (c) => {
+    tela.fillStyle = '#000'; tela.fillStyle = c;
+    const h = tela.fillStyle, m = /^#(..)(..)(..)$/.exec(h) || [];
+    const v = m.length ? m.slice(1).map((x) => parseInt(x, 16) / 255) : (h.match(/[\d.]+/g) || [0, 0, 0]).slice(0, 3).map((x) => x / 255);
+    const [r, g, b] = v.map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrasto = (a, b) => { const x = luce(a), y = luce(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const temi = sezioni.map((sec) => {
+    const cs = getComputedStyle(sec);
+    const strato = sec.querySelector(':scope > .mo-bg--colore');
+    let bg = strato ? getComputedStyle(strato).backgroundColor : '';
+    if (vuoto(bg)) bg = sec.classList.contains('mo-aperta') ? cs.getPropertyValue('--mo-fondo-aperto').trim() : cs.backgroundColor;
+    if (vuoto(bg)) bg = prima; // sezione senza colore: tiene quello della sezione prima
+    prima = bg;
+    const t = { bg, colore: cs.color };
+    NOMI.forEach((n) => { t[n] = cs.getPropertyValue('--mo-' + n).trim(); });
+    // Titoli poco leggibili sul colore della sezione: si usano i colori chiari o scuri adatti a quello sfondo
+    if (contrasto(t.ink || '#000', bg) < 3) {
+      const riserva = luce(bg) < 0.3 ? CHIARI : SCURI;
+      Object.assign(t, riserva);
+      t.colore = riserva.body;
+    }
+    return t;
+  });
+  const applica = (i) => {
+    const t = temi[i];
+    d.style.setProperty('--mo-sc-bg', t.bg);
+    d.style.setProperty('--mo-sc-colore', t.colore);
+    NOMI.forEach((n) => { if (t[n]) d.style.setProperty('--mo-sc-' + n, t[n]); });
+  };
+  // Colori di partenza: la sezione a metà schermo (senza dissolvenza al caricamento)
+  const meta = innerHeight * 0.55;
+  const att = sezioni.findIndex((sec) => { const r = sec.getBoundingClientRect(); return r.top <= meta && r.bottom > meta; });
+  applica(att < 0 ? 0 : att);
+  sezioni.forEach((sec, i) => {
+    sec.classList.add('mo-sc');
+    ST.create({ trigger: sec, start: 'top 55%', end: 'bottom 55%', onToggle: (st) => { if (st.isActive) applica(i); } });
+  });
+  requestAnimationFrame(() => d.classList.add('mo-scorre-attivo'));
+}
+
 /* Video di sfondo (scheda Sfondo): si scarica solo quando la sezione si avvicina allo schermo, si ferma quando
    esce. Con «riduci movimento» (e nell'editor) resta fermo sul primo fotogramma; con «risparmio dati», o sul
    telefono se scelto nel pannello, non si scarica: resta l'immagine di sfondo. */
@@ -1094,15 +1153,36 @@ function sezioniAperte() {
    telefono) resta la grandezza del CSS. */
 function initChiBreve(sec, { ST }) {
   const col = $('.mo-cb-num', sec), n = $('.mo-cb-n', sec), testo = $('.mo-cb-testo', sec), titolo = $('.mo-sec-title', sec);
-  const frase = $('.mo-cb-frase', sec), cifre = $('.mo-cb-n-txt', sec);
+  const frase = $('.mo-cb-frase', sec), cifre = $('.mo-cb-n-txt', sec), foto = $('.mo-cb-img', sec);
   if (!col || !n || !testo || !titolo || !frase || !cifre) return;
   let ultimo = '';
   const misura = () => {
     n.style.removeProperty('--mo-cb-n');
     n.style.removeProperty('--mo-cb-su');
     frase.style.removeProperty('font-size');
-    col.classList.remove('mo-cb-alto');
-    if (getComputedStyle(sec.querySelector('.mo-cb-grid')).gridTemplateColumns.split(' ').length < 2) return;
+    col.classList.remove('mo-cb-alto', 'mo-cb-foto');
+    const unaColonna = getComputedStyle(sec.querySelector('.mo-cb-grid')).gridTemplateColumns.split(' ').length < 2;
+    const f0 = parseFloat(getComputedStyle(n).fontSize);
+    let perEm = (cifre.offsetWidth - 0.1 * f0) / f0; // le cifre sporgono di .06 em oltre la loro larghezza
+    // Misura esatta della forma delle cifre (larghezza dell'inchiostro), se il browser lo permette
+    try {
+      const c = document.createElement('canvas').getContext('2d'), cs0 = getComputedStyle(cifre);
+      c.font = cs0.fontWeight + ' ' + f0 + 'px ' + cs0.fontFamily;
+      if ('letterSpacing' in c) c.letterSpacing = cs0.letterSpacing;
+      const m = c.measureText(cifre.textContent.trim());
+      const inchiostro = m.actualBoundingBoxRight + m.actualBoundingBoxLeft;
+      if (inchiostro > 0) perEm = inchiostro / f0;
+    } catch (e) { /* resta la stima */ }
+    // Su una colonna (tablet, telefono), o su computer con la foto: numero largo quanto la riga più lunga della frase
+    if (unaColonna || foto) {
+      const r = document.createRange();
+      r.selectNodeContents(frase);
+      const larga = Math.max(0, ...Array.from(r.getClientRects(), (x) => x.width));
+      if (!larga || !perEm) return;
+      n.style.setProperty('--mo-cb-n', Math.floor(larga / perEm) + 'px');
+      if (unaColonna) return;
+      col.classList.add('mo-cb-foto');
+    }
     // Cima delle maiuscole del titolo, dentro la sua prima riga (Montserrat: ascendente .968, maiuscole .70)
     const cs = getComputedStyle(titolo), fs = parseFloat(cs.fontSize);
     const lh = parseFloat(cs.lineHeight) || fs * 1.08;
@@ -1110,9 +1190,8 @@ function initChiBreve(sec, { ST }) {
     const H = testo.offsetHeight;
     const altezzaFrase = () => frase.offsetHeight + (parseFloat(getComputedStyle(frase).marginTop) || 0);
     let fr = altezzaFrase();
+    if (foto) { n.style.setProperty('--mo-cb-su', Math.round(su) + 'px'); return; } // la foto riempie il resto della colonna
     // Cifre alte .70 em (riga del numero a .7): grandezza per l'altezza, poi limite della larghezza della colonna
-    const f0 = parseFloat(getComputedStyle(n).fontSize);
-    const perEm = (cifre.offsetWidth - 0.1 * f0) / f0; // le cifre sporgono di .06 em oltre la loro larghezza
     let f = (H - su - fr) / 0.7;
     const fMax = perEm ? col.clientWidth / perEm : f;
     if (f > fMax) {
