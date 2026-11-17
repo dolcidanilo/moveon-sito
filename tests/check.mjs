@@ -771,6 +771,8 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   });
   check('Tema scuro: Chi sono, Non sai da dove partire? e Garanzie restano bianche, le altre blu', k.chiare.every((c) => c === 'rgb(244, 245, 247)' || c === 'rgb(248, 250, 252)') && k.blu.every((c) => c === 'rgb(34, 58, 184)') && k.titolo === 'rgb(34, 58, 184)', JSON.stringify({ chiare: k.chiare, blu: k.blu, titolo: k.titolo }));
   check('Garanzie: card senza bordo', !k.cardBordo);
+  const et = await page.evaluate(() => { const li = document.querySelector('.mo-si-voci li'); return { fondo: getComputedStyle(li).backgroundColor, testo: getComputedStyle(li).color, titolo: getComputedStyle(document.querySelector('.mo-si-q')).color }; });
+  check('Non sai da dove partire?: etichette del colore del titolo, con le scritte bianche', et.fondo === et.titolo && et.fondo === 'rgb(34, 58, 184)' && et.testo === 'rgb(244, 245, 247)', JSON.stringify(et));
   check('Contatti: linea verticale e bordi delle icone chiari, visibili sul blu', /rgba\(244, 245, 247/.test(k.side) && /rgba\(244, 245, 247/.test(k.item), `${k.side} · ${k.item}`);
   check('Footer: linea leggera larga quanto i contenuti, non a tutto schermo', k.linea.w === k.linea.contenuto && /rgba\(244, 245, 247, 0\.16\)/.test(k.linea.colore) && k.bordoFooter === '0px', JSON.stringify(k.linea) + ' ' + k.bordoFooter);
   await ctx.close();

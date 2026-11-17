@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.6.3 =
+* «Non sai da dove partire?»: le etichette dei consigli (Logo, Insegna…) hanno lo stesso colore del titolo della card, con le scritte bianche: prima si vedevano appena.
 
 = 1.6.2 =
 * Menu del telefono: la fascia del logo è blu scuro (#182343) e la barra di avanzamento sotto il logo non si vede più mentre il menu è aperto.
