@@ -60,13 +60,13 @@ const browser = await chromium.launch();
     titolo: getComputedStyle(document.querySelector('.mo-hw-in')).transform,
   }));
   check('Hero: prima immagine composta, titolo visibile, settori e pausa', h0.on === 0 && h0.tessere === 0 && h0.settori >= 2 && h0.pausa && /none|matrix\(1, 0, 0, 1, 0, 0\)/.test(h0.titolo), JSON.stringify(h0));
-  // Clic su un settore: la foto nuova si compone a tessere, poi resta solo lei
+  // Clic su un settore: la foto nuova arriva con i cubi 3D (colonne che ruotano), poi resta solo lei
   await page.click('.mo-hs-dot[data-i="1"]');
   await page.waitForTimeout(500);
-  const h1 = await page.evaluate(() => document.querySelectorAll('.mo-hs-tile').length);
+  const h1 = await page.evaluate(() => { const c = [...document.querySelectorAll('.mo-hs-cubo')]; return c.length && c.some((x) => /matrix3d/.test(getComputedStyle(x).transform)) ? c.length : 0; });
   await page.waitForTimeout(1800);
   const h2 = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), tessere: document.querySelectorAll('.mo-hs-tile').length, dot: [...document.querySelectorAll('.mo-hs-dot')].findIndex((d) => d.classList.contains('mo-is-on')) }));
-  check('Hero: clic su un settore → la foto si compone pixel dopo pixel', h1 > 20 && h2.on === 1 && h2.dot === 1 && h2.tessere === 0, `${h1} tessere · ${JSON.stringify(h2)}`);
+  check('Hero: clic su un settore → la foto nuova arriva con i cubi 3D', h1 >= 5 && h2.on === 1 && h2.dot === 1 && h2.tessere === 0, `${h1} colonne · ${JSON.stringify(h2)}`);
   // Le tessere ricompongono la foto esattamente come la foto ferma (nessuno scatto alla fine)
   const alli = await page.evaluate(async () => {
     const sec = document.querySelector('.mo-hero');
@@ -412,7 +412,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     });
     check('Colori dei testi scelti a mano (titoli, testi, etichette)', rgb(m.titolo) === 'rgb(124,45,18)' && rgb(m.testo) === 'rgb(67,20,7)' && rgb(m.etichetta) === 'rgb(29,78,216)', JSON.stringify(m));
     check('Colori a mano: i pulsanti selezionati restano leggibili', rgb(m.attivoFondo) === 'rgb(34,58,184)' && rgb(m.attivoTesto) === 'rgb(244,245,247)', `${m.attivoFondo} ${m.attivoTesto}`);
-    check('Card scure con testi chiari', rgb(c.cardGar) === 'rgb(34,58,184)' && rgb(c.titoloCard) === 'rgb(248,250,252)', `${c.cardGar} ${c.titoloCard}`);
+    check('Garanzie su sezione scura: card chiare con i testi scuri, leggibili', rgb(c.cardGar) === 'rgb(244,245,247)' && rgb(c.titoloCard) === 'rgb(34,58,184)', `${c.cardGar} ${c.titoloCard}`);
     await page.screenshot({ path: process.env.SCREEN_DIR ? process.env.SCREEN_DIR + '/prova-sfondo.png' : '/dev/null' }).catch(() => {});
   } else {
     console.log('… pagina "prova-sfondo" assente: controlli sullo sfondo saltati');
@@ -680,7 +680,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const col = await page.evaluate(() => {
     const cs = getComputedStyle(document.documentElement);
     const sheet = [...document.styleSheets].find((x) => /moveon\.css/.test(x.href || ''));
-    const testo = sheet ? [...sheet.cssRules].map((r) => r.cssText).join(' ') : '';
+    const testo = (sheet ? [...sheet.cssRules].map((r) => r.cssText).join(' ') : '').replace(/--mo-(carta|svc-bordo|svc-pallino):\s*(#ffffff|rgb\(255, 255, 255\))/gi, '');
     return { navy: cs.getPropertyValue('--mo-navy').trim(), bianco: cs.getPropertyValue('--mo-surface').trim(), vecchi: (testo.match(/rgb\(15, 23, 42\)|#0f172a|rgb\(255, 255, 255\)[^,]|#fff\b|#ffffff/gi) || []).length };
   });
   check('Colori: #0f172a diventa #223ab8, #ffffff diventa #f4f5f7', col.navy === '#223ab8' && col.bianco === '#f4f5f7' && col.vecchi === 0, JSON.stringify(col));
@@ -776,12 +776,51 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     const info = (card) => ({ fondo: cs(card, 'backgroundColor'), titolo: cs(card.querySelector('.mo-si-q'), 'color'), virg: cs(card.querySelector('.mo-si-virg'), 'color'), voce: cs(card.querySelector('.mo-si-voci li'), 'backgroundColor'), voceTesto: cs(card.querySelector('.mo-si-voci li'), 'color'), btn: cs(card.querySelector('.mo-si-btn'), 'backgroundColor') });
     return { chiara: info(c[0]), scura: info(c[1]), quinta: cs(c[4], 'backgroundColor'), sesta: cs(c[5], 'backgroundColor') };
   });
-  check('Non sai da dove partire?: card a scacchiera chiare e blu notte', et.chiara.fondo !== et.scura.fondo && et.scura.fondo === 'rgb(24, 35, 67)' && et.quinta === et.chiara.fondo && et.sesta === et.scura.fondo, JSON.stringify({ chiara: et.chiara.fondo, scura: et.scura.fondo }));
-  check('Non sai da dove partire?: gerarchia (titolo scuro o chiaro, virgolette gialle, consigli blu con scritte bianche, pulsante giallo)', et.chiara.titolo === 'rgb(24, 35, 67)' && et.scura.titolo === 'rgb(244, 245, 247)' && et.chiara.virg === 'rgb(245, 158, 11)' && et.chiara.voce === 'rgb(34, 58, 184)' && et.scura.voce === 'rgb(37, 99, 235)' && et.chiara.voceTesto === 'rgb(244, 245, 247)' && et.chiara.btn === 'rgb(245, 158, 11)' && et.scura.btn === 'rgb(245, 158, 11)', JSON.stringify(et));
+  check('Non sai da dove partire?: card tutte uguali, bianche con il tema scuro', [et.chiara.fondo, et.scura.fondo, et.quinta, et.sesta].every((c) => c === 'rgb(255, 255, 255)'), JSON.stringify({ a: et.chiara.fondo, b: et.scura.fondo }));
+  check('Non sai da dove partire?: gerarchia (titolo blu notte, virgolette gialle, consigli blu con scritte bianche, pulsante giallo)', [et.chiara, et.scura].every((x) => x.titolo === 'rgb(24, 35, 67)' && x.virg === 'rgb(245, 158, 11)' && x.voce === 'rgb(34, 58, 184)' && x.voceTesto === 'rgb(244, 245, 247)' && x.btn === 'rgb(245, 158, 11)'), JSON.stringify(et));
   const pu = await page.evaluate(() => { const cs = (s) => getComputedStyle(document.querySelector(s)); return { cta: cs('.mo-header-cta').backgroundColor, ctaT: cs('.mo-header-cta').color, invia: cs('.mo-ct-form .mo-btn').backgroundColor, inviaT: cs('.mo-ct-form .mo-btn').color, barra: cs('.mo-progress').backgroundColor }; });
   check('«Richiedi Preventivo» con gli stessi colori di «Invia Richiesta»; barra di avanzamento gialla', pu.cta === pu.invia && pu.ctaT === pu.inviaT && pu.cta === 'rgb(245, 158, 11)' && pu.barra === 'rgb(245, 158, 11)', JSON.stringify(pu));
   check('Contatti: linea verticale e bordi delle icone chiari, visibili sul blu', /rgba\(244, 245, 247/.test(k.side) && /rgba\(244, 245, 247/.test(k.item), `${k.side} · ${k.item}`);
   check('Footer: linea leggera larga quanto i contenuti, non a tutto schermo', k.linea.w === k.linea.contenuto && /rgba\(244, 245, 247, 0\.16\)/.test(k.linea.colore) && k.bordoFooter === '0px', JSON.stringify(k.linea) + ' ' + k.bordoFooter);
+  await ctx.close();
+}
+
+/* ---------------- 1.7.0: card, Servizi, hero con immagine fissa e nuove transizioni ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const chiaro = await page.evaluate(() => ({ si: [...document.querySelectorAll('.mo-si-card')].map((c) => getComputedStyle(c).backgroundColor), gar: [...document.querySelectorAll('.mo-gar-card')].map((c) => getComputedStyle(c).backgroundColor), tr: document.querySelector('.mo-hero').getAttribute('data-transizione') }));
+  check('Card di «Non sai da dove partire?» e Garanzie: tutte #f4f5f7 con il tema chiaro', [...chiaro.si, ...chiaro.gar].every((c) => c === 'rgb(244, 245, 247)') && chiaro.si.length === 6 && chiaro.gar.length === 6, JSON.stringify({ si: chiaro.si[1], gar: chiaro.gar[1] }));
+  check('Hero: di serie la transizione nuova «Cubi 3D»', chiaro.tr === 'cubi', chiaro.tr);
+  // Portale: la foto nuova si apre dal centro con la cornice gialla
+  await page.goto(URL + 'prova-hero-portale/', { waitUntil: 'load' });
+  await page.waitForTimeout(3500);
+  await page.click('.mo-hs-dot[data-i="1"]');
+  await page.waitForTimeout(450);
+  const po = await page.evaluate(() => { const b = document.querySelector('.mo-hs-portale'), c = document.querySelector('.mo-hs-cornice'); return { box: !!b && /inset/.test(b.style.clipPath), cornice: !!c && getComputedStyle(c).borderTopColor }; });
+  await page.waitForTimeout(1800);
+  const po2 = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), resti: document.querySelector('.mo-hs-tiles').children.length }));
+  check('Hero «Portale»: finestra che si apre dal centro con la cornice gialla, poi resta la foto nuova', po.box && po.cornice === 'rgb(245, 158, 11)' && po2.on === 1 && po2.resti === 0, JSON.stringify({ po, po2 }));
+  // Immagine fissa: una sola foto, niente settori
+  await page.goto(URL + 'prova-hero-fissa/', { waitUntil: 'load' });
+  await page.waitForTimeout(3500);
+  const fi = await page.evaluate(() => ({ foto: document.querySelectorAll('.mo-hs-slide').length, on: document.querySelector('.mo-hs-slide').classList.contains('mo-is-on'), nav: !!document.querySelector('.mo-hs-nav'), resti: document.querySelector('.mo-hs-tiles').children.length }));
+  check('Hero «Immagine fissa»: una sola foto, senza settori né barra', fi.foto === 1 && fi.on && !fi.nav && fi.resti === 0, JSON.stringify(fi));
+  check('1.7.0: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  await page.close();
+  // Servizi sul telefono con il tema scuro: bordo delle schede e pallini bianchi
+  const ctx = await browser.newContext({ ...devices['iPhone 13'], colorScheme: 'dark' });
+  const m = await ctx.newPage();
+  await m.goto(URL, { waitUntil: 'load' });
+  await m.waitForTimeout(1200);
+  const sv = await m.evaluate(() => {
+    const bordo = [...document.querySelectorAll('.mo-svc-panel.mo-t-light, .mo-svc-panel.mo-t-alt')].map((x) => getComputedStyle(x).borderTopColor);
+    const pall = [...document.querySelectorAll('.mo-svc-dots i:not(.mo-on)')].map((x) => getComputedStyle(x).backgroundColor);
+    return { bordo, pall };
+  });
+  check('Servizi (tema scuro): bordo delle schede e pallini bianchi', sv.bordo.length > 0 && sv.bordo.every((c) => c === 'rgb(255, 255, 255)') && sv.pall.length > 0 && sv.pall.every((c) => c === 'rgb(255, 255, 255)'), JSON.stringify(sv));
   await ctx.close();
 }
 

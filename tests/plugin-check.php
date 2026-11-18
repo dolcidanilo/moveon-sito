@@ -316,5 +316,13 @@ unset( $_GET['mo_scorre'] );
 check( 'Sfondo che cambia scorrendo: anteprima con ?mo_scorre=1', $anteprima );
 check( 'Impostazioni: casella «Sfondo che cambia scorrendo»', str_contains( $imp, 'name="mo[sfondo_scorre]"' ) );
 
+// 1.7.0: hero con immagine fissa e nuove transizioni
+$hs = mo_render_hero( array() );
+check( 'Hero: di serie la transizione «Cubi 3D»', str_contains( $hs, 'data-transizione="cubi"' ) && str_contains( $hs, 'mo-hs-nav' ) );
+check( 'Hero: transizione «Portale» e valore sconosciuto → «Cubi 3D»', str_contains( mo_render_hero( array( 'transizione' => 'portale' ) ), 'data-transizione="portale"' ) && str_contains( mo_render_hero( array( 'transizione' => 'boh' ) ), 'data-transizione="cubi"' ) );
+$hf = mo_render_hero( array( 'stile' => 'fissa', 'fissa_img' => (string) $img_id, 'fissa_pos' => '20% 30%' ) );
+check( 'Hero «Immagine fissa»: una sola foto, la sua, con il punto focale, senza settori', 1 === substr_count( $hf, 'class="mo-hs-slide' ) && str_contains( $hf, 'object-position:20% 30%' ) && ! str_contains( $hf, 'mo-hs-nav' ) );
+check( 'Hero «Immagine fissa» senza foto: usa la prima delle slide', 1 === substr_count( mo_render_hero( array( 'stile' => 'fissa' ) ), 'class="mo-hs-slide' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

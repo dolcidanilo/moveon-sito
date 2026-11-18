@@ -139,6 +139,15 @@ if ( ! get_page_by_path( "prova-chi-breve" ) ) {
   echo "· Pagina prova-chi-breve creata\n";
 }
 ' 2>/dev/null
+php wpcli.php '
+foreach ( array( "prova-hero-portale" => "[mo_hero transizione=\"portale\"]", "prova-hero-fissa" => "[mo_hero stile=\"fissa\" transizione=\"portale\"]" ) as $slug => $sc ) {
+  if ( ! get_page_by_path( $slug ) ) {
+    $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => $slug, "post_name" => $slug, "post_content" => mo_riga( $sc ) . mo_riga( "[mo_chi_breve]" ) ) );
+    update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+    echo "· Pagina $slug creata\n";
+  }
+}
+' 2>/dev/null
 # Video di sfondo: un breve video di prova (serve ffmpeg) e la pagina prova-video
 if command -v ffmpeg >/dev/null && [ ! -f wp/wp-content/uploads/prova-video.mp4 ]; then
   mkdir -p wp/wp-content/uploads

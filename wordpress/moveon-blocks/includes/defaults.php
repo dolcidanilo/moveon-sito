@@ -48,7 +48,8 @@ function mo_defaults(): array {
 				array( 'settore' => 'Web', 'posizione' => '50% 40%' ),
 			),
 			'durata'          => '6',
-			'transizione'     => 'pixel',
+			'transizione'     => 'cubi',
+			'fissa_pos'       => '50% 50%',
 			'scurimento'      => '45',
 		),
 		'nastro'    => array(

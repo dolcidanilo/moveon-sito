@@ -222,7 +222,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
   const hl = $$('.mo-hl-path', sec);
   const fade = $$('.mo-hero-sub, .mo-hero-actions, .mo-hs-nav', sec);
   const durata = parseFloat(sec.getAttribute('data-durata')) || 6;
-  const dissolvenza = sec.getAttribute('data-transizione') === 'dissolvenza';
+  const effetto = sec.getAttribute('data-transizione') || 'cubi';
   const n = slides.length;
   let cur = 0, busy = false, giro = null, inPausa = false, visibile = true, disegno = 0;
   const imgOf = (k) => $('img', slides[k]);
@@ -267,6 +267,95 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     return { tiles: out, cols, rows };
   }
 
+  // Dove cade la foto k quando «copre» la hero: serve per ritagliarne i pezzi (cubi, portale)
+  function geo(k) {
+    const img = imgOf(k);
+    const W = sec.clientWidth, H = sec.clientHeight;
+    const iw = img.naturalWidth || 1920, ih = img.naturalHeight || 1080;
+    const sc = Math.max(W / iw, H / ih);
+    const dw = iw * sc, dh = ih * sc;
+    const [px, py] = (slides[k].getAttribute('data-pos') || '50% 50%').split(/\s+/).map((v) => (parseFloat(v) || 50) / 100);
+    return { W, H, dw, dh, ox: (W - dw) * px, oy: (H - dh) * py, src: (img.currentSrc || img.src).replace(/"/g, '%22') };
+  }
+  const pezzo = (g, x) => (g ? `background-image:url("${g.src}");background-size:${g.dw}px ${g.dh}px;background-position:${g.ox - x}px ${g.oy}px` : 'background:var(--mo-navy)');
+
+  // CUBI 3D: la hero si divide in colonne-cubo che ruotano di un quarto di giro, a onda; sulla faccia
+  // che arriva c'è la foto nuova, quella che se ne va si scurisce come girando via dalla luce.
+  let verso = 0;
+  function cubi(k, primo, fine) {
+    const nuova = geo(k), vecchia = primo ? null : geo(cur);
+    const cols = window.innerWidth < 768 ? 5 : 9;
+    const w = Math.ceil(nuova.W / cols);
+    tilesBox.textContent = '';
+    tilesBox.classList.add('mo-hs-3d');
+    const colonne = [], ombreVia = [], ombreArrivo = [];
+    for (let c = 0; c < cols; c++) {
+      const col = document.createElement('div');
+      col.className = 'mo-hs-cubo';
+      col.style.cssText = `left:${c * w}px;width:${w + 1}px`;
+      col.innerHTML = `<i class="mo-hs-faccia" style='${pezzo(vecchia, c * w)}'><b class="mo-hs-ombra"></b></i><i class="mo-hs-faccia mo-hs-faccia--lato" style='${pezzo(nuova, c * w)}'><b class="mo-hs-ombra"></b></i>`;
+      tilesBox.appendChild(col);
+      colonne.push(col);
+      ombreVia.push(col.firstChild.firstChild);
+      ombreArrivo.push(col.lastChild.firstChild);
+    }
+    const from = ['start', 'end', 'center', 'edges'][verso++ % 4];
+    const stagger = { each: 0.07, from };
+    G.set(colonne, { transformOrigin: `50% 50% ${-w / 2}px`, rotationY: 0, z: 0 });
+    G.set(ombreArrivo, { opacity: 0.65 });
+    const tl = G.timeline({ onComplete: fine });
+    tl.to(colonne, { rotationY: -90, duration: 1.15, ease: 'power3.inOut', stagger }, 0)
+      .to(colonne, { keyframes: { z: [0, -w * 0.9, 0], ease: 'sine.inOut' }, duration: 1.15, stagger }, 0)
+      .to(ombreVia, { opacity: 0.75, duration: 1.15, ease: 'power2.in', stagger }, 0)
+      .to(ombreArrivo, { opacity: 0, duration: 1.15, ease: 'power2.out', stagger }, 0);
+  }
+
+  // PORTALE: la foto nuova si apre da una finestra al centro, con una cornice gialla che si allarga,
+  // mentre la foto vecchia ti viene incontro (si ingrandisce) e la nuova si «posa» rimpicciolendo.
+  function portale(k, primo, fine) {
+    const g = geo(k);
+    tilesBox.textContent = '';
+    tilesBox.classList.remove('mo-hs-3d');
+    const box = document.createElement('div');
+    box.className = 'mo-hs-portale';
+    box.innerHTML = `<i style='${pezzo(g, 0)}'></i>`;
+    const cornice = document.createElement('div');
+    cornice.className = 'mo-hs-cornice';
+    tilesBox.append(box, cornice);
+    const da = window.innerWidth < 768 ? { x: 30, y: 38 } : { x: 38, y: 34 };
+    const stato = { x: da.x, y: da.y, r: 28 };
+    const disegna = () => {
+      box.style.clipPath = `inset(${stato.y}% ${stato.x}% ${stato.y}% ${stato.x}% round ${stato.r}px)`;
+      cornice.style.inset = `${stato.y}% ${stato.x}%`;
+      cornice.style.borderRadius = stato.r + 'px';
+    };
+    disegna();
+    const tl = G.timeline({ onComplete: fine });
+    tl.fromTo(cornice, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'power2.out' }, 0)
+      .fromTo(box, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1)
+      .to(stato, { x: 0, y: 0, r: 0, duration: 1.35, ease: 'expo.inOut', onUpdate: disegna }, 0.25)
+      .fromTo(box.firstChild, { scale: 1.35 }, { scale: 1, duration: 1.6, ease: 'expo.inOut' }, 0.1)
+      .to(cornice, { opacity: 0, duration: 0.35, ease: 'power1.in' }, 1.3);
+    if (!primo) tl.to(imgOf(cur), { scale: 1.3, duration: 1.6, ease: 'expo.inOut', overwrite: true }, 0.1);
+  }
+
+  // Il passaggio scelto nel pannello (vale anche per l'entrata della prima foto)
+  function passa(k, primo, fine) {
+    if (effetto === 'cubi') { cubi(k, primo, fine); return; }
+    if (effetto === 'portale') { portale(k, primo, fine); return; }
+    tilesBox.classList.remove('mo-hs-3d');
+    if (effetto === 'dissolvenza') {
+      const { tiles } = tessere(k, 1);
+      G.fromTo(tiles, { opacity: 0 }, { opacity: 1, duration: primo ? 1.2 : 1.1, ease: 'power2.inOut', onComplete: fine });
+      return;
+    }
+    const { tiles, cols, rows } = tessere(k);
+    const from = primo ? 'random' : HS_DISEGNI[disegno++ % HS_DISEGNI.length];
+    G.fromTo(tiles,
+      { scale: 0, opacity: 0, rotation: () => G.utils.random(primo ? -35 : -28, primo ? 35 : 28), borderRadius: '30%' },
+      { scale: 1, opacity: 1, rotation: 0, borderRadius: '0%', duration: primo ? 0.8 : 0.75, ease: 'power3.out', stagger: { grid: [rows, cols], from, amount: primo ? 1.2 : 1.05 }, onComplete: fine });
+  }
+
   // La foto ferma si avvicina lentamente (molto meno di quanto si nota)
   function respiro(k) {
     if (reduce) return;
@@ -299,16 +388,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     segna(k);
     pronta(imgOf(k), () => {
       if (reduce) { mostra(k); return; }
-      if (dissolvenza) {
-        const { tiles } = tessere(k, 1);
-        G.fromTo(tiles, { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'power2.inOut', onComplete: () => mostra(k) });
-        return;
-      }
-      const { tiles, cols, rows } = tessere(k);
-      const from = HS_DISEGNI[disegno++ % HS_DISEGNI.length];
-      G.fromTo(tiles,
-        { scale: 0, opacity: 0, rotation: () => G.utils.random(-28, 28), borderRadius: '30%' },
-        { scale: 1, opacity: 1, rotation: 0, borderRadius: '0%', duration: 0.75, ease: 'power3.out', stagger: { grid: [rows, cols], from, amount: 1.05 }, onComplete: () => mostra(k) });
+      pronta(imgOf(cur), () => passa(k, false, () => mostra(k)));
     });
   }
 
@@ -339,12 +419,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     busy = true; // fino alla fine dell'entrata i clic sui settori aspettano
     intro
       .add(() => {
-        pronta(imgOf(0), () => {
-          const { tiles, cols, rows } = tessere(0);
-          G.fromTo(tiles,
-            { scale: 0, opacity: 0, rotation: () => G.utils.random(-35, 35), borderRadius: '30%' },
-            { scale: 1, opacity: 1, rotation: 0, borderRadius: '0%', duration: 0.8, ease: 'power3.out', stagger: { grid: [rows, cols], from: 'random', amount: 1.2 }, onComplete: () => mostra(0) });
-        });
+        pronta(imgOf(0), () => passa(0, true, () => mostra(0)));
       }, 0)
       .to(words, { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.1 }, 0.35)
       .to(fade, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.12 }, 1.05);

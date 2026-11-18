@@ -38,6 +38,7 @@
     --mo-link:#60a5fa; --mo-brand-tint:#172554; --mo-chip-ink:#93c5fd; --mo-focus:#93c5fd; --mo-tone-b:#93c5fd;
     --mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); --mo-shadow-hover:0 12px 32px rgba(0,0,0,.5);
     color-scheme:dark;
+    --mo-carta:#ffffff; --mo-svc-bordo:#ffffff; --mo-svc-pallino:#ffffff;
   }
 }
 :root[data-theme="dark"]{
@@ -45,6 +46,7 @@
   --mo-link:#60a5fa; --mo-brand-tint:#172554; --mo-chip-ink:#93c5fd; --mo-focus:#93c5fd; --mo-tone-b:#93c5fd;
   --mo-shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); --mo-shadow-hover:0 12px 32px rgba(0,0,0,.5);
   color-scheme:dark;
+  --mo-carta:#ffffff; --mo-svc-bordo:#ffffff; --mo-svc-pallino:#ffffff;
 }
 /* Sezioni sempre chiare: «Chi sono» breve, «Non sai da dove partire?» e «Garanzie» restano chiare anche con il tema scuro,
    così le sezioni bianche e blu si alternano per tutti (e il cambio di sfondo scorrendo si vede). Per farne una blu:
@@ -106,7 +108,7 @@ img,svg{max-width:100%}
 .mo-shield .mo-px i{border-radius:3px;transition:box-shadow .6s}
 .mo-gar-art.mo-is-done .mo-px-ck i{box-shadow:0 0 14px 2px rgba(245,158,11,.75)}
 .mo-gar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0;padding:0;list-style:none}
-.mo-gar-card{position:relative;padding:32px 28px 28px;border-radius:12px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card)}
+.mo-gar-card{position:relative;padding:32px 28px 28px;border-radius:12px;background:var(--mo-carta,#f4f5f7);box-shadow:var(--mo-shadow-card)}
 .mo-gar-stamp{display:block;width:76px;height:76px;margin-bottom:24px;color:var(--mo-link)}
 .mo-gar-stamp svg{display:block;width:100%;height:100%;overflow:visible}
 .mo-gar-card h3{margin:0 0 8px;font:700 20px/28px var(--mo-font);color:var(--mo-ink)}
@@ -268,8 +270,8 @@ img,svg{max-width:100%}
 .mo-svc-lead{margin:0 0 28px;max-width:42ch;font-size:18px;line-height:30px}
 .mo-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
 .mo-chips li{padding:8px 14px;border-radius:999px;font:600 14px/20px var(--mo-font);background:var(--mo-brand-tint);color:var(--mo-chip-ink)}
-.mo-t-light{--mo-art:var(--mo-link);--mo-art-soft:var(--mo-brand-tint);--mo-bg-panel:var(--mo-surface);background:var(--mo-surface);color:var(--mo-body);border-color:var(--mo-border)}
-.mo-t-alt{--mo-art:var(--mo-link);--mo-art-soft:var(--mo-brand-tint);--mo-bg-panel:var(--mo-surface-alt);background:var(--mo-surface-alt);color:var(--mo-body);border-color:var(--mo-border)}
+.mo-t-light{--mo-art:var(--mo-link);--mo-art-soft:var(--mo-brand-tint);--mo-bg-panel:var(--mo-surface);background:var(--mo-surface);color:var(--mo-body);border-color:var(--mo-svc-bordo,var(--mo-border))}
+.mo-t-alt{--mo-art:var(--mo-link);--mo-art-soft:var(--mo-brand-tint);--mo-bg-panel:var(--mo-surface-alt);background:var(--mo-surface-alt);color:var(--mo-body);border-color:var(--mo-svc-bordo,var(--mo-border))}
 .mo-t-light .mo-svc-title,.mo-t-alt .mo-svc-title{color:var(--mo-ink)}
 .mo-t-blue{--mo-art:#f4f5f7;--mo-art-soft:rgba(255,255,255,.14);--mo-bg-panel:var(--mo-brand);background:var(--mo-brand);color:#eff6ff}
 .mo-t-blue .mo-svc-title{color:#f4f5f7}
@@ -299,7 +301,7 @@ img,svg{max-width:100%}
 .mo-h-scroll .mo-hint-mob{display:none}
 .mo-svc-hud{display:none}
 .mo-svc-dots{display:flex;justify-content:center;gap:8px;padding:0 0 56px}
-.mo-svc-dots i{display:block;width:8px;height:8px;border-radius:4px;background:var(--mo-border);transition:width .3s,background .3s}
+.mo-svc-dots i{display:block;width:8px;height:8px;border-radius:4px;background:var(--mo-svc-pallino,var(--mo-border));transition:width .3s,background .3s}
 .mo-svc-dots i.mo-on{width:24px;background:var(--mo-brand)}
 .mo-h-scroll .mo-svc{height:100vh}
 .mo-h-scroll .mo-svc-track{width:max-content;height:100%;gap:0;padding:0;overflow:visible;scroll-snap-type:none}
@@ -607,7 +609,9 @@ img,svg{max-width:100%}
 /* Colori dei testi scelti a mano (scheda Sfondo): valgono per i testi sullo sfondo della sezione.
    Pulsanti, card e pannelli hanno un loro sfondo e tengono i colori automatici. */
 .mo-block{--mo-ink-base:var(--mo-ink);--mo-body-base:var(--mo-body);--mo-muted-base:var(--mo-muted);--mo-link-base:var(--mo-link);--mo-chip-ink-base:var(--mo-chip-ink)}
+/* card sempre chiare: vedi la regola subito sotto */
 .mo-block.mo-block.mo-block.mo-block :is(.mo-seg,.mo-card,.mo-gar-card,.mo-r-light,.mo-r-tint,.mo-chips li,.mo-svc-hud,.mo-t-light,.mo-t-alt,.mo-btn,.mo-fld){--mo-ink:var(--mo-ink-base);--mo-body:var(--mo-body-base);--mo-muted:var(--mo-muted-base);--mo-link:var(--mo-link-base);--mo-chip-ink:var(--mo-chip-ink-base)}
+.mo-block.mo-block.mo-block.mo-block.mo-block :is(.mo-gar-card,.mo-si-card){--mo-ink:#223ab8;--mo-body:#334155;--mo-muted:#64748b;--mo-link:#2563eb;--mo-chip-ink:#1d4ed8;--mo-brand-tint:#eff6ff;--mo-border:#e2e8f0;color:var(--mo-body)}
 
 /* =====================================================================
    CAROSELLO PROGETTI (elemento «MoveOn · Carosello progetti»)
@@ -758,6 +762,16 @@ img,svg{max-width:100%}
 .mo-block .mo-hs-slide img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform-origin:50% 50%}
 .mo-hs-tiles{position:absolute;inset:0;z-index:1;pointer-events:none}
 .mo-hs-tile{position:absolute;display:block;background-repeat:no-repeat;will-change:transform,opacity}
+/* Cubi 3D: colonne con due facce (foto che se ne va, foto che arriva) che ruotano di 90° */
+.mo-hs-tiles.mo-hs-3d{perspective:1600px;perspective-origin:50% 50%}
+.mo-hs-cubo{position:absolute;top:0;height:100%;transform-style:preserve-3d;will-change:transform}
+.mo-hs-faccia{position:absolute;top:0;left:0;width:100%;height:100%;display:block;background-repeat:no-repeat;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.mo-hs-faccia--lato{left:100%;transform-origin:0 50%;transform:rotateY(90deg)}
+.mo-hs-ombra{position:absolute;inset:0;display:block;background:#000;opacity:0}
+/* Portale: finestra che si allarga dal centro con la cornice gialla */
+.mo-hs-portale{position:absolute;inset:0;overflow:hidden;will-change:clip-path}
+.mo-hs-portale i{position:absolute;inset:0;display:block;background-repeat:no-repeat;will-change:transform}
+.mo-hs-cornice{position:absolute;border:2px solid var(--mo-accent);pointer-events:none;box-shadow:0 0 40px rgba(245,158,11,.35)}
 /* Velo per leggere il testo: più scuro a sinistra (dove c'è il titolo) e in basso (dove ci sono i settori) */
 .mo-hs-veil{position:absolute;inset:0;z-index:2;background:
   linear-gradient(0deg,rgba(9,14,32,.75) 0,rgba(9,14,32,0) 34%),
@@ -871,11 +885,10 @@ img,svg{max-width:100%}
 /* Non sai da dove partire? */
 .mo-si{background:var(--mo-surface-alt)}
 .mo-si-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
-.mo-si-card{display:flex;flex-direction:column;padding:32px;border-radius:16px;background:var(--mo-surface);box-shadow:var(--mo-shadow-card)}
+.mo-si-card{display:flex;flex-direction:column;padding:32px;border-radius:16px;background:var(--mo-carta,#f4f5f7);box-shadow:var(--mo-shadow-card)}
 /* Card a scacchiera: chiare (titolo blu notte, consigli blu) e blu notte (titolo chiaro, consigli blu acceso);
    virgolette gialle, «Ti consiglio» piccolo e grigio, «Chiedimi un consiglio» pulsante giallo come «Invia Richiesta». */
 .mo-si-card{--mo-si-titolo:#182343;--mo-si-label:#64748b;--mo-si-etichetta:#223ab8;--mo-si-etichetta-testo:#f4f5f7}
-.mo-block .mo-si-grid > .mo-si-card:nth-child(even){--mo-si-titolo:#f4f5f7;--mo-si-label:#94a3b8;--mo-si-etichetta:#2563eb;--mo-si-etichetta-testo:#f4f5f7;background:#182343;box-shadow:0 1px 2px rgba(0,0,0,.2),0 12px 28px rgba(24,35,67,.28)}
 .mo-block .mo-si-q{margin-bottom:20px;font:800 24px/1.25 var(--mo-font);letter-spacing:-.01em;color:var(--mo-si-titolo)}
 .mo-si-virg{color:var(--mo-accent)}
 .mo-block .mo-si-label{margin-bottom:10px;font:700 12px/16px var(--mo-font);letter-spacing:.14em;text-transform:uppercase;color:var(--mo-si-label)}

@@ -168,6 +168,16 @@ function mo_simboli_garanzie(): array {
 	);
 }
 
+/** Passaggi tra le immagini della hero (la prima voce è quella di serie). */
+function mo_transizioni_hero(): array {
+	return array(
+		'Cubi 3D: colonne che ruotano e mostrano la nuova foto' => 'cubi',
+		'Portale: la nuova foto si apre dal centro, la vecchia ti viene incontro' => 'portale',
+		'Pixel che si compongono (disegno diverso ogni volta)' => 'pixel',
+		'Dissolvenza' => 'dissolvenza',
+	);
+}
+
 /** Definizioni degli elementi: nome, descrizione, campi. */
 function mo_blocks(): array {
 	$d     = mo_defaults();
@@ -191,7 +201,9 @@ function mo_blocks(): array {
 				mo_p_area( 'testo', 'Testo sotto il titolo', 'Massimo 2 frasi: beneficio prima della caratteristica.', 'Testi', $d['hero']['testo'] ),
 				mo_p_text( 'pulsante_testo', 'Pulsante: testo', 'Verbo all’imperativo + oggetto, es. «Scopri i Servizi». Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['hero']['pulsante_testo'] ),
 				mo_p_text( 'pulsante_link', 'Pulsante: porta a', 'L’ancora di una sezione (es. #servizi) oppure un indirizzo intero.', 'Testi', $d['hero']['pulsante_link'] ),
-				mo_p_drop( 'stile', 'Dietro al titolo', array( 'Immagini a tutto schermo (una per settore)' => 'slide', 'Lampadina in pixel (versione precedente)' => 'lampadina' ), $d['hero']['stile'], '', 'Immagini' ),
+				mo_p_drop( 'stile', 'Dietro al titolo', array( 'Immagini che si alternano (slide, una per settore)' => 'slide', 'Un’immagine fissa' => 'fissa', 'Lampadina in pixel (versione precedente)' => 'lampadina' ), $d['hero']['stile'], 'Puoi passare dalle slide all’immagine fissa quando vuoi: le immagini delle slide restano salvate.', 'Immagini' ),
+				mo_p_img( 'fissa_img', 'Immagine fissa (orizzontale, almeno 1920 px)', 'Si usa con «Un’immagine fissa». JPG o PNG. Se manca si usa la prima immagine delle slide.' ),
+				mo_p_text( 'fissa_pos', 'Immagine fissa: punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 30% 40% = più a sinistra e in alto.', 'Immagini', $d['hero']['fissa_pos'] ),
 				mo_p_group(
 					'slide',
 					'Immagini (una per settore)',
@@ -205,7 +217,7 @@ function mo_blocks(): array {
 					'Immagini'
 				),
 				mo_p_drop( 'durata', 'Tempo per ogni immagine', array( '4 secondi' => '4', '6 secondi' => '6', '8 secondi' => '8', '10 secondi' => '10' ), $d['hero']['durata'], '', 'Immagini' ),
-				mo_p_drop( 'transizione', 'Passaggio tra le immagini', array( 'Pixel che si compongono (disegno diverso ogni volta)' => 'pixel', 'Dissolvenza' => 'dissolvenza' ), $d['hero']['transizione'], '', 'Immagini' ),
+				mo_p_drop( 'transizione', 'Passaggio tra le immagini', mo_transizioni_hero(), $d['hero']['transizione'], 'Vale anche per l’entrata della prima immagine e dell’immagine fissa.', 'Immagini' ),
 				mo_p_drop( 'scurimento', 'Velo scuro sulle immagini', array( 'Leggero (30%)' => '30', 'Medio (45%)' => '45', 'Forte (60%)' => '60' ), $d['hero']['scurimento'], 'Rende il testo leggibile su qualsiasi foto.', 'Immagini' ),
 				mo_p_anchor( $d['hero']['anchor'] ),
 				...mo_p_sfondo(),
@@ -392,10 +404,17 @@ function mo_render_hero( $atts ): string {
 	$btn = mo_text( $a['pulsante_testo'] );
 	$btn = '-' === $btn ? '' : $btn; // il trattino nasconde
 	// Immagini a tutto schermo (una per settore); se manca una foto si usa un'immagine di prova
-	$slide_mode = 'lampadina' !== mo_text( $a['stile'] );
+	$stile      = mo_text( $a['stile'] );
+	$slide_mode = 'lampadina' !== $stile;
 	$slides     = array();
 	$prova      = array( 'idea', 'pausa', 'contatti' );
-	foreach ( mo_group( $a['slide'] ) as $i => $s ) {
+	$elenco     = mo_group( $a['slide'] );
+	// Immagine fissa: la sua foto (o, se manca, la prima delle slide), senza settori né barra
+	if ( 'fissa' === $stile ) {
+		$prima  = $elenco[0] ?? array();
+		$elenco = array( absint( $a['fissa_img'] ?? 0 ) ? array( 'immagine' => $a['fissa_img'], 'posizione' => $a['fissa_pos'] ?? '50% 50%', 'settore' => '' ) : array_merge( $prima, array( 'settore' => '' ) ) );
+	}
+	foreach ( $elenco as $i => $s ) {
 		$img = mo_image( $s['immagine'] ?? 0, $prova[ $i % 3 ], '2048x2048' );
 		if ( ! $img ) {
 			continue;
@@ -429,7 +448,7 @@ function mo_render_hero( $atts ): string {
 			'slides'       => $slides,
 			'piu_slide'    => count( $slides ) > 1,
 			'durata'       => $durata,
-			'transizione'  => 'dissolvenza' === mo_text( $a['transizione'] ) ? 'dissolvenza' : 'pixel',
+			'transizione'  => in_array( mo_text( $a['transizione'] ), mo_transizioni_hero(), true ) ? mo_text( $a['transizione'] ) : 'cubi',
 			'velo'         => (string) ( (int) $velo / 100 ),
 		)
 	);

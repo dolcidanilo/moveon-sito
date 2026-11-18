@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.6.4
+Stable tag: 1.7.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,12 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.7.0 =
+* Hero: si sceglie tra immagini che si alternano (slide) e un’immagine fissa, con il suo campo foto e punto focale; le slide restano salvate.
+* Hero: due passaggi nuovi tra le immagini, «Cubi 3D» (di serie: colonne che ruotano come cubi e mostrano la nuova foto) e «Portale» (la nuova foto si apre dal centro con una cornice gialla); valgono anche per l’entrata.
+* Card di «Non sai da dove partire?» e «Garanzie» tutte uguali: #f4f5f7 con il tema chiaro, #ffffff con il tema scuro, con i testi sempre leggibili.
+* Servizi con il tema scuro: bordo delle schede chiare e pallini in basso bianchi.
 
 = 1.6.4 =
 * «Richiedi Preventivo» (in alto e nel menu del telefono) con gli stessi colori di «Invia Richiesta»: giallo con il testo blu.
