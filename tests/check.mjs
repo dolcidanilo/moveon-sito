@@ -64,9 +64,17 @@ const browser = await chromium.launch();
   await page.click('.mo-hs-dot[data-i="1"]');
   await page.waitForTimeout(500);
   const h1 = await page.evaluate(() => { const c = [...document.querySelectorAll('.mo-hs-cubo')]; return c.length && c.some((x) => /matrix3d/.test(getComputedStyle(x).transform)) ? c.length : 0; });
+  // A metà passaggio nessuna colonna deve restare ferma (bug 1.7.0: le ultime partivano tardi e sembravano bloccate)
+  await page.waitForTimeout(200);
+  const onda = await page.evaluate(() => {
+    const c = [...document.querySelectorAll('.mo-hs-cubo')];
+    const gradi = c.map((x) => { const m = new DOMMatrix(getComputedStyle(x).transform); return Math.round(Math.atan2(-m.m13, m.m11) * 180 / Math.PI); });
+    return { gradi, livelli: c.length && getComputedStyle(c[0].querySelector('.mo-hs-faccia')).willChange };
+  });
   await page.waitForTimeout(1800);
   const h2 = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), tessere: document.querySelectorAll('.mo-hs-tile').length, dot: [...document.querySelectorAll('.mo-hs-dot')].findIndex((d) => d.classList.contains('mo-is-on')) }));
   check('Hero: clic su un settore → la foto nuova arriva con i cubi 3D', h1 >= 5 && h2.on === 1 && h2.dot === 1 && h2.tessere === 0, `${h1} colonne · ${JSON.stringify(h2)}`);
+  check('Hero «Cubi 3D»: a metà passaggio tutte le colonne stanno girando (nessuna ferma), facce pronte sulla scheda grafica', onda.gradi.length >= 5 && onda.gradi.filter((g) => g < -1 && g > -89).length >= onda.gradi.length - 1 && onda.livelli === 'transform', JSON.stringify(onda));
   // Le tessere ricompongono la foto esattamente come la foto ferma (nessuno scatto alla fine)
   const alli = await page.evaluate(async () => {
     const sec = document.querySelector('.mo-hero');

@@ -274,6 +274,9 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     return { tiles: out, cols, rows };
   }
 
+  // Foto già decodificate prima di un passaggio: altrimenti il browser lo fa a metà animazione (scatto)
+  const decodifica = (ks) => Promise.all(ks.map((i) => { const im = imgOf(i); return im && im.decode ? im.decode().catch(() => {}) : null; }));
+
   // Dove cade la foto k quando «copre» la hero: serve per ritagliarne i pezzi (cubi, portale)
   function geo(k) {
     const img = imgOf(k);
@@ -307,14 +310,24 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
       ombreArrivo.push(col.lastChild.firstChild);
     }
     const from = ['start', 'end', 'center', 'edges'][verso++ % 4];
-    const stagger = { each: 0.07, from };
+    // Onda compatta: tutte le colonne partono entro 0,35 s, così nessuna sembra ferma mentre le altre girano
+    const stagger = { amount: 0.35, from };
     G.set(colonne, { transformOrigin: `50% 50% ${-w / 2}px`, rotationY: 0, z: 0 });
     G.set(ombreArrivo, { opacity: 0.65 });
-    const tl = G.timeline({ onComplete: fine });
-    tl.to(colonne, { rotationY: -90, duration: 1.15, ease: 'power3.inOut', stagger }, 0)
-      .to(colonne, { keyframes: { z: [0, -w * 0.9, 0], ease: 'sine.inOut' }, duration: 1.15, stagger }, 0)
-      .to(ombreVia, { opacity: 0.75, duration: 1.15, ease: 'power2.in', stagger }, 0)
-      .to(ombreArrivo, { opacity: 0, duration: 1.15, ease: 'power2.out', stagger }, 0);
+    const tl = G.timeline({ paused: true, onComplete: fine });
+    tl.to(colonne, { rotationY: -90, duration: 1.1, ease: 'power2.inOut', stagger }, 0)
+      .to(colonne, { keyframes: { z: [0, -w * 0.9, 0], ease: 'sine.inOut' }, duration: 1.1, stagger }, 0)
+      .to(ombreVia, { opacity: 0.75, duration: 1.1, ease: 'power2.in', stagger }, 0)
+      .to(ombreArrivo, { opacity: 0, duration: 1.1, ease: 'power2.out', stagger }, 0);
+    // Riscaldamento: per un attimo, quasi invisibili, tutte le colonne a metà giro, così il browser prepara
+    // subito entrambe le facce di ogni colonna (prima le ultime si preparavano a animazione in corso: scatto)
+    tilesBox.style.opacity = '0.01';
+    G.set(colonne, { rotationY: -45 });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      G.set(colonne, { rotationY: 0 });
+      tilesBox.style.opacity = '';
+      requestAnimationFrame(() => tl.play());
+    }));
   }
 
   // PORTALE: la foto nuova si apre da una finestra al centro, con una cornice gialla che si allarga,
@@ -383,6 +396,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     slides.forEach((s, i) => s.classList.toggle('mo-is-on', i === k));
     G.set(imgOf(k), { scale: 1 });
     tilesBox.textContent = '';
+    tilesBox.style.opacity = '';
     cur = k;
     busy = false;
     respiro(k);
@@ -395,7 +409,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     segna(k);
     pronta(imgOf(k), () => {
       if (reduce) { mostra(k); return; }
-      pronta(imgOf(cur), () => passa(k, false, () => mostra(k)));
+      pronta(imgOf(cur), () => decodifica([k, cur]).then(() => passa(k, false, () => mostra(k))));
     });
   }
 
@@ -426,7 +440,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     busy = true; // fino alla fine dell'entrata i clic sui settori aspettano
     intro
       .add(() => {
-        pronta(imgOf(0), () => passa(0, true, () => mostra(0)));
+        pronta(imgOf(0), () => decodifica([0]).then(() => passa(0, true, () => mostra(0))));
       }, 0)
       .to(words, { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.1 }, 0.35)
       .to(fade, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.12 }, 1.05);

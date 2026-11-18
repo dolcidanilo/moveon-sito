@@ -768,7 +768,7 @@ img,svg{max-width:100%}
 /* Cubi 3D: colonne con due facce (foto che se ne va, foto che arriva) che ruotano di 90° */
 .mo-hs-tiles.mo-hs-3d{perspective:1600px;perspective-origin:50% 50%}
 .mo-hs-cubo{position:absolute;top:0;height:100%;transform-style:preserve-3d;will-change:transform}
-.mo-hs-faccia{position:absolute;top:0;left:0;width:100%;height:100%;display:block;background-repeat:no-repeat;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.mo-hs-faccia{position:absolute;top:0;left:0;width:100%;height:100%;display:block;background-repeat:no-repeat;-webkit-backface-visibility:hidden;backface-visibility:hidden;will-change:transform}
 .mo-hs-faccia--lato{left:100%;transform-origin:0 50%;transform:rotateY(90deg)}
 .mo-hs-ombra{position:absolute;inset:0;display:block;background:#000;opacity:0}
 /* Portale: finestra che si allarga dal centro con la cornice gialla */
