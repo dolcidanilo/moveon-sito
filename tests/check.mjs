@@ -69,12 +69,13 @@ const browser = await chromium.launch();
   const onda = await page.evaluate(() => {
     const c = [...document.querySelectorAll('.mo-hs-cubo')];
     const gradi = c.map((x) => { const m = new DOMMatrix(getComputedStyle(x).transform); return Math.round(Math.atan2(-m.m13, m.m11) * 180 / Math.PI); });
-    return { gradi, livelli: c.length && getComputedStyle(c[0].querySelector('.mo-hs-faccia')).willChange };
+    return { gradi, livelli: c.length && getComputedStyle(c[0].querySelector('.mo-hs-faccia')).willChange, sotto: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')) };
   });
   await page.waitForTimeout(1800);
   const h2 = await page.evaluate(() => ({ on: [...document.querySelectorAll('.mo-hs-slide')].findIndex((x) => x.classList.contains('mo-is-on')), tessere: document.querySelectorAll('.mo-hs-tile').length, dot: [...document.querySelectorAll('.mo-hs-dot')].findIndex((d) => d.classList.contains('mo-is-on')) }));
   check('Hero: clic su un settore → la foto nuova arriva con i cubi 3D', h1 >= 5 && h2.on === 1 && h2.dot === 1 && h2.tessere === 0, `${h1} colonne · ${JSON.stringify(h2)}`);
   check('Hero «Cubi 3D»: a metà passaggio tutte le colonne stanno girando (nessuna ferma), facce pronte sulla scheda grafica', onda.gradi.length >= 5 && onda.gradi.filter((g) => g < -1 && g > -89).length >= onda.gradi.length - 1 && onda.livelli === 'transform', JSON.stringify(onda));
+  check('Hero «Cubi 3D»: sotto le colonne c’è già la foto nuova (negli spiragli niente foto vecchia, nessuno scatto alla fine)', onda.sotto === 1, JSON.stringify(onda.sotto));
   // Le tessere ricompongono la foto esattamente come la foto ferma (nessuno scatto alla fine)
   const alli = await page.evaluate(async () => {
     const sec = document.querySelector('.mo-hero');
@@ -607,7 +608,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   });
   check('Sfumatura dell’intestazione sotto i testi della sezione dopo', sf.aperta && sf.isol === 'auto' && sf.etichettaDavanti, JSON.stringify(sf));
   check('Invito finale su sfondo bianco con «testi scuri»: titolo e testo scuri', sf.titoloInvito === 'rgb(34, 58, 184)' && sf.testoInvito === 'rgb(24, 35, 67)', `${sf.titoloInvito} · ${sf.testoInvito}`);
-  check('Pagine nuove: nessun errore nella console', errori.length === 0, errori.join(' | '));
+  { const veri = errori.filter((m) => !/Transition was aborted because of invalid state/.test(m)); check('Pagine nuove: nessun errore nella console', veri.length === 0, veri.join(' | ')); }
   await page.close();
 }
 

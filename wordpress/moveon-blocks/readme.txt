@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.8.2 =
+* Hero «Cubi 3D»: sotto le colonne c’è già la foto nuova, quindi negli spiragli tra i cubi non si vede più la foto vecchia; la faccia vecchia svanisce nella seconda metà del giro invece di diventare scura. Alla fine non resta nessuna striscia e non c’è più lo scatto.
 
 = 1.8.1 =
 * Hero «Cubi 3D» più fluida: le foto sono pronte prima di partire, le facce dei cubi vengono preparate in anticipo (prima le ultime colonne si preparavano a animazione in corso e si fermavano per un attimo) e l’onda è più compatta, così nessuna colonna resta ferma mentre le altre girano.

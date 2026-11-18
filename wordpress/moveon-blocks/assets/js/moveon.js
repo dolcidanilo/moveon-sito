@@ -298,7 +298,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     const w = Math.ceil(nuova.W / cols);
     tilesBox.textContent = '';
     tilesBox.classList.add('mo-hs-3d');
-    const colonne = [], ombreVia = [], ombreArrivo = [];
+    const colonne = [], facceVia = [], ombreVia = [], ombreArrivo = [];
     for (let c = 0; c < cols; c++) {
       const col = document.createElement('div');
       col.className = 'mo-hs-cubo';
@@ -306,6 +306,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
       col.innerHTML = `<i class="mo-hs-faccia" style='${pezzo(vecchia, c * w)}'><b class="mo-hs-ombra"></b></i><i class="mo-hs-faccia mo-hs-faccia--lato" style='${pezzo(nuova, c * w)}'><b class="mo-hs-ombra"></b></i>`;
       tilesBox.appendChild(col);
       colonne.push(col);
+      facceVia.push(col.firstChild);
       ombreVia.push(col.firstChild.firstChild);
       ombreArrivo.push(col.lastChild.firstChild);
     }
@@ -317,8 +318,13 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     const tl = G.timeline({ paused: true, onComplete: fine });
     tl.to(colonne, { rotationY: -90, duration: 1.1, ease: 'power2.inOut', stagger }, 0)
       .to(colonne, { keyframes: { z: [0, -w * 0.9, 0], ease: 'sine.inOut' }, duration: 1.1, stagger }, 0)
-      .to(ombreVia, { opacity: 0.75, duration: 1.1, ease: 'power2.in', stagger }, 0)
-      .to(ombreArrivo, { opacity: 0, duration: 1.1, ease: 'power2.out', stagger }, 0);
+      .to(ombreVia, { opacity: 0.35, duration: 1.1, ease: 'power2.in', stagger }, 0)
+      .to(ombreArrivo, { opacity: 0, duration: 1.1, ease: 'power2.out', stagger }, 0)
+      // Nella seconda metà del giro la faccia vecchia svanisce: niente strisce scure o vecchie a fine passaggio
+      .to(facceVia, { opacity: 0, duration: 0.55, ease: 'power1.in', stagger }, 0.55);
+    // Sotto le colonne c'è già la foto nuova: gli spiragli tra un cubo e l'altro mostrano lei, non la vecchia,
+    // e quando le colonne spariscono non cambia niente (prima la fine sembrava uno scatto)
+    const sotto = () => { slides.forEach((s, i) => s.classList.toggle('mo-is-on', i === k)); G.set(imgOf(k), { scale: 1 }); };
     // Riscaldamento: per un attimo, quasi invisibili, tutte le colonne a metà giro, così il browser prepara
     // subito entrambe le facce di ogni colonna (prima le ultime si preparavano a animazione in corso: scatto)
     tilesBox.style.opacity = '0.01';
@@ -326,7 +332,7 @@ function initHeroSlide(sec, { G, reduce, setHeroPlay }) {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       G.set(colonne, { rotationY: 0 });
       tilesBox.style.opacity = '';
-      requestAnimationFrame(() => tl.play());
+      requestAnimationFrame(() => { sotto(); tl.play(); });
     }));
   }
 
