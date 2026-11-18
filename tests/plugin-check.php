@@ -324,5 +324,24 @@ $hf = mo_render_hero( array( 'stile' => 'fissa', 'fissa_img' => (string) $img_id
 check( 'Hero «Immagine fissa»: una sola foto, la sua, con il punto focale, senza settori', 1 === substr_count( $hf, 'class="mo-hs-slide' ) && str_contains( $hf, 'object-position:20% 30%' ) && ! str_contains( $hf, 'mo-hs-nav' ) );
 check( 'Hero «Immagine fissa» senza foto: usa la prima delle slide', 1 === substr_count( mo_render_hero( array( 'stile' => 'fissa' ) ), 'class="mo-hs-slide' ) );
 
+// 1.8.0: colori principali numerati
+check( 'Colori: 10 colori principali numerati, di serie nessun CSS in più', 10 === count( mo_colori_base() ) && '' === mo_colori_css() && '#223ab8' === mo_colori()[1] );
+mo_colori_salva( array( 1 => '#0F5C4D', 3 => 'rosso', 6 => '#f59e0b', 7 => '#abc' ) );
+$salvati = get_option( 'moveon_colori' );
+check( 'Colori: si salvano solo quelli cambiati e validi (anche #abc)', array( 1 => '#0f5c4d', 7 => '#aabbcc' ) === $salvati, wp_json_encode( $salvati ) );
+check( 'Colori: CSS con le sole variabili cambiate', ':root{--mo-c1:#0f5c4d;--mo-c7:#aabbcc}' === mo_colori_css(), mo_colori_css() );
+mo_colori_salva( array(), true );
+check( 'Colori: «Ripristina» torna a quelli di serie', '' === mo_colori_css() && array() === get_option( 'moveon_colori' ) );
+ob_start();
+mo_admin_colori();
+$col = (string) ob_get_clean();
+check( 'Colori: scheda nel pannello con i 10 colori numerati e il selettore', 10 === substr_count( $col, 'class="mo-colore" name="mo_colori[' ) && str_contains( $col, 'Ripristina i colori di serie' ) );
+$css = (string) file_get_contents( MOVEON_DIR . 'assets/css/moveon.css' );
+$fuori = 0;
+foreach ( mo_colori_base() as $n => $c ) {
+	$fuori += substr_count( strtolower( $css ), $c['colore'] ) - 1; // una volta sola: nella definizione di --mo-cN
+}
+check( 'Colori: nel CSS i colori principali passano tutti dalle variabili --mo-c1 … --mo-c10', 0 === $fuori && str_contains( mo_pixels( 'shield' ), 'var(--mo-c' ), (string) $fuori );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

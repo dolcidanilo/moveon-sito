@@ -181,9 +181,9 @@ function mo_pixels( string $kind ): string {
 			$cls = 'mo-px mo-px-on';
 			if ( 'bulb' === $kind ) {
 				if ( 'X' === $ch ) {
-					$col = ( $r + $c < 8 ) ? '#60a5fa' : ( $r + $c > 17 ? '#1d4ed8' : '#2563eb' );
+					$col = ( $r + $c < 8 ) ? 'var(--mo-c4)' : ( $r + $c > 17 ? 'var(--mo-c3-scuro)' : 'var(--mo-c3)' );
 				} elseif ( 'A' === $ch ) {
-					$col = '#f59e0b';
+					$col = 'var(--mo-c6)';
 					$cls = 'mo-px mo-px-a mo-px-on';
 				} elseif ( 'S' === $ch ) {
 					$col = '#94a3b8';
@@ -191,7 +191,7 @@ function mo_pixels( string $kind ): string {
 					$col = '#64748b';
 				}
 			} else {
-				$col = 'C' === $ch ? '#f59e0b' : ( ( $r + $c < 7 ) ? '#60a5fa' : ( $r + $c > 17 ? '#1d4ed8' : '#2563eb' ) );
+				$col = 'C' === $ch ? 'var(--mo-c6)' : ( ( $r + $c < 7 ) ? 'var(--mo-c4)' : ( $r + $c > 17 ? 'var(--mo-c3-scuro)' : 'var(--mo-c3)' ) );
 				if ( 'C' === $ch ) {
 					$cls = 'mo-px mo-px-ck mo-px-on';
 				}

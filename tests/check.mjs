@@ -824,6 +824,21 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- 1.8.0: colori principali numerati (MoveOn → Colori) ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  const prima = await page.evaluate(() => ({ c1: getComputedStyle(document.documentElement).getPropertyValue('--mo-c1').trim(), cta: getComputedStyle(document.querySelector('.mo-header-cta')).backgroundColor, contatti: getComputedStyle(document.querySelector('.mo-contact')).backgroundColor }));
+  // Come se in MoveOn → Colori si cambiassero il colore 1 (blu intenso) e il 6 (giallo)
+  await page.addStyleTag({ content: ':root{--mo-c1:#0f5c4d;--mo-c6:#e11d48}' });
+  await page.waitForTimeout(400);
+  const dopo = await page.evaluate(() => ({ cta: getComputedStyle(document.querySelector('.mo-header-cta')).backgroundColor, ctaTesto: getComputedStyle(document.querySelector('.mo-header-cta')).color, contatti: getComputedStyle(document.querySelector('.mo-contact')).backgroundColor, barra: getComputedStyle(document.querySelector('.mo-progress')).backgroundColor, invia: getComputedStyle(document.querySelector('.mo-ct-form .mo-btn')).backgroundColor }));
+  check('Colori: di serie i 10 colori principali sono quelli di sempre', prima.c1 === '#223ab8' && prima.cta === 'rgb(245, 158, 11)' && prima.contatti === 'rgb(34, 58, 184)', JSON.stringify(prima));
+  check('Colori: cambiando un colore numerato cambia in tutto il sito (pulsanti, barra, sfondi, testo sul giallo)', dopo.cta === 'rgb(225, 29, 72)' && dopo.invia === 'rgb(225, 29, 72)' && dopo.barra === 'rgb(225, 29, 72)' && dopo.contatti === 'rgb(15, 92, 77)' && dopo.ctaTesto === 'rgb(15, 92, 77)', JSON.stringify(dopo));
+  await page.close();
+}
+
 /* ---------------- Movimento ridotto ---------------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

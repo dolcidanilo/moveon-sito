@@ -20,6 +20,13 @@ const Lenis = window.Lenis;
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+// Colori principali del sito (MoveOn → Colori): letti dalle variabili --mo-c1 … --mo-c10
+const colore = (n, riserva) => (getComputedStyle(document.documentElement).getPropertyValue('--mo-c' + n).trim() || riserva);
+// Un colore #rrggbb un po' più scuro (f = quanto resta: 0.84 = 16% più scuro)
+const scurisci = (hex, f) => {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  return m ? '#' + m.slice(1).map((x) => Math.round(parseInt(x, 16) * f).toString(16).padStart(2, '0')).join('') : hex;
+};
 
 function initSite() {
   if (window.__moSiteStarted || !gsap || !ScrollTrigger) return;
@@ -540,7 +547,8 @@ function initPausa(sec, { G, reduce }) {
 function emoCanvas(cv, reduce) {
   const ctx = cv.getContext('2d');
   let W = 0, H = 0, parts = [], running = false, raf = 0;
-  const COLS = ['#2563eb', '#2563eb', '#1d4ed8', '#1d4ed8', '#60a5fa', '#93c5fd', '#f59e0b'];
+  const blu = colore(3, '#2563eb'), giallo = colore(6, '#f59e0b');
+  const COLS = [blu, blu, scurisci(blu, 0.84), scurisci(blu, 0.84), colore(4, '#60a5fa'), colore(5, '#93c5fd'), giallo];
   const rnd = (a, b) => a + Math.random() * (b - a);
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -554,7 +562,7 @@ function emoCanvas(cv, reduce) {
     parts = [];
     for (let i = 0; i < n; i++) {
       const c = COLS[Math.floor(Math.random() * COLS.length)];
-      parts.push({ x: rnd(0, W), y: rnd(0, H), s: rnd(4, c === '#f59e0b' ? 10 : 16), vy: rnd(0.12, 0.55), amp: rnd(6, 34), ph: rnd(0, 6.28), f: rnd(0.25, 0.9), rot: rnd(0, 6.28), vr: rnd(-0.008, 0.008), c, a: rnd(0.35, 1) });
+      parts.push({ x: rnd(0, W), y: rnd(0, H), s: rnd(4, c === giallo ? 10 : 16), vy: rnd(0.12, 0.55), amp: rnd(6, 34), ph: rnd(0, 6.28), f: rnd(0.25, 0.9), rot: rnd(0, 6.28), vr: rnd(-0.008, 0.008), c, a: rnd(0.35, 1) });
     }
   }
   function square(x, y, s, r) {
@@ -1127,8 +1135,8 @@ function sfondoScorre(ST, editor) {
   let prima = getComputedStyle(d).getPropertyValue('--mo-surface').trim();
   // Colori dei testi di riserva (gli stessi di «testi chiari» e «testi scuri» della scheda Sfondo): servono alle
   // sezioni che scrivono i testi con colori fissi (es. Pausa, Contatti), perché la sezione vicina li erediti leggibili.
-  const CHIARI = { surface: '#223ab8', 'surface-alt': '#182343', ink: '#f8fafc', body: '#e2e8f0', muted: '#e2e8f0', link: '#60a5fa', 'chip-ink': '#93c5fd', border: '#334155', 'brand-tint': '#172554' };
-  const SCURI = { surface: '#f4f5f7', 'surface-alt': '#f8fafc', ink: '#223ab8', body: '#182343', muted: '#182343', link: '#2563eb', 'chip-ink': '#1d4ed8', border: '#e2e8f0', 'brand-tint': '#eff6ff' };
+  const CHIARI = { surface: colore(1, '#223ab8'), 'surface-alt': colore(2, '#182343'), ink: colore(8, '#f8fafc'), body: '#e2e8f0', muted: '#e2e8f0', link: colore(4, '#60a5fa'), 'chip-ink': colore(5, '#93c5fd'), border: colore(9, '#334155'), 'brand-tint': '#172554' };
+  const SCURI = { surface: colore(7, '#f4f5f7'), 'surface-alt': colore(8, '#f8fafc'), ink: colore(1, '#223ab8'), body: colore(2, '#182343'), muted: colore(2, '#182343'), link: colore(3, '#2563eb'), 'chip-ink': scurisci(colore(3, '#2563eb'), 0.84), border: '#e2e8f0', 'brand-tint': '#eff6ff' };
   const tela = document.createElement('canvas').getContext('2d');
   const luce = (c) => {
     tela.fillStyle = '#000'; tela.fillStyle = c;

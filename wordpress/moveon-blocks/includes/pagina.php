@@ -186,6 +186,11 @@ add_action(
 		$css = MOVEON_DIR . 'assets/css/moveon.css';
 		wp_enqueue_style( 'moveon-fonts', MOVEON_URL . 'assets/css/fonts.css', array(), $v );
 		wp_enqueue_style( 'moveon', MOVEON_URL . 'assets/css/moveon.css', array( 'moveon-fonts' ), $v . '-' . ( file_exists( $css ) ? filemtime( $css ) : 0 ) );
+		// Colori cambiati in MoveOn → Colori (solo quelli diversi da quelli di serie)
+		$colori = mo_colori_css();
+		if ( '' !== $colori ) {
+			wp_add_inline_style( 'moveon', $colori );
+		}
 
 		$js = MOVEON_URL . 'assets/js/vendor/';
 		wp_enqueue_script( 'moveon-gsap', $js . 'gsap.min.js', array(), '3.15.0', true );

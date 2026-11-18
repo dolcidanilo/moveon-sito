@@ -1,17 +1,20 @@
 # Marchio di MoveOn Studio
 
-## Colori (quelli del sito)
-| Ruolo | Colore |
-| --- | --- |
-| Blu principale (pulsanti, etichette, numeri) | #2563eb |
-| Blu intenso (sfondi scuri, menu del telefono, titoli sui fondi chiari) | #223ab8 |
-| Navy secondario (sfondi di sezione e card scure) | #182343 |
-| Azzurro (dettagli su sfondo scuro, sfumature) | #60a5fa |
-| Giallo arancio (accento: spunte, bollini, un solo dettaglio per volta) | #f59e0b |
-| Bianco del sito (al posto del bianco puro #ffffff) | #f4f5f7 |
-| Grigio chiaro (sfondi chiari) | #f8fafc |
-| Azzurro chiarissimo (fondi di etichette e timbri) | #eff6ff |
+## Colori (quelli del sito, numerati come in MoveOn → Colori e nel PDF «Colori MoveOn»)
+| N. | Colore | Ruolo |
+| --- | --- | --- |
+| 1 | #223ab8 | Blu intenso: sfondi scuri, menu del telefono, titoli sui fondi chiari |
+| 2 | #182343 | Blu notte: fascia del logo nel menu, campi del modulo, titoli delle card |
+| 3 | #2563eb | Blu brillante: pulsanti blu, link, etichette, numeri |
+| 4 | #60a5fa | Azzurro: link ed etichette sui fondi scuri, illustrazioni |
+| 5 | #93c5fd | Azzurro chiaro: dettagli sui fondi scuri |
+| 6 | #f59e0b | Giallo: pulsanti d'azione, spunte, virgolette (un solo accento per volta) |
+| 7 | #f4f5f7 | Bianco del sito (al posto del bianco puro): testi sui fondi scuri, sfondi chiari |
+| 8 | #f8fafc | Grigio chiarissimo: sfondi chiari alternativi |
+| 9 | #334155 | Grigio ardesia: testi dei paragrafi sui fondi chiari |
+| 10 | #cbd5e1 | Grigio perla: testi dei paragrafi sui fondi scuri |
 
+Quando il titolare parla di «colore 6» o manda il PDF dei colori, il numero è quello di questa tabella.
 Colori non più usati: #1e293b (ora #182343), #0f172a (ora #223ab8), bianco puro #ffffff (ora #f4f5f7).
 Nelle animazioni del «25» il blu passa per l'azzurro e un lilla tenue (#a78bfa) prima dell'arancio, perché tra azzurro e arancio la sfumatura diventa grigia.
 

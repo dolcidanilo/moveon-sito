@@ -74,6 +74,58 @@ add_action(
 	}
 );
 
+/* ---------------- Salvataggio colori ---------------- */
+
+add_action(
+	'admin_post_moveon_salva_colori',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Permesso negato.' );
+		}
+		check_admin_referer( 'moveon_colori' );
+		$in = wp_unslash( $_POST['mo_colori'] ?? array() );
+		mo_colori_salva( is_array( $in ) ? $in : array(), isset( $_POST['ripristina'] ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=moveon&tab=colori&salvato=' . ( isset( $_POST['ripristina'] ) ? 'ripristinati' : '1' ) ) );
+		exit;
+	}
+);
+
+/** Scheda «Colori»: i colori principali numerati, come nel PDF «Colori MoveOn». */
+function mo_admin_colori(): void {
+	$esito = sanitize_key( $_GET['salvato'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
+	if ( $esito ) {
+		echo '<div class="notice notice-success"><p>' . ( 'ripristinati' === $esito ? 'Colori di serie ripristinati.' : 'Colori salvati: ricarica il sito (e svuota la cache) per vederli.' ) . '</p></div>';
+	}
+	$in_uso = mo_colori();
+	?>
+	<p class="description" style="max-width:820px">I colori principali del sito, con lo stesso numero del PDF «Colori MoveOn». Cambiane uno e salva: cambia in tutto il sito, insieme alle sue sfumature (es. il blu del passaggio del mouse). Attenzione alla leggibilità: i testi chiari (7, 8, 10) vanno sui fondi scuri (1, 2), quelli scuri (1, 9) sui fondi chiari (7, 8).</p>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<input type="hidden" name="action" value="moveon_salva_colori">
+		<?php wp_nonce_field( 'moveon_colori' ); ?>
+		<table class="widefat striped mo-colori" style="max-width:980px">
+			<thead><tr><th style="width:40px">N.</th><th style="width:70px">Colore</th><th style="width:260px">Nome e codice</th><th>Dove si usa</th></tr></thead>
+			<tbody>
+			<?php foreach ( mo_colori_base() as $n => $c ) : ?>
+				<tr>
+					<td><strong style="font-size:18px"><?php echo (int) $n; ?></strong></td>
+					<td><span style="display:block;width:48px;height:48px;border-radius:8px;border:1px solid #dcdcde;background:<?php echo esc_attr( $in_uso[ $n ] ); ?>"></span></td>
+					<td><strong><?php echo esc_html( $c['nome'] ); ?></strong><br>
+						<input type="text" class="mo-colore" name="mo_colori[<?php echo (int) $n; ?>]" value="<?php echo esc_attr( $in_uso[ $n ] ); ?>" data-default-color="<?php echo esc_attr( $c['colore'] ); ?>">
+						<?php if ( $in_uso[ $n ] !== $c['colore'] ) : ?><br><span class="description">Di serie: <?php echo esc_html( $c['colore'] ); ?></span><?php endif; ?>
+					</td>
+					<td><?php echo esc_html( $c['uso'] ); ?></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+		<p class="submit">
+			<?php submit_button( 'Salva i colori', 'primary', 'salva', false ); ?>
+			<button type="submit" name="ripristina" value="1" class="button" onclick="return confirm('Tornare a tutti i colori di serie?')">Ripristina i colori di serie</button>
+		</p>
+	</form>
+	<?php
+}
+
 /* ---------------- Salvataggio modelli HTML ---------------- */
 
 add_action(
@@ -139,13 +191,16 @@ add_action(
 
 function mo_admin_page(): void {
 	$tab  = sanitize_key( $_GET['tab'] ?? 'impostazioni' ); // phpcs:ignore WordPress.Security.NonceVerification
-	$tabs = array( 'impostazioni' => 'Impostazioni', 'modelli' => 'Modelli HTML', 'strumenti' => 'Strumenti', 'guida' => 'Guida' );
+	$tabs = array( 'impostazioni' => 'Impostazioni', 'colori' => 'Colori', 'modelli' => 'Modelli HTML', 'strumenti' => 'Strumenti', 'guida' => 'Guida' );
 	echo '<div class="wrap"><h1>MoveOn</h1><nav class="nav-tab-wrapper mo-tabs">';
 	foreach ( $tabs as $k => $label ) {
 		printf( '<a href="%s" class="nav-tab %s">%s</a>', esc_url( admin_url( 'admin.php?page=moveon&tab=' . $k ) ), $k === $tab ? 'nav-tab-active' : '', esc_html( $label ) );
 	}
 	echo '</nav>';
 	switch ( $tab ) {
+		case 'colori':
+			mo_admin_colori();
+			break;
 		case 'modelli':
 			mo_admin_modelli();
 			break;

@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,11 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.8.0 =
+* Nuova sezione MoveOn → Colori: i 10 colori principali del sito, numerati, da cambiare con il selettore; cambiano in tutto il sito, con le loro sfumature. «Ripristina i colori di serie» torna a quelli di partenza.
+* PDF «Colori MoveOn» con gli stessi numeri: si cambia il colore dei quadrati e si rimanda.
+* Con i colori di serie il sito resta identico.
 
 = 1.7.0 =
 * Hero: si sceglie tra immagini che si alternano (slide) e un’immagine fissa, con il suo campo foto e punto focale; le slide restano salvate.
