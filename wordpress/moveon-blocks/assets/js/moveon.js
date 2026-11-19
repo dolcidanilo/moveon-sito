@@ -67,6 +67,21 @@ function initSite() {
     }
   }
   if (menuBtn) menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
+  // Frecce avanti/indietro del browser: la pagina ripresa dalla memoria si riapriva con il menu aperto
+  // (e la foto del progetto, nel passaggio animato, gli passava sopra). Il menu si chiude subito, senza animazione.
+  function chiudiMenuSubito() {
+    if (!menuBtn || !menu || !d.classList.contains('mo-menu-open')) return;
+    G.killTweensOf(menu);
+    G.killTweensOf($$('.mo-mm-item', menu));
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-label', 'Apri il menu');
+    d.classList.remove('mo-menu-open');
+    menu.style.clipPath = '';
+    menu.hidden = true;
+    if (lenis) lenis.start();
+  }
+  window.addEventListener('pageshow', (e) => { if (e.persisted) chiudiMenuSubito(); });
+  window.addEventListener('pagereveal', () => chiudiMenuSubito());
 
   /* ---------- Ancore ---------- */
   const headerH = () => ($('.mo-site-header')?.offsetHeight ?? 0);

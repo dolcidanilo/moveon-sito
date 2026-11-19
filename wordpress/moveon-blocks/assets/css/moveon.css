@@ -752,6 +752,8 @@ img,svg{max-width:100%}
 
 /* Dalla card del carosello alla pagina del progetto: l'immagine «vola» al suo posto (nei browser che lo supportano) */
 @view-transition{navigation:auto}
+/* Con il menu aperto la foto del progetto non «vola» sopra il menu nel passaggio tra le pagine */
+html.mo-menu-open .mo-prj-cover img,html.mo-menu-open .mo-car-card img{view-transition-name:none!important}
 ::view-transition-group(mo-progetto-img){animation-duration:.65s;animation-timing-function:cubic-bezier(.65,0,.35,1)}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 

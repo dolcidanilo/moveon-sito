@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.10.1 =
+* Telefono: con le frecce avanti/indietro del browser una pagina lasciata con il menu aperto tornava con il menu aperto, e la foto del progetto compariva per un attimo sopra il menu. Ora il menu si chiude subito e la foto non passa più sopra il menu.
 
 = 1.10.0 =
 * Servizi nel nuovo ordine: Social, Siti web, Grafica, Stampa. La Formazione resta nella pagina Servizi e nel menu (in fondo), non più nella home. Nuovo strumento «Metti in ordine i servizi» per le pagine già create (i colori restano al loro posto).

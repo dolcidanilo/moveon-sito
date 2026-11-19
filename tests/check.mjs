@@ -908,6 +908,30 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- Frecce avanti/indietro del browser con il menu del telefono aperto (bug 1.10.0) ---------------- */
+{
+  const ctx = await browser.newContext({ viewport: { width: 428, height: 926 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  const prj = await (await browser.newPage()).goto(URL + 'progetti/').then(async (r) => { const pg = r.frame().page(); const h = await pg.evaluate(() => document.querySelector('a[href*="/progetti/"][href$="/"]:not([href$="/progetti/"])')?.href); await pg.close(); return h; });
+  await page.goto(prj, { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  await page.click('.mo-menu-btn');
+  await page.waitForTimeout(900);
+  const vtn = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-prj-cover img')).viewTransitionName);
+  check('Menu del telefono aperto: la foto del progetto non passa sopra il menu nel passaggio tra le pagine', vtn === 'none', vtn);
+  await Promise.all([page.waitForNavigation(), page.click('#mo-mobile-menu a:text-is("Portfolio")')]);
+  await page.waitForTimeout(1000);
+  await page.goBack();
+  await page.waitForTimeout(1200);
+  const ind = await page.evaluate(() => ({ open: document.documentElement.classList.contains('mo-menu-open'), hidden: document.getElementById('mo-mobile-menu').hidden }));
+  await page.click('.mo-menu-btn');
+  await page.waitForTimeout(900);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  const mem = await page.evaluate(() => ({ open: document.documentElement.classList.contains('mo-menu-open'), hidden: document.getElementById('mo-mobile-menu').hidden }));
+  check('Frecce del browser: tornando a una pagina lasciata con il menu aperto, il menu è chiuso', !ind.open && ind.hidden && !mem.open && mem.hidden, JSON.stringify({ ind, mem }));
+  await ctx.close();
+}
+
 await browser.close();
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} controlli superati`);
