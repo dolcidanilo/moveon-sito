@@ -535,6 +535,10 @@ function mo_icona_motivo( array $m, string $icona ): string {
 }
 
 function mo_render_pausa( $atts ): string {
+	// Nella stessa pagina c'è il «Chi sono» con la foto che si apre: la Pausa è già lì (foto, frase e sfondo animato)
+	if ( mo_pausa_dentro_chi_sono() ) {
+		return '<span class="mo-pausa-unita" hidden></span>';
+	}
 	$a = mo_atts( 'pausa', $atts );
 	list( $fx, $fy ) = mo_focus( $a['punto_focale'], array( 50, 32 ) );
 	$img = mo_image( $a['foto'], 'pausa', '2048x2048' );

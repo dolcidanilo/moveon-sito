@@ -183,6 +183,30 @@ function mo_testa_sezione( array $a, string $anchor ): array {
 	);
 }
 
+/**
+ * Attributi dell'elemento Pausa emozionale nella pagina che si sta mostrando (null se non c'è).
+ */
+function mo_pausa_nella_pagina(): ?array {
+	$pagina = function_exists( 'get_post' ) ? get_post() : null;
+	if ( ! $pagina || ! preg_match( '/\[mo_pausa\b([^\]]*)\]/', (string) $pagina->post_content, $m ) ) {
+		return null;
+	}
+	$a = shortcode_parse_atts( trim( $m[1] ) );
+	return is_array( $a ) ? $a : array();
+}
+
+/**
+ * La Pausa emozionale è già dentro il «Chi sono» di questa pagina? (c'è un Chi sono breve con la foto che si apre)
+ */
+function mo_pausa_dentro_chi_sono(): bool {
+	$pagina = function_exists( 'get_post' ) ? get_post() : null;
+	if ( ! $pagina || ! preg_match( '/\[mo_chi_breve\b([^\]]*)\]/', (string) $pagina->post_content, $m ) ) {
+		return false;
+	}
+	$a = shortcode_parse_atts( trim( $m[1] ) );
+	return 'no' !== ( is_array( $a ) ? ( $a['apertura'] ?? 'si' ) : 'si' );
+}
+
 function mo_render_chi_breve( $atts ): string {
 	$a   = mo_atts( 'chi_breve', $atts );
 	$btn = mo_facoltativo( $a['pulsante'] );
@@ -190,11 +214,17 @@ function mo_render_chi_breve( $atts ): string {
 	if ( $img ) {
 		$img['pos'] = implode( '% ', mo_focus( $a['immagine_pos'] ?? '50% 50%' ) ) . '%';
 	}
-	// Foto che si apre (la vecchia Pausa emozionale): non se nella pagina c'è ancora l'elemento Pausa, per non ripeterla
+	// Foto che si apre (la vecchia Pausa emozionale). Se nella pagina c'è ancora l'elemento Pausa, il Chi sono prende
+	// la sua foto, il punto focale e la frase (se qui non sono stati scelti) e la Pausa non si mostra: una sezione sola.
 	$apertura = null;
-	$pagina   = function_exists( 'get_post' ) ? get_post() : null;
-	$doppia   = $pagina && has_shortcode( (string) $pagina->post_content, 'mo_pausa' );
-	if ( 'no' !== ( $a['apertura'] ?? 'si' ) && ! $doppia ) {
+	$pausa    = mo_pausa_nella_pagina();
+	$propri   = is_array( $atts ) ? $atts : array();
+	foreach ( array( 'foto' => 'apertura_img', 'punto_focale' => 'apertura_pos', 'frase' => 'apertura_frase' ) as $da => $a2 ) {
+		if ( null !== $pausa && isset( $pausa[ $da ] ) && '' !== $pausa[ $da ] && ! isset( $propri[ $a2 ] ) ) {
+			$a[ $a2 ] = $pausa[ $da ];
+		}
+	}
+	if ( 'no' !== ( $a['apertura'] ?? 'si' ) ) {
 		list( $fx, $fy ) = mo_focus( $a['apertura_pos'] ?? '50% 32%', array( 50, 32 ) );
 		$foto            = mo_image( $a['apertura_img'] ?? '', 'pausa', '2048x2048' );
 		if ( $foto ) {

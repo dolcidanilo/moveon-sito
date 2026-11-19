@@ -350,7 +350,13 @@ check( 'Chi sono: «Sfondo animato: No» e «Foto che si apre: No»', ! str_cont
 check( 'Chi sono: foto e punto focale scelti, frase tolta con il trattino', str_contains( $f9 = mo_render_chi_breve( array( 'apertura_img' => (string) $img_id, 'apertura_pos' => '30% 60%', 'apertura_frase' => '-' ) ), 'object-position:30% 60%' ) && ! str_contains( $f9, 'mo-emo-text' ) );
 $GLOBALS['post'] = (object) array( 'ID' => 0, 'post_content' => '[mo_chi_breve][mo_pausa]', 'post_type' => 'page', 'filter' => 'raw' );
 $GLOBALS['post'] = new WP_Post( $GLOBALS['post'] );
-check( 'Chi sono: se nella pagina c’è ancora la Pausa, la foto non si ripete', ! str_contains( mo_render_chi_breve( array() ), 'mo-cb-apertura' ) );
+$GLOBALS['post'] = new WP_Post( (object) array( 'ID' => 0, 'post_content' => '[mo_chi_breve][mo_pausa frase="Ciao|mondo" punto_focale="20% 10%"]', 'post_type' => 'page', 'filter' => 'raw' ) );
+$cbp = mo_render_chi_breve( array() );
+check( 'Chi sono: se nella pagina c’è ancora la Pausa, prende la sua foto e la sua frase', str_contains( $cbp, 'mo-cb-apertura' ) && str_contains( $cbp, 'Ciao' ) && str_contains( $cbp, 'object-position:20% 10%' ) );
+check( 'Pausa nella stessa pagina del Chi sono: non si mostra (solo un segnaposto per nascondere la riga)', '<span class="mo-pausa-unita" hidden></span>' === mo_render_pausa( array() ) );
+check( 'Chi sono: frase scelta nel Chi sono vince su quella della Pausa', str_contains( mo_render_chi_breve( array( 'apertura_frase' => 'Mia' ) ), '>Mia<' ) );
+$GLOBALS['post'] = new WP_Post( (object) array( 'ID' => 0, 'post_content' => '[mo_chi_breve apertura="no"][mo_pausa]', 'post_type' => 'page', 'filter' => 'raw' ) );
+check( 'Chi sono senza foto che si apre: la Pausa resta visibile', str_contains( mo_render_pausa( array() ), 'mo-emo' ) );
 unset( $GLOBALS['post'] );
 check( 'Home di serie: la Pausa non c’è più come sezione a sé', ! in_array( 'pausa', mo_home_elementi(), true ) );
 $prima = '[vc_row full_width="stretch_row_content_no_spaces"][vc_column][mo_chi_breve numero="30"][/vc_column][/vc_row][vc_row][vc_column][mo_pausa foto="12" punto_focale="40% 20%" frase="Ciao|mondo"][/vc_column][/vc_row][vc_row][vc_column][mo_servizi][/vc_column][/vc_row]';

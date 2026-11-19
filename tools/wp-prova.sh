@@ -148,6 +148,14 @@ foreach ( array( "prova-hero-portale" => "[mo_hero transizione=\"portale\"]", "p
   }
 }
 ' 2>/dev/null
+php wpcli.php '
+if ( ! get_page_by_path( "prova-pausa-unita" ) ) {
+  $c = mo_riga( "[mo_chi_breve]" ) . mo_riga( "[mo_pausa frase=\"Prova|unita\" punto_focale=\"40% 30%\"]" ) . mo_riga( "[mo_garanzie]" );
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova Pausa unita", "post_name" => "prova-pausa-unita", "post_content" => $c ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-pausa-unita creata\n";
+}
+' 2>/dev/null
 # Video di sfondo: un breve video di prova (serve ffmpeg) e la pagina prova-video
 if command -v ffmpeg >/dev/null && [ ! -f wp/wp-content/uploads/prova-video.mp4 ]; then
   mkdir -p wp/wp-content/uploads

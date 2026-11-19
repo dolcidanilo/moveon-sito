@@ -1260,8 +1260,12 @@ function initChiBreve(sec, { G, ST, reduce }) {
   if (cv && cv.getContext) emoCanvas(cv, reduce);
   const ap = $('.mo-cb-apertura', sec);
   if (ap && !reduce) {
+    // Una fessura larga 1 px al centro, alta quanto la foto, che si allarga verso destra e sinistra mentre scendi
+    const sipario = $('.mo-cb-sipario', ap), stato = { p: 0 };
+    const apri = () => { const r = 1 - stato.p; sipario.style.clipPath = r > 0 ? `inset(0px calc(${(50 * r).toFixed(3)}% - ${(0.5 * r).toFixed(3)}px))` : 'none'; };
+    apri();
     G.timeline({ scrollTrigger: { trigger: ap, start: 'top bottom', end: 'center center', scrub: 0.6 } })
-      .fromTo($('.mo-cb-sipario', ap), { clipPath: 'inset(0% 50% 0% 50%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', duration: 1 }, 0)
+      .to(stato, { p: 1, ease: 'none', duration: 1, onUpdate: apri }, 0)
       .fromTo($('.mo-cb-sipario img', ap), { scale: 1.3 }, { scale: 1, ease: 'none', duration: 1 }, 0)
       .fromTo($('.mo-emo-veil', ap), { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.35 }, 0.65);
     G.fromTo($$('.mo-emo-line span', ap), { yPercent: 110 }, {

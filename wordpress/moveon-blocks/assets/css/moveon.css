@@ -830,6 +830,7 @@ img,svg{max-width:100%}
 .mo-cb-num.mo-cb-alto .mo-cb-frase{margin-top:auto;padding-top:20px}
 /* Sfondo animato (pixel e linee) di tutta la sezione, sopra colore e immagine della scheda Sfondo */
 .mo-block > .mo-cb-canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none}
+.mo-content .vc_row:has(> .wpb_column:only-child > .vc_column-inner > .wpb_wrapper > .mo-pausa-unita:only-child){display:none} /* la Pausa è dentro il Chi sono: la sua riga sparisce */
 /* Foto che si apre come un sipario (dal centro verso i lati), a tutta larghezza sotto i testi */
 .mo-cb.mo-cb--apertura{padding-bottom:0}
 .mo-cb-apertura{position:relative;height:min(88vh,860px);margin-top:112px;overflow:hidden}

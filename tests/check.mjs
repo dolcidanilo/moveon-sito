@@ -101,12 +101,13 @@ const browser = await chromium.launch();
   });
   await smoothScroll(page, emo.top - 900 + 60);
   await page.waitForTimeout(900);
-  const aperturaInizio = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-cb-sipario')).clipPath);
+  const aperturaInizio = await page.evaluate(() => document.querySelector('.mo-cb-sipario').style.clipPath);
   await smoothScroll(page, emo.top + emo.h / 2 - 450);
   await page.waitForTimeout(1200);
-  const aperturaCentro = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-cb-sipario')).clipPath);
+  const aperturaCentro = await page.evaluate(() => document.querySelector('.mo-cb-sipario').style.clipPath);
   // inset(0% X%): X = quanto è ancora chiuso ciascun lato
-  const chiuso = (c) => { const m = /inset\(([\d.]+)%(?:\s+([\d.]+)%)?/.exec(c); return m ? parseFloat(m[2] ?? m[1]) : (c === 'none' ? 0 : NaN); };
+  // «inset(0px calc(X% - …px))»: X = quanto è ancora chiuso ciascun lato (fessura di 1 px al centro che si allarga); «none» = tutta aperta
+  const chiuso = (c) => { const m = /calc\(([\d.]+)%/.exec(c || ''); return m ? parseFloat(m[1]) : (c === 'none' ? 0 : NaN); };
   check('Chi sono: la foto si apre come un sipario (dal centro verso i lati), finisce al centro dello schermo, senza blocco', !emo.bloccata && chiuso(aperturaInizio) > 35 && chiuso(aperturaCentro) < 1, `${aperturaInizio} → ${aperturaCentro}`);
   check('Chi sono: sfondo animato in tutta la sezione e niente Pausa separata', emo.canvas && !emo.pausa, JSON.stringify(emo));
 
@@ -847,6 +848,33 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const dopo = await page.evaluate(() => ({ cta: getComputedStyle(document.querySelector('.mo-header-cta')).backgroundColor, ctaTesto: getComputedStyle(document.querySelector('.mo-header-cta')).color, contatti: getComputedStyle(document.querySelector('.mo-contact')).backgroundColor, barra: getComputedStyle(document.querySelector('.mo-progress')).backgroundColor, invia: getComputedStyle(document.querySelector('.mo-ct-form .mo-btn')).backgroundColor }));
   check('Colori: di serie i 10 colori principali sono quelli di sempre', prima.c1 === '#223ab8' && prima.cta === 'rgb(245, 158, 11)' && prima.contatti === 'rgb(34, 58, 184)', JSON.stringify(prima));
   check('Colori: cambiando un colore numerato cambia in tutto il sito (pulsanti, barra, sfondi, testo sul giallo)', dopo.cta === 'rgb(225, 29, 72)' && dopo.invia === 'rgb(225, 29, 72)' && dopo.barra === 'rgb(225, 29, 72)' && dopo.contatti === 'rgb(15, 92, 77)' && dopo.ctaTesto === 'rgb(15, 92, 77)', JSON.stringify(dopo));
+  await page.close();
+}
+
+/* ---------------- 1.9.1: Pausa ancora separata nella pagina → entra da sola nel Chi sono ---------------- */
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errori = []; page.on('pageerror', (e) => errori.push(e.message));
+  await page.goto(URL + 'prova-pausa-unita/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const u = await page.evaluate(() => ({
+    canvas: document.querySelectorAll('canvas').length, pausa: document.querySelectorAll('.mo-emo').length,
+    frase: [...document.querySelectorAll('.mo-cb-apertura .mo-emo-line')].map((x) => x.textContent).join(' '),
+    riga: (() => { const r = document.querySelector('.mo-pausa-unita')?.closest('.vc_row'); return r ? getComputedStyle(r).display : '-'; })(),
+    pos: document.querySelector('.mo-cb-sipario img')?.style.objectPosition,
+  }));
+  check('Pausa ancora nella pagina: entra da sola nel Chi sono (un solo sfondo animato, sua foto e frase, riga nascosta)', u.canvas === 1 && u.pausa === 0 && u.frase === 'Prova unita' && u.riga === 'none' && u.pos === '40% 30%', JSON.stringify(u));
+  // Sulla home (la hero sopra): appena la foto entra dal basso, la fessura è stretta
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  const top = await page.evaluate(() => document.querySelector('.mo-cb-apertura').getBoundingClientRect().top + scrollY);
+  await page.evaluate((y) => scrollTo(0, y), top - 900 + 2);
+  await page.waitForTimeout(150);
+  await page.evaluate((y) => scrollTo(0, y), top - 900 + 4);
+  await page.waitForTimeout(1500);
+  const fessura = await page.evaluate(() => { const r = document.querySelector('.mo-cb-sipario').getBoundingClientRect(); const m = /calc\(([\d.]+)%/.exec(document.querySelector('.mo-cb-sipario').style.clipPath); return m ? Math.round(r.width * (1 - 2 * parseFloat(m[1]) / 100)) : -1; });
+  check('Sipario: all’inizio è una fessura stretta al centro, alta quanto la foto', fessura >= 0 && fessura < 40, `${fessura} px`);
+  check('1.9.1: nessun errore nella console', errori.length === 0, errori.join(' | '));
   await page.close();
 }
 
