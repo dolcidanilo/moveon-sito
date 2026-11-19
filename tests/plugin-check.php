@@ -343,5 +343,20 @@ foreach ( mo_colori_base() as $n => $c ) {
 }
 check( 'Colori: nel CSS i colori principali passano tutti dalle variabili --mo-c1 … --mo-c10', 0 === $fuori && str_contains( mo_pixels( 'shield' ), 'var(--mo-c' ), (string) $fuori );
 
+// 1.9.0: la Pausa emozionale dentro il «Chi sono»
+$cb9 = mo_render_chi_breve( array() );
+check( 'Chi sono: di serie sfondo animato e foto che si apre con la frase', str_contains( $cb9, 'class="mo-emo-canvas mo-cb-canvas"' ) && str_contains( $cb9, 'class="mo-cb-apertura"' ) && str_contains( $cb9, 'mo-cb--apertura' ) && str_contains( $cb9, 'si ricordano.' ) );
+check( 'Chi sono: «Sfondo animato: No» e «Foto che si apre: No»', ! str_contains( mo_render_chi_breve( array( 'sfondo_animato' => 'no' ) ), 'mo-cb-canvas' ) && ! str_contains( mo_render_chi_breve( array( 'apertura' => 'no' ) ), 'mo-cb-apertura' ) );
+check( 'Chi sono: foto e punto focale scelti, frase tolta con il trattino', str_contains( $f9 = mo_render_chi_breve( array( 'apertura_img' => (string) $img_id, 'apertura_pos' => '30% 60%', 'apertura_frase' => '-' ) ), 'object-position:30% 60%' ) && ! str_contains( $f9, 'mo-emo-text' ) );
+$GLOBALS['post'] = (object) array( 'ID' => 0, 'post_content' => '[mo_chi_breve][mo_pausa]', 'post_type' => 'page', 'filter' => 'raw' );
+$GLOBALS['post'] = new WP_Post( $GLOBALS['post'] );
+check( 'Chi sono: se nella pagina c’è ancora la Pausa, la foto non si ripete', ! str_contains( mo_render_chi_breve( array() ), 'mo-cb-apertura' ) );
+unset( $GLOBALS['post'] );
+check( 'Home di serie: la Pausa non c’è più come sezione a sé', ! in_array( 'pausa', mo_home_elementi(), true ) );
+$prima = '[vc_row full_width="stretch_row_content_no_spaces"][vc_column][mo_chi_breve numero="30"][/vc_column][/vc_row][vc_row][vc_column][mo_pausa foto="12" punto_focale="40% 20%" frase="Ciao|mondo"][/vc_column][/vc_row][vc_row][vc_column][mo_servizi][/vc_column][/vc_row]';
+$dopo  = mo_unisci_pausa( $prima );
+check( 'Alleggerisci la home: la Pausa entra nel Chi sono (foto, punto focale, frase) e la sua riga sparisce', str_contains( $dopo, '[mo_chi_breve numero="30" apertura_img="12" apertura_pos="40% 20%" apertura_frase="Ciao|mondo"]' ) && ! str_contains( $dopo, 'mo_pausa' ) && 2 === substr_count( $dopo, '[vc_row' ), $dopo );
+check( 'Alleggerisci la home: senza Pausa o senza Chi sono non cambia niente', '[mo_chi_breve]' === mo_unisci_pausa( '[mo_chi_breve]' ) && '[mo_pausa]' === mo_unisci_pausa( '[mo_pausa]' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

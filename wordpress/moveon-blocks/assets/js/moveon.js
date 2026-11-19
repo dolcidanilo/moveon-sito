@@ -1254,7 +1254,21 @@ function sezioniAperte() {
 /* Chi sono breve: numero e frase alti quanto i testi a destra. La cima delle cifre è allineata alla cima
    delle maiuscole del titolo, la fine della frase alla fine del pulsante. Su una colonna sola (tablet,
    telefono) resta la grandezza del CSS. */
-function initChiBreve(sec, { ST }) {
+function initChiBreve(sec, { G, ST, reduce }) {
+  // Sfondo animato (pixel e linee) e foto che si apre come un sipario, dal centro verso i lati
+  const cv = $('.mo-cb-canvas', sec);
+  if (cv && cv.getContext) emoCanvas(cv, reduce);
+  const ap = $('.mo-cb-apertura', sec);
+  if (ap && !reduce) {
+    G.timeline({ scrollTrigger: { trigger: ap, start: 'top bottom', end: 'center center', scrub: 0.6 } })
+      .fromTo($('.mo-cb-sipario', ap), { clipPath: 'inset(0% 50% 0% 50%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', duration: 1 }, 0)
+      .fromTo($('.mo-cb-sipario img', ap), { scale: 1.3 }, { scale: 1, ease: 'none', duration: 1 }, 0)
+      .fromTo($('.mo-emo-veil', ap), { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.35 }, 0.65);
+    G.fromTo($$('.mo-emo-line span', ap), { yPercent: 110 }, {
+      yPercent: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out',
+      scrollTrigger: { trigger: ap, start: 'center center', toggleActions: 'play none none reverse' },
+    });
+  }
   const col = $('.mo-cb-num', sec), n = $('.mo-cb-n', sec), testo = $('.mo-cb-testo', sec), titolo = $('.mo-sec-title', sec);
   const frase = $('.mo-cb-frase', sec), cifre = $('.mo-cb-n-txt', sec), foto = $('.mo-cb-img', sec);
   if (!col || !n || !testo || !titolo || !frase || !cifre) return;

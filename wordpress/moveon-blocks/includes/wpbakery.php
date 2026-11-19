@@ -30,7 +30,7 @@ add_action(
 
 /** Le sezioni della home, nell'ordine: la home riassume, le pagine approfondiscono. */
 function mo_home_elementi(): array {
-	return array( 'hero', 'nastro', 'chi_breve', 'pausa', 'servizi', 'situazioni', 'carosello', 'garanzie', 'contatti' );
+	return array( 'hero', 'nastro', 'chi_breve', 'servizi', 'situazioni', 'carosello', 'garanzie', 'contatti' ); // la Pausa è dentro il Chi sono (1.9.0)
 }
 
 /** Contenuto della home completa (ogni sezione in una riga senza margini). */

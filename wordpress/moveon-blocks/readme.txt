@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.8.2
+Stable tag: 1.9.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,11 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.9.0 =
+* «Chi sono» con la Pausa emozionale dentro: sotto i testi la foto si apre come un sipario, dal centro verso i lati, e i pixel e le linee animati fanno da sfondo a tutta la sezione.
+* Scheda Sfondo del Chi sono: «Sfondo animato» sì/no (con «No» restano colore o immagine con opacità). Nuova scheda «Foto che si apre»: sì/no, foto, punto focale, frase.
+* «Alleggerisci la home» porta la Pausa dentro il Chi sono (foto, punto focale, frase) e toglie l’elemento Pausa; finché la Pausa c’è ancora, il Chi sono non ripete la foto.
 
 = 1.8.2 =
 * Hero «Cubi 3D»: sotto le colonne c’è già la foto nuova, quindi negli spiragli tra i cubi non si vede più la foto vecchia; la faccia vecchia svanisce nella seconda metà del giro invece di diventare scura. Alla fine non resta nessuna striscia e non c’è più lo scatto.

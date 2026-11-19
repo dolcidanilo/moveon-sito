@@ -454,6 +454,8 @@ img,svg{max-width:100%}
   .mo-fld-row{grid-template-columns:1fr}
   .mo-ct-badge{right:-16px;bottom:-24px;width:108px;height:108px}
   .mo-emo-text{bottom:calc(88px + env(safe-area-inset-bottom,0px))} /* sopra la barra dei contatti in basso */
+  .mo-cb-apertura{height:78vh;margin-top:72px}
+  .mo-block .mo-cb-apertura .mo-emo-text{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
   .mo-mbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--mo-surface);border-top:1px solid var(--mo-border)}
   .mo-mbar .mo-btn{flex:1}
   body{padding-bottom:72px}
@@ -826,6 +828,15 @@ img,svg{max-width:100%}
 .mo-cb-n-luce{position:absolute;top:-.22em;left:0;z-index:-1;color:var(--mo-cb-c1);filter:blur(.09em);opacity:0;pointer-events:none;user-select:none}
 .mo-block .mo-cb-frase{margin:20px 0 0;max-width:24ch;font:700 22px/1.35 var(--mo-font);color:var(--mo-ink)}
 .mo-cb-num.mo-cb-alto .mo-cb-frase{margin-top:auto;padding-top:20px}
+/* Sfondo animato (pixel e linee) di tutta la sezione, sopra colore e immagine della scheda Sfondo */
+.mo-block > .mo-cb-canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none}
+/* Foto che si apre come un sipario (dal centro verso i lati), a tutta larghezza sotto i testi */
+.mo-cb.mo-cb--apertura{padding-bottom:0}
+.mo-cb-apertura{position:relative;height:min(88vh,860px);margin-top:112px;overflow:hidden}
+.mo-cb-sipario{position:absolute;inset:0;overflow:hidden;will-change:clip-path}
+.mo-block .mo-cb-sipario img{display:block;width:100%;height:100%;max-width:none;margin:0;object-fit:cover;will-change:transform}
+.mo-cb-apertura .mo-emo-veil{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(9,14,32,.62),rgba(9,14,32,.15) 60%,rgba(9,14,32,0))}
+.mo-block .mo-cb-apertura .mo-emo-text{position:absolute;left:0;right:0;bottom:12%;z-index:2;max-width:1200px;margin:0 auto;padding:0 var(--mo-margin);font:800 clamp(40px,6.6vw,104px)/1.02 var(--mo-font);letter-spacing:-.035em;color:var(--mo-c7)}
 /* Foto (facoltativa) con angoli arrotondati come quella dei Contatti: su computer riempie la colonna fino alla fine dei testi a destra */
 .mo-cb-img{position:relative;margin-top:28px;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--mo-surface-alt)}
 .mo-block .mo-cb-img img{display:block;width:100%;height:100%;max-width:none;margin:0;object-fit:cover}

@@ -150,8 +150,37 @@ function mo_alleggerisci_home(): array {
 		$c       = substr( $c, 0, $fine ) . mo_riga( '[mo_situazioni]' ) . substr( $c, $fine );
 		$fatto[] = 'aggiunta la sezione «Non sai da dove partire?» dopo i Servizi';
 	}
+	$unita = mo_unisci_pausa( $c );
+	if ( $unita !== $c ) {
+		$c       = $unita;
+		$fatto[] = 'la «Pausa emozionale» è entrata nel «Chi sono» (foto, punto focale e frase), con lo sfondo animato';
+	}
 	if ( $fatto ) {
 		wp_update_post( array( 'ID' => $id, 'post_content' => $c ) );
 	}
 	return array( 'home' => $id, 'fatto' => $fatto );
+}
+
+/**
+ * La «Pausa emozionale» diventa la foto che si apre del «Chi sono»: foto, punto focale e frase passano nel Chi sono
+ * e l'elemento Pausa (con la sua riga, se è da solo) sparisce. Senza Chi sono o senza Pausa il contenuto resta com'è.
+ */
+function mo_unisci_pausa( string $c ): string {
+	if ( ! preg_match( '/\[mo_pausa\b([^\]]*)\]/', $c, $p ) || ! preg_match( '/\[mo_chi_breve\b([^\]]*)\]/', $c, $cb ) ) {
+		return $c;
+	}
+	$pa     = shortcode_parse_atts( trim( $p[1] ) );
+	$pa     = is_array( $pa ) ? $pa : array();
+	$cbatts = shortcode_parse_atts( trim( $cb[1] ) );
+	$cbatts = is_array( $cbatts ) ? $cbatts : array();
+	$nuovi  = '';
+	foreach ( array( 'foto' => 'apertura_img', 'punto_focale' => 'apertura_pos', 'frase' => 'apertura_frase' ) as $da => $a ) {
+		if ( isset( $pa[ $da ] ) && '' !== $pa[ $da ] && ! isset( $cbatts[ $a ] ) ) {
+			$nuovi .= ' ' . $a . '="' . str_replace( '"', '``', (string) $pa[ $da ] ) . '"';
+		}
+	}
+	$c = str_replace( $cb[0], rtrim( substr( $cb[0], 0, -1 ) ) . $nuovi . ']', $c );
+	// Via la riga della Pausa se contiene solo lei, altrimenti solo l'elemento
+	$senza = preg_replace( '/\[vc_row\b[^\]]*\]\s*\[vc_column\b[^\]]*\]\s*\[mo_pausa\b[^\]]*\]\s*\[\/vc_column\]\s*\[\/vc_row\]/', '', $c, 1, $n );
+	return $n ? (string) $senza : (string) preg_replace( '/\[mo_pausa\b[^\]]*\]/', '', $c, 1 );
 }

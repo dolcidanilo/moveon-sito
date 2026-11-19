@@ -1,6 +1,7 @@
-{{! CHI SONO BREVE (home) · anchor sfondo etichetta numero frase_numero immagine (url, alt, w, h, pos) animazione titolo; punti (righe); pulsante (testo, href) }}
-<section class="mo-block mo-sec mo-cb" id="{{anchor}}" data-mo-block="chi-breve">
+{{! CHI SONO BREVE (home) · anchor sfondo animato etichetta numero frase_numero immagine (url, alt, w, h, pos) animazione titolo; apertura (foto, righe, frase_piana, fx, fy); punti (righe); pulsante (testo, href) }}
+<section class="mo-block mo-sec mo-cb{{#apertura}} mo-cb--apertura{{/apertura}}" id="{{anchor}}" data-mo-block="chi-breve">
   {{{sfondo}}}
+  {{#animato}}<canvas class="mo-emo-canvas mo-cb-canvas" aria-hidden="true"></canvas>{{/animato}}
   {{#etichetta}}<div class="mo-wrap mo-sec-head"><p class="mo-overline-h2 mo-reveal">{{etichetta}}</p></div>{{/etichetta}}
   <div class="mo-wrap mo-cb-grid">
     <div class="mo-cb-num mo-reveal">
@@ -14,4 +15,11 @@
       {{#pulsante}}<a class="mo-btn mo-btn-primary mo-magnetic mo-reveal" href="{{href}}">{{testo}}</a>{{/pulsante}}
     </div>
   </div>
+  {{#apertura}}
+  <div class="mo-cb-apertura" data-fx="{{fx}}" data-fy="{{fy}}"{{#frase_piana}} role="img" aria-label="{{frase_piana}}"{{/frase_piana}}>
+    <div class="mo-cb-sipario">{{#foto}}<img src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" style="object-position:{{pos}}" loading="lazy" decoding="async">{{/foto}}</div>
+    <div class="mo-emo-veil" aria-hidden="true"></div>
+    {{#frase_piana}}<p class="mo-emo-text" aria-hidden="true">{{#righe}}<span class="mo-emo-line"><span>{{.}}</span></span>{{/righe}}</p>{{/frase_piana}}
+  </div>
+  {{/apertura}}
 </section>

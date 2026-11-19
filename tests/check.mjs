@@ -94,19 +94,21 @@ const browser = await chromium.launch();
   check('Hero: il pulsante pausa ferma lo scorrimento', b1 === b2 && premuto === 'true', `${b1} → ${b2}`);
   await page.click('.mo-hs-pausa');
 
-  // Pausa emozionale: la foto si apre scorrendo, senza bloccare la pagina, ed è aperta del tutto al centro dello schermo
+  // Chi sono: la foto (ex Pausa emozionale) si apre come un sipario, dal centro verso i lati, scorrendo, senza bloccare la pagina
   const emo = await page.evaluate(() => {
-    const s = document.querySelector('.mo-emo');
-    return { bloccata: s.parentElement.classList.contains('pin-spacer'), top: s.getBoundingClientRect().top + scrollY, h: s.offsetHeight };
+    const s = document.querySelector('.mo-cb-apertura');
+    return { bloccata: s.parentElement.classList.contains('pin-spacer'), top: s.getBoundingClientRect().top + scrollY, h: s.offsetHeight, pausa: !!document.querySelector('.mo-emo'), canvas: !!document.querySelector('.mo-cb > .mo-cb-canvas') };
   });
   await smoothScroll(page, emo.top - 900 + 60);
   await page.waitForTimeout(900);
-  const aperturaInizio = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-emo-frame')).clipPath);
+  const aperturaInizio = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-cb-sipario')).clipPath);
   await smoothScroll(page, emo.top + emo.h / 2 - 450);
   await page.waitForTimeout(1200);
-  const aperturaCentro = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-emo-frame')).clipPath);
-  const raggio = (c) => parseFloat((/circle\(([\d.]+)%/.exec(c) || [])[1] || 'NaN');
-  check('Pausa: la foto inizia ad aprirsi appena compare e finisce al centro, senza blocco', !emo.bloccata && raggio(aperturaInizio) < 30 && raggio(aperturaCentro) >= 79, `${aperturaInizio} → ${aperturaCentro}`);
+  const aperturaCentro = await page.evaluate(() => getComputedStyle(document.querySelector('.mo-cb-sipario')).clipPath);
+  // inset(0% X%): X = quanto è ancora chiuso ciascun lato
+  const chiuso = (c) => { const m = /inset\(([\d.]+)%(?:\s+([\d.]+)%)?/.exec(c); return m ? parseFloat(m[2] ?? m[1]) : (c === 'none' ? 0 : NaN); };
+  check('Chi sono: la foto si apre come un sipario (dal centro verso i lati), finisce al centro dello schermo, senza blocco', !emo.bloccata && chiuso(aperturaInizio) > 35 && chiuso(aperturaCentro) < 1, `${aperturaInizio} → ${aperturaCentro}`);
+  check('Chi sono: sfondo animato in tutta la sezione e niente Pausa separata', emo.canvas && !emo.pausa, JSON.stringify(emo));
 
   // Bug: animazioni delle Garanzie già concluse su desktop
   const garTop = await topOf(page, '.mo-gar');
@@ -219,14 +221,14 @@ const browser = await chromium.launch();
 
   const sopra = await page.evaluate(() => {
     const bar = document.querySelector('.mo-mbar').getBoundingClientRect().height;
-    const emo = document.querySelector('.mo-emo'), testo = document.querySelector('.mo-emo-text');
+    const emo = document.querySelector('.mo-cb-apertura'), testo = emo.querySelector('.mo-emo-text');
     const nav = document.querySelector('.mo-hs-nav'), hero = document.querySelector('.mo-hero');
     return {
       pausa: Math.round(emo.getBoundingClientRect().bottom - testo.getBoundingClientRect().bottom - bar),
       hero: nav ? Math.round(hero.getBoundingClientRect().bottom - nav.getBoundingClientRect().bottom - bar) : 0,
     };
   });
-  check('Telefono: frase della Pausa e settori della hero sopra la barra dei contatti', sopra.pausa > 0 && sopra.hero > 0, JSON.stringify(sopra));
+  check('Telefono: frase sulla foto del Chi sono e settori della hero sopra la barra dei contatti', sopra.pausa > 0 && sopra.hero > 0, JSON.stringify(sopra));
   check('Barra contatti in basso visibile su mobile', await page.evaluate(() => getComputedStyle(document.querySelector('.mo-mbar')).display === 'flex'));
   check('Nessun cursore personalizzato al tocco', !(await page.evaluate(() => document.documentElement.classList.contains('mo-has-cursor'))));
   { const veri = errors.filter((m) => !/Transition was aborted because of invalid state/.test(m)); check('Nessun errore nella console (mobile)', veri.length === 0, veri.join(' | ')); }
@@ -254,7 +256,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     await page.waitForTimeout(1000);
     speed[hz] = Math.abs((await X()) - a);
     // Velocità media di salita dei pixel (px al secondo), confrontando il primo e l'ultimo fotogramma
-    await page.evaluate(() => window.scrollTo(0, document.querySelector('.mo-emo').getBoundingClientRect().top + window.scrollY));
+    await page.evaluate(() => window.scrollTo(0, document.querySelector('.mo-cb').getBoundingClientRect().top + window.scrollY));
     await page.waitForTimeout(800);
     await page.evaluate(() => { window.__f = []; });
     await page.waitForTimeout(1000);
@@ -278,17 +280,17 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       const jump = Math.abs((await X()) - before);
       check('Nastro: nessun salto quando compare o sparisce la barra del browser', jump < 40, `${jump.toFixed(0)} px`);
       // Pixel della Pausa emozionale: si muovono ancora (canvas che cambia nel tempo)
-      await page.evaluate(() => window.scrollTo(0, document.querySelector('.mo-emo').getBoundingClientRect().top + window.scrollY));
+      await page.evaluate(() => window.scrollTo(0, document.querySelector('.mo-cb').getBoundingClientRect().top + window.scrollY));
       await page.waitForTimeout(800);
       const snap = () => page.evaluate(() => document.querySelector('.mo-emo-canvas').toDataURL());
       const s1 = await snap();
       await page.waitForTimeout(400);
-      check('Pausa emozionale: pixel in movimento', s1 !== (await snap()));
+      check('Sfondo animato del Chi sono: pixel in movimento', s1 !== (await snap()));
     }
     await ctx.close();
   }
   const pr = pxSpeed[120] / pxSpeed[60];
-  check('Pausa emozionale: pixel autonomi, stessa velocità a 60 e a 120 Hz', pr > 0.85 && pr < 1.15 && pxSpeed[60] > 8 && pxSpeed[60] < 40, `${pxSpeed[60].toFixed(1)} vs ${pxSpeed[120].toFixed(1)} px/s`);
+  check('Sfondo animato del Chi sono: pixel autonomi, stessa velocità a 60 e a 120 Hz', pr > 0.85 && pr < 1.15 && pxSpeed[60] > 8 && pxSpeed[60] < 40, `${pxSpeed[60].toFixed(1)} vs ${pxSpeed[120].toFixed(1)} px/s`);
   const ratio = speed[120] / speed[60];
   check('Nastro: stessa velocità a 60 e a 120 Hz', ratio > 0.85 && ratio < 1.15, `${speed[60].toFixed(0)} vs ${speed[120].toFixed(0)} px/s`);
 }
@@ -714,10 +716,10 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
       return { fondo: getComputedStyle(document.querySelector('.mo-content')).backgroundColor, sezione: getComputedStyle(sec).backgroundColor, titolo: t ? getComputedStyle(t).color : '', ink: cs.getPropertyValue('--mo-sc-ink') };
     }, sel);
   };
-  const a = await passo('.mo-cb'), b = await passo('.mo-emo'), c = await passo('.mo-si');
+  const a = await passo('.mo-cb'), b = await passo('.mo-car'), c = await passo('.mo-si');
   check('Sfondo che cambia scorrendo: attivo su tutte le sezioni della pagina', sc0.attivo && sc0.sezioni >= 8, JSON.stringify(sc0));
   check('Sfondo che cambia scorrendo: la pagina prende il colore della sezione a metà schermo', a.fondo === 'rgb(244, 245, 247)' && b.fondo === 'rgb(34, 58, 184)' && c.fondo === 'rgb(248, 250, 252)' && a.sezione === 'rgba(0, 0, 0, 0)', JSON.stringify({ a: a.fondo, b: b.fondo, c: c.fondo, sezione: a.sezione }));
-  check('Sfondo che cambia scorrendo: testi leggibili (scuri sul chiaro, chiari sulla Pausa blu)', a.titolo === 'rgb(34, 58, 184)' && b.ink === 'rgb(248, 250, 252)', JSON.stringify({ a: a.titolo, b: b.ink }));
+  check('Sfondo che cambia scorrendo: testi leggibili (scuri sul chiaro, chiari sul Portfolio blu)', a.titolo === 'rgb(34, 58, 184)' && b.ink === 'rgb(248, 250, 252)', JSON.stringify({ a: a.titolo, b: b.ink }));
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForTimeout(800);
   const spento = await page.evaluate(() => document.documentElement.classList.contains('mo-scorre'));
@@ -773,7 +775,7 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
     const ct = document.querySelector('.mo-contact .mo-wrap'), pad = parseFloat(getComputedStyle(ct).paddingLeft);
     const cr = ct.getBoundingClientRect();
     return {
-      chiare: [bg('.mo-cb'), bg('.mo-si'), bg('.mo-gar')], blu: [bg('.mo-emo'), bg('.mo-car'), bg('.mo-contact')], titolo: getComputedStyle(document.querySelector('.mo-gar .mo-statement')).color,
+      chiare: [bg('.mo-cb'), bg('.mo-si'), bg('.mo-gar')], blu: [bg('.mo-hero'), bg('.mo-car'), bg('.mo-contact')], titolo: getComputedStyle(document.querySelector('.mo-gar .mo-statement')).color,
       cardBordo: /inset/.test(card), side, item,
       linea: { w: Math.round(parseFloat(linea.width)), contenuto: Math.round(cr.width - 2 * pad), colore: linea.backgroundColor }, bordoFooter: getComputedStyle(document.querySelector('.mo-foot')).borderTopWidth,
     };

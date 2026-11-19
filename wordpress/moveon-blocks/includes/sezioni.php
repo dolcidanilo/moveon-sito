@@ -25,10 +25,15 @@ function mo_sezioni_def( array $d ): array {
 				mo_p_area( 'titolo', 'Frase principale', 'Una o due frasi, in parole semplici.', 'Testi', $d['chi_breve']['titolo'] ),
 				mo_p_img( 'immagine', 'Foto (facoltativa)', 'JPG o PNG, almeno 1200 px di larghezza. Con angoli arrotondati, sotto la frase del numero: su telefono e tablet sta tra la frase e il titolo; su computer riempie la colonna di sinistra sotto la frase.' ),
 				mo_p_text( 'immagine_pos', 'Punto focale della foto', 'Il punto da tenere sempre visibile, in percentuale orizzontale e verticale: «50% 50%» = centro, «50% 30%» = un po’ più in alto.', 'Immagini', $d['chi_breve']['immagine_pos'] ),
+				mo_p_drop( 'apertura', 'Foto che si apre', array( 'Sì, sotto i testi' => 'si', 'No' => 'no' ), 'si', 'La foto a tutta larghezza che si apre dal centro verso i lati, come un sipario, mentre scorri (era la «Pausa emozionale»). Se nella pagina c’è ancora l’elemento Pausa emozionale, qui non compare, per non ripeterla: usa MoveOn → Strumenti → Alleggerisci la home.', 'Foto che si apre' ),
+				mo_p_img( 'apertura_img', 'Foto', 'Orizzontale, almeno 1600 px. Se manca si usa la foto di prova.', 'Foto che si apre' ),
+				mo_p_text( 'apertura_pos', 'Punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 50% 30% = più in alto.', 'Foto che si apre', $d['chi_breve']['apertura_pos'] ),
+				mo_p_area( 'apertura_frase', 'Frase sulla foto', 'Massimo 8 parole. Va a capo dove premi Invio. Scrivi - (un trattino) per nessuna frase.', 'Foto che si apre', $d['chi_breve']['apertura_frase'] ),
 				mo_p_area( 'punti', 'Tre punti di forza', 'Uno per riga, brevi.', 'Testi', $d['chi_breve']['punti'] ),
 				mo_p_text( 'pulsante', 'Pulsante: testo', $trattino, 'Testi', $d['chi_breve']['pulsante'] ),
 				mo_p_text( 'link', 'Pulsante: porta a', 'Es. /chi-sono/ (pagina del sito) oppure #contatti.', 'Testi', $d['chi_breve']['link'] ),
 				mo_p_anchor( $d['chi_breve']['anchor'] ),
+				mo_p_drop( 'sfondo_animato', 'Sfondo animato (pixel e linee)', array( 'Sì: pixel che salgono e linee che ondeggiano' => 'si', 'No: solo colore o immagine (campi qui sotto)' => 'no' ), 'si', 'L’animazione copre tutta la sezione, sopra il colore e l’immagine di sfondo. Con «No» restano il colore e l’immagine con la sua opacità.', 'Sfondo' ),
 				...mo_p_sfondo(),
 			),
 		),
@@ -185,6 +190,20 @@ function mo_render_chi_breve( $atts ): string {
 	if ( $img ) {
 		$img['pos'] = implode( '% ', mo_focus( $a['immagine_pos'] ?? '50% 50%' ) ) . '%';
 	}
+	// Foto che si apre (la vecchia Pausa emozionale): non se nella pagina c'è ancora l'elemento Pausa, per non ripeterla
+	$apertura = null;
+	$pagina   = function_exists( 'get_post' ) ? get_post() : null;
+	$doppia   = $pagina && has_shortcode( (string) $pagina->post_content, 'mo_pausa' );
+	if ( 'no' !== ( $a['apertura'] ?? 'si' ) && ! $doppia ) {
+		list( $fx, $fy ) = mo_focus( $a['apertura_pos'] ?? '50% 32%', array( 50, 32 ) );
+		$foto            = mo_image( $a['apertura_img'] ?? '', 'pausa', '2048x2048' );
+		if ( $foto ) {
+			$foto['pos'] = $fx . '% ' . $fy . '%';
+			$frase       = mo_facoltativo( $a['apertura_frase'] ?? '' );
+			$righe       = '' !== $frase ? mo_lines( $frase ) : array();
+			$apertura    = array( 'foto' => $foto, 'righe' => $righe, 'frase_piana' => implode( ' ', $righe ), 'fx' => $fx, 'fy' => $fy );
+		}
+	}
 	return MO_Tpl::render(
 		'chi-breve',
 		array_merge(
@@ -193,6 +212,8 @@ function mo_render_chi_breve( $atts ): string {
 				'numero'       => mo_text( $a['numero'] ),
 				'frase_numero' => mo_text( $a['frase_numero'] ),
 				'immagine'     => $img,
+				'apertura'     => $apertura,
+				'animato'      => 'no' !== ( $a['sfondo_animato'] ?? 'si' ),
 				'animazione'   => in_array( $a['animazione'], array( 'tutto', 'colori', 'bagliore', 'nessuna' ), true ) ? $a['animazione'] : 'tutto',
 				'punti'        => mo_lines( $a['punti'] ),
 				'pulsante'     => '' !== $btn ? array( 'testo' => $btn, 'href' => mo_href( $a['link'] ) ) : null,

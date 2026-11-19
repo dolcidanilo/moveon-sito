@@ -274,7 +274,7 @@ function mo_blocks(): array {
 		),
 		'pausa'     => array(
 			'name'   => 'MoveOn · Pausa emozionale',
-			'desc'   => 'Foto che si apre da un cerchio a tutto schermo, con pixel e onde. Mettila in una riga senza margini.',
+			'desc'   => 'Foto che si apre da un cerchio a tutto schermo, con pixel e onde. In home ora è dentro «Chi sono (breve)»: questo elemento resta per altre pagine.',
 			'params' => array(
 				mo_p_area( 'frase', 'Frase', 'Massimo 8 parole. Va a capo dove premi Invio (oppure con |).', 'Testi', $d['pausa']['frase'] ),
 				mo_p_img( 'foto', 'Foto', 'Orizzontale, almeno 1600 px. Controlla che i bordi non abbiano strisce chiare.' ),
