@@ -118,7 +118,7 @@ Inciampi già visti:
 
 ## In sospeso
 
-- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`**. Fase B (costruzione) fatta nella 1.4.0: ora il cliente usa gli Strumenti su /nuovo, corregge i testi [tra quadre], carica le foto (hero, punti di forza) e raccoglie le recensioni vere. Poi fase C (W3).
+- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`**. Fase B (costruzione e ritocchi grafici) **chiusa il 19/11/2026** con la 1.9.1: il cliente ha approvato la grafica. **Fase C (W3) iniziata**: piano riproposto per intero; in attesa dal cliente di servizi in ordine, comuni coperti, progetti e recensioni veri, testi [tra quadre], foto vere, scheda Google. Dopo la messa online il sito resta modificabile come ora (pannello + zip del plugin, versioni in `dist/archivio/`): consigliato tenere /nuovo come copia di prova.
 - Possibili ritocchi grafici «di gusto» annunciati dal cliente.
 - **Scheda Google**: il cliente preferisce aprirla quando il sito nuovo è online.
 - **W3** — vedi `docs/piano-W3-seo-analytics-legalblink.md` (da riproporre per intero quando si inizia): SEO locale su Pescara e provincia (scheda Google Business Profile da creare, attività senza sede aperta al pubblico; Rank Math; pagine servizi; dati strutturati), Google Analytics, LegalBlink, invio email affidabile (SMTP con la casella Aruba).

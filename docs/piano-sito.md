@@ -33,8 +33,11 @@ Regole per i testi (decise con il cliente):
 ### Fatto (10 novembre 2026, versione 1.4.0)
 - Fase B: 11 elementi per le pagine, pagine pronte (Chi sono, Servizi + 5 servizi, Contatti) e menu a tendina dagli Strumenti, home alleggerita, «Scopri di più» sui Servizi, App WebView tolta, testi in prima persona.
 
-### Prossimo passo
-Il cliente: usa «Crea le pagine e il menu» e «Alleggerisci la home» su /nuovo, corregge i testi (parti tra [quadre]), sostituisce le foto di prova e le recensioni segnaposto. Poi fase C (W3).
+### Fatto (19 novembre 2026, versioni 1.4.1 – 1.9.1)
+- Ritocchi grafici chiesti dal cliente: colori nuovi e numerati (MoveOn → Colori + PDF), tema scuro, card, menu del telefono, hero fissa o a slide con transizioni Cubi 3D e Portale, video di sfondo, sfondo che cambia scorrendo, Pausa emozionale dentro il Chi sono. Il cliente ha approvato la grafica: **fase B chiusa**.
+
+### Prossimo passo (dal 19/11/2026): fase C · W3
+Riproposto al cliente il piano W3 per intero. In attesa dal cliente: servizi in ordine di importanza, comuni coperti, progetti veri con permesso, recensioni vere, testi [tra quadre] corretti, foto vere, apertura della scheda Google. Claude intanto può preparare la scheda attività per Google (JSON-LD) e il campo Google Analytics con consenso.
 
 ### Prossimo passo (prima della 1.4.0)
 Il cliente ha chiesto di andare avanti **senza il vecchio elenco**: Claude ricostruisce elenco e situazioni dai servizi; recensioni con **segnaposto** finché non arrivano quelle vere.
@@ -67,9 +70,10 @@ Profilo professionale del cliente (promemoria in `CLAUDE.md`), social, eventuale
 
 ## 3. Cosa deve fare adesso il cliente
 
-Solo tre cose, nessuna urgente:
-1. ritrovare il vecchio elenco;
-2. chiedere qualche recensione;
-3. (facoltativo) aprire la scheda Google.
+Per la W3 (aggiornato al 19/11/2026):
+1. aprire la scheda Google Business Profile (la verifica richiede giorni o settimane);
+2. dire i servizi in ordine di importanza e i comuni coperti davvero;
+3. chiedere 3–5 recensioni vere e scegliere i progetti veri da mostrare (con il permesso);
+4. correggere i testi [tra quadre] e mettere le foto vere.
 
 Tutto il resto lo guida Claude, un passo alla volta.
