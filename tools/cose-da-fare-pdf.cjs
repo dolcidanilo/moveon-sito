@@ -10,6 +10,8 @@ const { chromium } = require('playwright');
 const ROOT = path.join(__dirname, '..');
 const versione = (/Version:\s+([\d.]+)/.exec(fs.readFileSync(path.join(ROOT, 'wordpress/moveon-blocks/moveon-blocks.php'), 'utf8')) || [])[1] || '';
 const DATA = '19 novembre 2026';
+// Passi della parte A già fatti dal cliente (casella spuntata)
+const FATTI = 8;
 
 // Ogni passo: [titolo, dettagli (HTML)]
 const parteA = [
@@ -34,9 +36,11 @@ const parteA = [
     <li>Indirizzo: <b>solo</b> comune (Pescara), CAP, provincia, paese. <b>Niente via.</b></li>
     <li>Tipo di attività, se c’è: <b>Professional Service</b></li></ul>
     Salva e <b>fai uno screenshot</b> della pagina: mi serve.`],
-  ['LegalBlink: controlla l’abbonamento su Aruba', 'Nel pannello Aruba verifica che LegalBlink sia <b>attivo</b> e che il piano comprenda il <b>Cookie Banner v2</b> (serve per Google Analytics). Se non c’è, dimmelo prima di acquistare.'],
-  ['LegalBlink: genera il token', 'Pannello Aruba → servizio LegalBlink → <b>Impostazioni → Genera token</b>. Copialo (non mandarlo in chat).'],
-  ['LegalBlink: installalo su /nuovo', '<b>Plugin → Aggiungi nuovo</b> → cerca <b>«LegalBlink for Aruba»</b> → Installa → Attiva → incolla il token. <b>Sul sito attuale lascia iubenda</b> com’è: si disdice solo dopo lo spostamento (controlla la data di rinnovo).'],
+  ['Rank Math: tre ritocchi', `<ul><li><b>Impostazioni → Generali → Titolo del sito</b>: <b>MoveOn Studio</b> (non tutto maiuscolo)</li><li>Home in modifica → riquadro Rank Math → <b>Modifica snippet</b> → Titolo: <i>MoveOn Studio · Social, siti web e grafica a Pescara</i> · Descrizione: <i>Social, siti web, grafica e stampa per aziende e professionisti di Pescara e dintorni. Un solo referente dall’idea al prodotto finito.</i> → Aggiorna</li><li><b>Rank Math SEO → Titoli e Meta → Pagine</b> → Tipo di schema: <b>Nessuno</b>; <b>Titoli e Meta → Autori</b> → disattiva <b>Archivi autore</b> → Salva</li></ul>`],
+  ['iubenda: attiva il Consent Mode nel banner', 'Su iubenda.com → <b>Privacy Controls and Cookie Solution → MODIFICA</b>: controlla che sia attivo il <b>Google Consent Mode</b> (di solito tra le impostazioni avanzate o le integrazioni) → Salva. LegalBlink si valuta al rinnovo del dominio (<b>3 febbraio 2027</b>): segnati anche la data di rinnovo di iubenda.'],
+  ['iubenda: installa il banner su /nuovo', '<b>Plugin → Aggiungi nuovo</b> → cerca <b>«iubenda»</b> → installa <b>«iubenda | All-in-one Compliance for GDPR / CCPA Cookie Consent»</b> → Attiva → segui la procedura guidata. Quando chiede il codice, lo trovi su iubenda → Privacy Controls and Cookie Solution → <b>INTEGRA</b>. Poi apri /nuovo in una finestra in incognito: deve comparire il banner. Se hai dubbi, mandami uno screenshot.'],
+  ['Controlla i link Privacy e Cookie', '<b>MoveOn → Impostazioni → Footer e note legali</b>: apri «Link Privacy Policy» e «Link Cookie Policy» e controlla che portino alle <b>tue</b> policy iubenda (i link giusti sono in iubenda → Privacy e Cookie Policy → INTEGRA). Se sono diversi, sostituiscili → Salva.'],
+  ['Google Analytics: il codice di misurazione', 'Se il sito attuale ha già Google Analytics 4: Analytics → <b>Amministrazione → Stream di dati</b> → il tuo sito → copia l’<b>ID misurazione</b> (inizia con <b>G-</b>) e mandamelo: non è un dato segreto. Se non ce l’hai, dimmelo e ti guido a crearlo, con lo stesso account Google della scheda Google.'],
   ['Scheda Google (Google Business Profile): creala e avvia la verifica', `Vai su <b>business.google.com</b> con l’account Google dell’attività (lo stesso userò per Analytics e Search Console).
     <ul><li>Nome: solo <b>MoveOn Studio</b> (niente «Pescara» o altre parole: Google penalizza)</li>
     <li>Categoria principale: la più vicina ai social, es. <b>«Consulente di social media»</b> o <b>«Agenzia di marketing»</b>; secondarie: <b>«Web designer»</b>, <b>«Graphic designer»</b>. Se hai dubbi, mandami lo screenshot delle categorie proposte.</li>
@@ -48,7 +52,7 @@ const parteA = [
     <li>Descrizione, pronta da incollare:</li></ul>
     <div class="testo"><i>Grafica, siti web, social e stampa per aziende e professionisti di Pescara e dintorni. Seguo ogni lavoro dall’idea al prodotto finito, con un solo referente e 25 anni di esperienza nella comunicazione: pagine social curate e pubblicità online, siti chiari e veloci che portano contatti, loghi e immagine coordinata, stampa e allestimenti con fornitori scelti. Ti spiego tutto con parole semplici e ti mando un preventivo chiaro, voce per voce, prima di iniziare. Anche lezioni individuali online di Photoshop, Illustrator, InDesign e WordPress.</i></div>
     Avvia la verifica e <b>annota il metodo</b> che ti propone Google (la verifica può richiedere giorni: non serve aspettarla per scrivermi).`],
-  ['Scrivimi «tutto fatto»', 'Allega: <b>lo screenshot di Rank Math</b> (passo 8), <b>il metodo di verifica</b> proposto da Google (passo 12) e dimmi se LegalBlink è installato. Io proseguo con i punti qui sotto.'],
+  ['Scrivimi «tutto fatto»', 'Allega: <b>l’ID di Google Analytics</b> (passo 13), <b>il metodo di verifica</b> proposto da Google (passo 14) e dimmi se il banner di iubenda compare su /nuovo. Io proseguo con i punti qui sotto.'],
 ];
 
 const parteB = [
@@ -63,7 +67,7 @@ const parteB = [
 
 const dopo = [
   'Controllo la scheda di Rank Math e i dati che legge Google.',
-  'Collego le pagine Privacy e Cookie di LegalBlink al footer e al modulo contatti.',
+  'Controllo il banner di iubenda e i link Privacy e Cookie nel footer e nel modulo contatti.',
   'Aggiungo Google Analytics, che parte solo quando il visitatore accetta i cookie.',
   'Rendo affidabile l’invio delle email del modulo (con la tua casella Aruba).',
   'Poi la W4: lo spostamento del sito nuovo al posto di quello attuale.',
@@ -71,8 +75,8 @@ const dopo = [
 
 const esc = (t) => String(t);
 let n = 0;
-const passi = (lista) => lista.map(([t, d]) => { n += 1; return `
-  <div class="passo"><div class="box"></div><div class="num">${n}</div>
+const passi = (lista) => lista.map(([t, d]) => { n += 1; const ok = n <= FATTI; return `
+  <div class="passo${ok ? ' fatto' : ''}"><div class="box">${ok ? '✓' : ''}</div><div class="num">${n}</div>
     <div class="corpo"><div class="titolo">${esc(t)}</div><div class="dett">${d}</div></div></div>`; }).join('');
 
 const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Cose da fare · MoveOn</title>
@@ -88,6 +92,9 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>
   .sotto { margin: 0 0 2mm; color: #334155; }
   .passo { display: flex; gap: 3mm; padding: 2.6mm 0; border-top: .3mm solid #e2e8f0; break-inside: avoid; }
   .box { flex: none; width: 5mm; height: 5mm; margin-top: .4mm; border: .45mm solid #223ab8; border-radius: 1mm; }
+  .fatto .box { background: #223ab8; color: #f4f5f7; font: 800 9pt/5mm Montserrat, Arial, sans-serif; text-align: center; }
+  .fatto .titolo::after { content: '  · fatto'; color: #16a34a; font-weight: 700; }
+  .fatto .dett { opacity: .55; }
   .num { flex: none; width: 6mm; font: 800 11pt/1.2 Montserrat, Arial, sans-serif; color: #223ab8; }
   .corpo { flex: 1; }
   .titolo { font: 700 10.5pt/1.3 Montserrat, Arial, sans-serif; color: #182343; margin-bottom: .6mm; }
