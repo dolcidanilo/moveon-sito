@@ -118,9 +118,9 @@ Inciampi già visti:
 
 ## In sospeso
 
-- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`**. Fase B (costruzione e ritocchi grafici) **chiusa il 19/11/2026** con la 1.9.1: il cliente ha approvato la grafica. **Fase C (W3) iniziata**: piano riproposto per intero; in attesa dal cliente di servizi in ordine, comuni coperti, progetti e recensioni veri, testi [tra quadre], foto vere, scheda Google. Dopo la messa online il sito resta modificabile come ora (pannello + zip del plugin, versioni in `dist/archivio/`): consigliato tenere /nuovo come copia di prova.
+- **Piano del sito e ordine dei lavori: `docs/piano-sito.md`**. Fase B (costruzione e ritocchi grafici) **chiusa il 19/11/2026** con la 1.9.1: il cliente ha approvato la grafica. **Fase C (W3) iniziata**: piano riproposto per intero; servizi in ordine (Social, Siti web, Grafica, Stampa, Formazione; Formazione in dubbio) e zona (Pescara + 30 km) ricevuti, vedi «Risposte di Danilo» nel piano W3; in attesa dal cliente di decisione sulla Formazione, conferma dei comuni, progetti e recensioni veri, testi [tra quadre], foto vere, scheda Google. Dopo la messa online il sito resta modificabile come ora (pannello + zip del plugin, versioni in `dist/archivio/`): consigliato tenere /nuovo come copia di prova.
 - Possibili ritocchi grafici «di gusto» annunciati dal cliente.
-- **Scheda Google**: il cliente preferisce aprirla quando il sito nuovo è online.
+- **Scheda Google**: prima preferiva aprirla a sito online; il 19/11/2026 ha detto che farà i 6 punti della W3 (scheda compresa) appena possibile. Dati strutturati dopo Rank Math, Analytics dopo LegalBlink.
 - **W3** — vedi `docs/piano-W3-seo-analytics-legalblink.md` (da riproporre per intero quando si inizia): SEO locale su Pescara e provincia (scheda Google Business Profile da creare, attività senza sede aperta al pubblico; Rank Math; pagine servizi; dati strutturati), Google Analytics, LegalBlink, invio email affidabile (SMTP con la casella Aruba).
 - **W4** — spostamento da /nuovo al sito principale. **Alla fine della W4 ricorda al cliente: 1) pannello cliente (vedi sotto), 2) profilo professionale / skill, 3) social.**
 - **Dopo**: social (Instagram, Facebook, LinkedIn): idee nel piano W3, in fondo.

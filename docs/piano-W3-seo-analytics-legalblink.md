@@ -75,6 +75,15 @@ Cosa manca:
 2. I comuni coperti davvero (Pescara, Montesilvano, Spoltore, Città Sant'Angelo, Cepagatti…? anche Chieti e Francavilla, che sono in provincia di Chieti?).
 3. Progetti reali di clienti della zona, con il permesso di mostrarli.
 
+## Risposte di Danilo (19/11/2026)
+
+1. **Ordine dei servizi**: Social (si vende di più) → Siti web (si guadagna di più) → Grafica → Stampa → Formazione.
+   Feedback dato: ordine giusto per la home; per la SEO la pagina Siti web merita più cura (più ricerche e più valore), Social e Siti si vendono insieme, la Grafica è spesso la porta d'ingresso.
+   **Formazione in dubbio**: niente sede, disponibile solo la sera e nel weekend, online o presso il cliente. Consiglio: tenerla come servizio secondario, **lezioni individuali online** (chi impara Photoshop/WordPress lavora anche lui di giorno: gli orari coincidono) e **affiancamento WordPress** per chi compra il sito; non adatta ai corsi aziendali in orario d'ufficio. Mai scrivere sul sito il motivo degli orari (anonimato). Decisione in attesa: com'è oggi / pagina sì ma niente scheda in home / togliere.
+2. **Zona**: Pescara + 30 km (comuni proposti nella risposta, da confermare; massimo 20 nella scheda Google). Siti, social e lezioni online si vendono anche fuori zona.
+
+**Scelta tecnica (19/11/2026)**: la scheda attività per Google (dati strutturati) si fa **dopo l'installazione di Rank Math**, che ne crea già una parte gratis: il plugin aggiungerà solo ciò che manca (zona servita, servizi), senza doppioni. Google Analytics dopo LegalBlink, perché deve partire dal suo banner.
+
 ## Aspettative
 
 La SEO dà risultati in qualche mese; la scheda Google con le recensioni è la parte che dà frutti prima.
