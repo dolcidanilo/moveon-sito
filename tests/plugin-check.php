@@ -213,7 +213,7 @@ check( 'Hero: immagine scelta, punto focale, velo e tempi; con una sola immagine
 /* 12) Pagine pronte, home leggera, testi */
 check( 'Indirizzi «/pagina/» verso le pagine di questo sito (anche in /nuovo)', home_url( '/chi-sono/' ) === mo_href( '/chi-sono/' ) && '#contatti' === mo_href( '#contatti' ) && 'https://esempio.it/x' === mo_href( 'https://esempio.it/x' ) );
 $html = do_shortcode( '[mo_servizi]' );
-check( 'Servizi: 5 schede con «Scopri di più», niente App WebView', 5 === substr_count( $html, 'class="mo-svc-more"' ) && ! str_contains( $html, 'App WebView' ) && str_contains( $html, 'href="' . home_url( '/servizi/grafica/' ) . '"' ) );
+check( 'Servizi: 4 schede con «Scopri di più» in home (la Formazione solo nella pagina Servizi), niente App WebView', 4 === substr_count( $html, 'class="mo-svc-more"' ) && ! str_contains( $html, 'App WebView' ) && str_contains( $html, 'href="' . home_url( '/servizi/grafica/' ) . '"' ) );
 check( 'Modulo contatti: niente App tra le scelte, «consigliami» c’è', ! str_contains( do_shortcode( '[mo_contatti]' ), '<option>App' ) && str_contains( do_shortcode( '[mo_contatti]' ), 'consigliami' ) );
 $html = do_shortcode( '[mo_situazioni]' );
 check( 'Non sai da dove partire?: situazioni con il messaggio per il modulo', 6 === substr_count( $html, 'class="mo-si-card"' ) && str_contains( $html, 'data-messaggio="Ciao, la mia situazione è: «Apro una nuova attività»' ) );
@@ -363,6 +363,35 @@ $prima = '[vc_row full_width="stretch_row_content_no_spaces"][vc_column][mo_chi_
 $dopo  = mo_unisci_pausa( $prima );
 check( 'Alleggerisci la home: la Pausa entra nel Chi sono (foto, punto focale, frase) e la sua riga sparisce', str_contains( $dopo, '[mo_chi_breve numero="30" apertura_img="12" apertura_pos="40% 20%" apertura_frase="Ciao|mondo"]' ) && ! str_contains( $dopo, 'mo_pausa' ) && 2 === substr_count( $dopo, '[vc_row' ), $dopo );
 check( 'Alleggerisci la home: senza Pausa o senza Chi sono non cambia niente', '[mo_chi_breve]' === mo_unisci_pausa( '[mo_chi_breve]' ) && '[mo_pausa]' === mo_unisci_pausa( '[mo_pausa]' ) );
+
+// 1.10.0: ordine dei servizi e dati per Google
+$chiavi = function ( $schede ) { return implode( ',', array_map( 'mo_chiave_servizio', $schede ) ); };
+$col    = function ( $schede ) { return implode( ',', array_column( $schede, 'colore' ) ); };
+check( 'Servizi di serie: Social, Siti web, Grafica, Stampa in home; pagina Servizi con la Formazione in fondo', 'social,siti-web,grafica,stampa' === $chiavi( mo_defaults()['servizi']['servizi'] ) && 'social,siti-web,grafica,stampa,formazione' === $chiavi( mo_schede_servizi_tutte() ) && 'social,siti-web,grafica,stampa,formazione' === implode( ',', array_keys( mo_servizi_pagine() ) ) );
+$vecchie = array(
+	array( 'nome' => 'G', 'link' => '/servizi/grafica/', 'colore' => 'bianco' ),
+	array( 'nome' => 'W', 'link' => '/servizi/siti-web/', 'colore' => 'blu' ),
+	array( 'nome' => 'Mio', 'link' => '#contatti', 'colore' => 'navy' ),
+	array( 'nome' => 'S', 'link' => '/servizi/social/', 'colore' => 'grigio' ),
+	array( 'nome' => 'T', 'link' => '/servizi/stampa/', 'colore' => 'blu' ),
+	array( 'nome' => 'F', 'link' => '/servizi/formazione/', 'colore' => 'bianco' ),
+);
+$home10 = mo_riordina_schede( $vecchie, false );
+$tutte10 = mo_riordina_schede( $vecchie, true );
+check( 'Metti in ordine i servizi: nuovo ordine, colori al loro posto, schede proprie in fondo, Formazione solo nella pagina Servizi', 'social,siti-web,grafica,stampa,' === $chiavi( $home10 ) && 'bianco,blu,navy,grigio,blu' === $col( $home10 ) && 'Mio' === $home10[4]['nome'] && 'social,siti-web,grafica,stampa,formazione,' === $chiavi( $tutte10 ), $chiavi( $home10 ) . ' / ' . $col( $home10 ) );
+$sc10 = '[vc_row][vc_column][mo_servizi etichetta="X" servizi="' . rawurlencode( wp_json_encode( $vecchie ) ) . '"][/vc_column][/vc_row]';
+$out10 = mo_ordina_servizi_testo( $sc10, false );
+preg_match( '/\[mo_servizi\b([^\]]*)\]/', $out10, $m10 );
+$a10 = shortcode_parse_atts( trim( $m10[1] ) );
+check( 'Metti in ordine i servizi: lo shortcode della home cambia solo le schede (gli altri campi restano)', 'X' === ( $a10['etichetta'] ?? '' ) && 'social,siti-web,grafica,stampa,' === $chiavi( mo_group( $a10['servizi'] ?? '' ) ) && $out10 === mo_ordina_servizi_testo( $out10, false ) );
+check( 'Metti in ordine i servizi: home con i testi di serie non cambia; pagina Servizi riceve tutte le schede', '[mo_servizi]' === mo_ordina_servizi_testo( '[mo_servizi]', false ) && str_contains( mo_ordina_servizi_testo( '[mo_servizi]', true ), 'formazione' ) );
+check( 'Zona di serie: Pescara per primo e i comuni entro 30 km', 'Pescara' === mo_zona()[0] && count( mo_zona() ) >= 20 && in_array( 'Città Sant\'Angelo', mo_zona(), true ) );
+$rm = array( 'WebSite' => array( '@id' => home_url( '/#website' ) ), 'publisher' => array( '@type' => 'Organization', '@id' => home_url( '/#organization' ), 'name' => 'Da Rank Math', 'areaServed' => 'Già scelta' ) );
+$rm2 = mo_aggiungi_a_rank_math( $rm );
+check( 'Rank Math: zona e servizi entrano nella sua scheda dell’attività, senza cambiare quello che c’è già', 'Da Rank Math' === $rm2['publisher']['name'] && 'Già scelta' === $rm2['publisher']['areaServed'] && 5 === count( $rm2['publisher']['hasOfferCatalog']['itemListElement'] ) && ! isset( $rm2['WebSite']['hasOfferCatalog'] ) );
+unset( $GLOBALS['mo_dati_google_fatti'] );
+$dg10 = mo_dati_google();
+check( 'Senza Rank Math: scheda propria con telefono, email, comune senza via', 'ProfessionalService' === $dg10['@type'] && ! empty( $dg10['telephone'] ) && ! empty( $dg10['email'] ) && 'Pescara' === $dg10['address']['addressLocality'] && ! isset( $dg10['address']['streetAddress'] ) );
 
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

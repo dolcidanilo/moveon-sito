@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.9.1
+Stable tag: 1.10.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,11 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.10.0 =
+* Servizi nel nuovo ordine: Social, Siti web, Grafica, Stampa. La Formazione resta nella pagina Servizi e nel menu (in fondo), non più nella home. Nuovo strumento «Metti in ordine i servizi» per le pagine già create (i colori restano al loro posto).
+* Impostazioni: «Zona in cui lavori» (comuni entro 30 km da Pescara). Zona e servizi vanno nei dati per Google: dentro la scheda dell'attività di Rank Math, o in una scheda propria senza Rank Math.
+* Testi di serie: Formazione come lezioni individuali online, anche la sera e nel weekend; «Dove lavori?» con i comuni vicini e il lavoro online in tutta Italia; scelte del modulo nel nuovo ordine.
 
 = 1.9.1 =
 * Se nella pagina c’è ancora l’elemento Pausa emozionale, ora entra da solo nel «Chi sono»: il Chi sono usa la sua foto, il punto focale e la frase e la Pausa (con la sua riga) non si vede più. Così c’è un solo sfondo animato per tutta la sezione, senza confine a metà, e la foto si apre a sipario e non più dal cerchio.

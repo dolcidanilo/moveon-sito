@@ -49,8 +49,9 @@
 <h2>Le pagine del sito</h2>
 <ul>
 	<li>La <strong>home</strong> è la vetrina e <strong>riassume</strong>; le pagine <strong>Chi sono</strong>, <strong>Servizi</strong> (con una pagina per ogni servizio), <strong>Progetti</strong> e <strong>Contatti</strong> approfondiscono. Così Google trova una pagina per ogni argomento, senza testi ripetuti.</li>
-	<li><strong>MoveOn → Strumenti → Crea le pagine e il menu</strong>: crea Chi sono, Servizi (Grafica e immagine, Siti web e negozi online, Social e pubblicità online, Stampa e allestimenti, Formazione) e Contatti, già composte e con i testi da correggere, più il menu con i servizi a tendina. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.</li>
+	<li><strong>MoveOn → Strumenti → Crea le pagine e il menu</strong>: crea Chi sono, Servizi (Social e pubblicità online, Siti web e negozi online, Grafica e immagine, Stampa e allestimenti, Formazione) e Contatti, già composte e con i testi da correggere, più il menu con i servizi a tendina. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.</li>
 	<li><strong>MoveOn → Strumenti → Alleggerisci la home</strong>: al posto del «Chi siamo» lungo mette la versione breve «Chi sono» (con il pulsante verso la pagina) porta dentro il Chi sono la <strong>Pausa emozionale</strong> (foto, punto focale e frase) e aggiunge «Non sai da dove partire?» dopo i Servizi. La versione di prima resta nelle <strong>Revisioni</strong> della pagina.</li>
+	<li><strong>MoveOn → Strumenti → Metti in ordine i servizi</strong>: Social, Siti web, Grafica, Stampa e, solo nella pagina Servizi e nel menu a tendina, la Formazione in fondo (in home non ha la scheda). Cambia solo l’ordine: testi e foto delle schede restano, i colori restano al loro posto. La versione di prima resta nelle <strong>Revisioni</strong>.</li>
 	<li><strong>Chi sono (breve)</strong>: il numero grande e la frase sotto sono alti quanto i testi a destra (su computer); su tablet stretto e telefono vanno uno sotto l’altro e il numero è largo quanto la riga più lunga della frase. Campo <strong>Foto</strong> (facoltativa, con <strong>punto focale</strong>): angoli arrotondati come la foto dei Contatti; su telefono sta tra la frase e il titolo, su computer riempie la colonna di sinistra fino alla fine del pulsante. Campo <strong>Animazione del numero</strong>: colori che scorrono e bagliore, solo colori, solo bagliore o nessuna. I colori si cambiano dal CSS aggiuntivo: <code>.mo-cb-n{--mo-cb-c1:#2563eb;--mo-cb-c2:#60a5fa;--mo-cb-c3:#a78bfa;--mo-cb-c4:#f59e0b}</code>.</li>
 	<li><strong>Garanzie</strong>: ogni garanzia ha il campo <strong>Icona del timbro</strong> (documento, calendario, frecce, cartella, persona, cuffie, spunta, scudo, stella, euro, lucchetto, fulmine). Con «Automatica» le garanzie prendono un’icona diversa ciascuna, nell’ordine.</li>
 	<li>Le parti dei testi tra <strong>[quadre]</strong> sono tempi o dettagli d’esempio: controllale e correggile. Le <strong>recensioni</strong> di serie sono segnaposto: sostituiscile con recensioni vere (con il permesso dei clienti) prima della messa online.</li>
@@ -72,6 +73,13 @@
 	<li>Gli stessi numeri sono nel PDF <strong>«Colori MoveOn»</strong>: puoi cambiare il colore dei quadrati e mandarlo a Claude, che dal numero sa quale colore sostituire.</li>
 	<li>Leggibilità: i testi chiari (7, 8, 10) stanno sui fondi scuri (1, 2), i testi scuri (1, 9) sui fondi chiari (7, 8). Se scurisci il 7 o schiarisci l’1, controlla che i testi si leggano ancora.</li>
 	<li>Nel CSS aggiuntivo i colori sono le variabili <code>--mo-c1</code> … <code>--mo-c10</code>, es. <code>:root{--mo-c6:#e11d48}</code>.</li>
+</ul>
+
+<h2>Farsi trovare su Google</h2>
+<ul>
+	<li><strong>MoveOn → Impostazioni → Zona in cui lavori</strong>: un comune per riga, il primo è quello principale. Non compare nella pagina: insieme ai servizi va nei dati che Google legge per capire cosa fai e dove. Tienilo uguale alla zona servita della scheda Google.</li>
+	<li>Con <strong>Rank Math</strong> attivo, zona e servizi si aggiungono alla scheda dell’attività che compili in Rank Math (nome, logo, contatti): Google trova una scheda sola. Senza Rank Math il plugin ne crea una da solo, con il comune ma senza la via.</li>
+	<li>Per controllare: apri la home, tasto destro → «Visualizza sorgente pagina» e cerca <code>areaServed</code>; oppure, a sito online, lo strumento «Test dei risultati multimediali» di Google.</li>
 </ul>
 
 <h2>Chi sono (breve)</h2>

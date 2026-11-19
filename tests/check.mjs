@@ -553,14 +553,18 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const h = await page.evaluate(() => ({
     breve: !!document.querySelector('.mo-cb'), lungo: !!document.querySelector('.mo-about'), situazioni: document.querySelectorAll('.mo-si-card').length,
     scopri: [...document.querySelectorAll('.mo-svc-more')].map((a) => new URL(a.href).pathname), app: /App WebView/i.test(document.body.textContent),
+    dati: [...document.querySelectorAll('script[type="application/ld+json"].mo-dati-google')].map((x) => x.textContent),
   }));
   check('Home leggera: «Chi sono» breve al posto di quello lungo, «Non sai da dove partire?»', h.breve && !h.lungo && h.situazioni >= 3, JSON.stringify({ breve: h.breve, lungo: h.lungo, situazioni: h.situazioni }));
-  check('Servizi: «Scopri di più» verso la pagina di ogni servizio, App WebView tolta', h.scopri.length === 5 && h.scopri.every((u) => /\/nuovo\/servizi\/[^/]+\/$/.test(u)) && !h.app, h.scopri.join(' '));
+  check('Servizi: «Scopri di più» verso la pagina di ogni servizio, App WebView tolta', h.scopri.length >= 4 && h.scopri.every((u) => /\/nuovo\/servizi\/[^/]+\/$/.test(u)) && !h.app, h.scopri.join(' '));
+  check('Servizi in home: Social, Siti web, Grafica, Stampa (la Formazione solo nel menu)', h.scopri.map((u) => u.split('/').at(-2)).join(',') === 'social,siti-web,grafica,stampa', h.scopri.join(' '));
+  let dg = null; try { dg = JSON.parse(h.dati[0]); } catch (e) { /* non valido */ }
+  check('Dati per Google in home: attività con zona servita (Pescara…) e i 5 servizi', h.dati.length === 1 && dg && dg['@type'] === 'ProfessionalService' && dg.areaServed?.[0]?.name === 'Pescara' && dg.areaServed.length >= 20 && dg.hasOfferCatalog?.itemListElement?.length === 5 && dg.address?.addressLocality === 'Pescara' && !dg.address.streetAddress, (h.dati[0] || 'nessuno').slice(0, 160));
   // Menu a tendina
   await page.hover('.mo-nav-item > a');
   await page.waitForTimeout(500);
-  const sub = await page.evaluate(() => { const s = document.querySelector('.mo-sub'); return { vis: getComputedStyle(s).visibility, n: s.querySelectorAll('a').length }; });
-  check('Menu: i servizi compaiono a tendina sotto «Servizi»', sub.vis === 'visible' && sub.n === 5, JSON.stringify(sub));
+  const sub = await page.evaluate(() => { const s = document.querySelector('.mo-sub'); return { vis: getComputedStyle(s).visibility, n: s.querySelectorAll('a').length, ultimo: [...s.querySelectorAll('a')].at(-1)?.textContent.trim() }; });
+  check('Menu: i servizi compaiono a tendina sotto «Servizi», Formazione in fondo', sub.vis === 'visible' && sub.n === 5 && sub.ultimo === 'Formazione', JSON.stringify(sub));
   // «Chiedimi un consiglio» nella home: il messaggio è già scritto nel modulo
   await page.evaluate(() => document.querySelector('.mo-si').scrollIntoView());
   await page.waitForTimeout(1200);

@@ -155,7 +155,7 @@ function mo_pagine_pronte(): array {
 			'madre'   => '',
 			'sezioni' => array(
 				array( 'intestazione', array( 'etichetta' => 'Servizi', 'titolo' => 'Tutto quello che serve alla tua attività per farsi notare.', 'testo' => 'Grafica, siti, social e stampa: un solo referente, dall’idea al prodotto finito.' ) ),
-				array( 'servizi', array() ),
+				array( 'servizi', array( 'servizi' => mo_schede_servizi_tutte() ) ),
 				array( 'situazioni', array( 'link' => '/contatti/' ) ),
 				array( 'invito', array() ),
 			),
@@ -166,7 +166,7 @@ function mo_pagine_pronte(): array {
 			'sezioni' => array(
 				array( 'contatti', array() ),
 				array( 'faq', array( 'domande' => array(
-					array( 'domanda' => 'Dove lavori?', 'risposta' => 'A Pescara e in tutta la provincia. [Per alcuni lavori anche a distanza.]' ),
+					array( 'domanda' => 'Dove lavori?', 'risposta' => 'A Pescara e nei comuni vicini, entro circa 30 km: Montesilvano, Chieti, Francavilla al Mare, Spoltore, Città Sant’Angelo, Silvi, Ortona e dintorni. Siti, social e lezioni online li seguo in tutta Italia.' ),
 					array( 'domanda' => 'Quanto costa un lavoro?', 'risposta' => 'Dipende da cosa ti serve. Dopo una breve chiacchierata ti mando un preventivo chiaro, voce per voce, prima di iniziare.' ),
 					array( 'domanda' => 'In quanto tempo mi rispondi?', 'risposta' => '[Di solito entro un giorno lavorativo.]' ),
 				) ) ),
@@ -191,6 +191,18 @@ function mo_pagine_pronte(): array {
 
 /** I servizi con la loro pagina (l'App non c'è: il titolare ha deciso di non mostrarla per ora). */
 function mo_servizi_pagine(): array {
+	$testi = mo_servizi_pagine_testi();
+	$out   = array();
+	foreach ( mo_ordine_servizi() as $k ) {
+		if ( isset( $testi[ $k ] ) ) {
+			$out[ $k ] = $testi[ $k ];
+		}
+	}
+	return $out + $testi;
+}
+
+/** Testi delle pagine dei servizi (l'ordine lo decide mo_ordine_servizi()). */
+function mo_servizi_pagine_testi(): array {
 	return array(
 		'grafica'    => array(
 			'nome'          => 'Grafica e immagine',
@@ -271,8 +283,8 @@ function mo_servizi_pagine(): array {
 		'formazione' => array(
 			'nome'          => 'Formazione',
 			'area'          => '',
-			'titolo'        => 'Corsi di grafica e WordPress, uno a uno.',
-			'testo'         => 'Lezioni individuali, su misura per te o per i tuoi collaboratori: impari a usare gli strumenti dei professionisti.',
+			'titolo'        => 'Lezioni di grafica e WordPress, uno a uno, online.',
+			'testo'         => 'Lezioni individuali online, anche la sera e nel weekend: impari a usare gli strumenti dei professionisti senza togliere tempo al tuo lavoro.',
 			'punti_titolo'  => 'Impari quello che ti serve davvero.',
 			'punti'         => array(
 				array( 'titolo' => 'Lezioni su misura', 'testo' => 'Partiamo da quello che sai già e da quello che ti serve nel lavoro.' ),
@@ -280,10 +292,12 @@ function mo_servizi_pagine(): array {
 				array( 'titolo' => 'Diventi autonomo', 'testo' => 'L’obiettivo è che tu possa fare da solo le cose di tutti i giorni.' ),
 			),
 			'elenco_titolo' => 'Cosa puoi imparare.',
-			'voci'          => "Photoshop\nIllustrator\nInDesign\nWordPress\nPreparare i file per la stampa\nGrafiche per i social\nCorsi per aziende e collaboratori",
+			'voci'          => "Photoshop\nIllustrator\nInDesign\nWordPress\nPreparare i file per la stampa\nGrafiche per i social\nAggiornare da solo il tuo sito",
 			'faq'           => array(
 				array( 'domanda' => 'Serve esperienza?', 'risposta' => 'No: si parte dal tuo livello, anche da zero.' ),
-				array( 'domanda' => 'Dove si fanno le lezioni?', 'risposta' => '[A Pescara di persona oppure online, come preferisci.]' ),
+				array( 'domanda' => 'Dove si fanno le lezioni?', 'risposta' => 'Online, con lo schermo condiviso: ti basta un computer. [Se preferisci, anche da te, a Pescara e dintorni.]' ),
+				array( 'domanda' => 'In che orari?', 'risposta' => 'La sera o nel weekend: così non togli ore al tuo lavoro.' ),
+				array( 'domanda' => 'Ho appena fatto il sito: posso imparare ad aggiornarlo?', 'risposta' => 'Sì: in una o due lezioni impari a cambiare testi, foto e pagine da solo.' ),
 				array( 'domanda' => 'Quanto dura un corso?', 'risposta' => 'Dipende dagli obiettivi: [di solito da 4 a 10 lezioni].' ),
 			),
 		),

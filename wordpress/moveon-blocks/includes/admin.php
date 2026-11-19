@@ -57,6 +57,8 @@ add_action(
 				$out[ $k ] = esc_url_raw( trim( (string) $val ) );
 			} elseif ( 'email' === $k ) {
 				$out[ $k ] = sanitize_email( (string) $val );
+			} elseif ( 'zona' === $k ) {
+				$out[ $k ] = sanitize_textarea_field( (string) $val );
 			} else {
 				$out[ $k ] = sanitize_text_field( (string) $val );
 			}
@@ -180,6 +182,8 @@ add_action(
 			$esito = array( 'pagine' => mo_crea_pagine(), 'menu_pagine' => mo_crea_menu_pagine() );
 		} elseif ( 'alleggerisci' === $azione ) {
 			$esito = array( 'alleggerita' => mo_alleggerisci_home() );
+		} elseif ( 'servizi' === $azione ) {
+			$esito = array( 'servizi_ordinati' => mo_ordina_servizi() );
 		}
 		set_transient( 'moveon_esito_' . get_current_user_id(), $esito, 120 );
 		wp_safe_redirect( admin_url( 'admin.php?page=moveon&tab=strumenti&fatto=' . $azione ) );
@@ -326,6 +330,10 @@ function mo_admin_impostazioni(): void {
 			$text( 'email', 'Email', 'Usata da «Scrivici». È anche l’indirizzo a cui arrivano le richieste del modulo.', 'email' );
 			?>
 		</table>
+		<h2>Zona in cui lavori (per Google)</h2>
+		<table class="form-table" role="presentation">
+			<tr><th><label for="mo-zona">Comuni</label></th><td><textarea class="large-text" rows="8" id="mo-zona" name="mo[zona]"><?php echo esc_textarea( (string) $s['zona'] ); ?></textarea><p class="description">Un comune per riga, il primo è quello principale. Non compare nella pagina: va nei dati che Google legge per capire dove lavori (insieme ai servizi e alla scheda di Rank Math). Tienilo uguale alla «zona servita» della scheda Google.</p></td></tr>
+		</table>
 		<h2>Pulsanti</h2>
 		<table class="form-table" role="presentation">
 			<?php
@@ -456,6 +464,16 @@ function mo_admin_strumenti(): void {
 				echo '<li>La home era già alleggerita: niente da cambiare.</li>';
 			}
 		}
+		if ( isset( $esito['servizi_ordinati'] ) ) {
+			if ( $esito['servizi_ordinati']['fatto'] ) {
+				foreach ( $esito['servizi_ordinati']['fatto'] as $f ) {
+					echo '<li>' . esc_html( ucfirst( $f ) ) . '.</li>';
+				}
+				echo '<li>Le versioni precedenti delle pagine restano nelle <strong>Revisioni</strong>.</li>';
+			} else {
+				echo '<li>I servizi erano già in ordine: niente da cambiare.</li>';
+			}
+		}
 		echo '</ul></div>';
 	}
 	$form = function ( $azione, $titolo, $testo, $bottone, $extra = '' ) {
@@ -473,8 +491,9 @@ function mo_admin_strumenti(): void {
 		</div>
 		<?php
 	};
-	$form( 'pagine', 'Crea le pagine', 'Crea le pagine <strong>Chi sono</strong>, <strong>Servizi</strong> (con una pagina per ogni servizio: Grafica, Siti web, Social, Stampa, Formazione) e <strong>Contatti</strong>, già composte con gli elementi MoveOn e i testi da correggere, più il <strong>menu con i servizi a tendina</strong>. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.', 'Crea le pagine e il menu' );
+	$form( 'pagine', 'Crea le pagine', 'Crea le pagine <strong>Chi sono</strong>, <strong>Servizi</strong> (con una pagina per ogni servizio: Social, Siti web, Grafica, Stampa, Formazione) e <strong>Contatti</strong>, già composte con gli elementi MoveOn e i testi da correggere, più il <strong>menu con i servizi a tendina</strong>. Le pagine che esistono già non vengono toccate; il menu di prima resta in Aspetto → Menu.', 'Crea le pagine e il menu' );
 	$form( 'alleggerisci', 'Alleggerisci la home', 'Nella pagina impostata come home: sostituisce «Chi siamo» con la versione breve <strong>Chi sono</strong> (il resto va nella pagina Chi sono) aggiunge <strong>Non sai da dove partire?</strong> dopo i Servizi e porta la <strong>Pausa emozionale</strong> dentro il Chi sono (foto, punto focale e frase; l’elemento Pausa sparisce). La versione precedente resta nelle <strong>Revisioni</strong> della pagina e si può ripristinare.', 'Alleggerisci la home' );
+	$form( 'servizi', 'Metti in ordine i servizi', 'Mette i servizi nell’ordine scelto: <strong>Social, Siti web, Grafica, Stampa</strong>, poi la <strong>Formazione</strong>. Nella <strong>home</strong> la Formazione non ha più la scheda; nella <strong>pagina Servizi</strong> e nel <strong>menu a tendina</strong> resta, in fondo. I testi e le foto delle schede non cambiano; i colori restano al loro posto (il ritmo bianco, blu, grigio non cambia). La versione precedente resta nelle <strong>Revisioni</strong>.', 'Metti in ordine i servizi' );
 	$form( 'demo', 'Crea la pagina demo', 'Crea una pagina «Home MoveOn» con il modello <strong>MoveOn · pagina intera</strong> e tutte le sezioni della home già compilate, più i progetti di esempio e il menu. Puoi crearla più volte: ogni volta è una pagina nuova.', 'Crea la pagina demo', '<p><label><input type="checkbox" name="home" value="1"> Imposta la pagina come home del sito</label></p>' );
 	$form( 'progetti', 'Crea i progetti di esempio', 'Crea gli 8 progetti di esempio del prototipo in «Progetti portfolio», con le copertine nella Libreria media. Quelli già creati non vengono duplicati.', 'Crea i progetti' );
 	$form( 'menu', 'Crea il menu', 'Crea il menu «MoveOn · menu principale» con le voci Chi siamo, Servizi, Portfolio, Contatti e lo assegna all’header.', 'Crea il menu' );
