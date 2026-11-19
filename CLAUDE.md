@@ -71,6 +71,9 @@ Colori del cliente (PDF):
 - `node tools/colori-pdf.cjs` rigenera `dist/colori-moveon.pdf` dai colori di `includes/colori.php` (quadrati pieni numerati, Montserrat del plugin). Rigeneralo se cambiano nomi, numeri o colori di serie.
 - Quando il cliente rimanda il PDF modificato: `python3 -I tools/colori-da-pdf.py <pdf>` dice quali numeri sono cambiati e stampa il `mo_colori_salva(...)` da provare nel WordPress di prova. Se decide di cambiare i colori **di serie**, aggiorna `mo_colori_base()` e le definizioni `--mo-cN` in cima a moveon.css; altrimenti basta che li metta lui in MoveOn → Colori.
 
+Elenco delle cose da fare del cliente (PDF):
+- `node tools/cose-da-fare-pdf.cjs` → `dist/cose-da-fare.pdf`: passi numerati con caselle (parte A «adesso, in ordine», parte B «con calma, prima della messa online», cosa fa Claude dopo). Chiesto dal cliente il 19/11/2026 perché fatica a ricordare tutto: quando scrive **«tutto fatto»** ha completato la parte A (passi 1–13: plugin 1.10.0, testi Formazione/Contatti, Scoraggia motori, Rank Math SEO locale + screenshot, LegalBlink su /nuovo, scheda Google con metodo di verifica). A ogni nuova serie di richieste aggiorna i testi nello script, rigeneralo e mandaglielo.
+
 Inciampi già visti:
 - Nel WordPress di prova non si scarica da wordpress.org (rete bloccata).
 - Gli script Playwright salvano gli screenshot nella cartella corrente: lanciali dalla scratchpad, mai dalla cartella del plugin (uno screenshot è finito una volta nello zip). Prima del commit controlla `git status`.
