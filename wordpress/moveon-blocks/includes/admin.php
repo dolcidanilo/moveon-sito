@@ -59,6 +59,8 @@ add_action(
 				$out[ $k ] = sanitize_email( (string) $val );
 			} elseif ( 'analytics_id' === $k ) {
 				$out[ $k ] = mo_analytics_id( (string) $val );
+			} elseif ( 'email_copia' === $k ) {
+				$out[ $k ] = implode( ', ', mo_email_lista( (string) $val ) );
 			} elseif ( 'zona' === $k ) {
 				$out[ $k ] = sanitize_textarea_field( (string) $val );
 			} else {
@@ -330,6 +332,7 @@ function mo_admin_impostazioni(): void {
 			$text( 'telefono', 'Telefono', 'Usato da «Chiamaci» e dalla barra in basso su mobile. Non compare mai scritto nella pagina.' );
 			$text( 'whatsapp', 'Numero WhatsApp', 'Usato da «Chatta». Se manca il prefisso viene aggiunto +39.' );
 			$text( 'email', 'Email', 'Usata da «Scrivici». È anche l’indirizzo a cui arrivano le richieste del modulo.', 'email' );
+			$text( 'email_copia', 'Avviso delle richieste anche a', 'Altri indirizzi a cui arriva l’avviso quando qualcuno compila il modulo, per esempio il tuo Gmail. Più indirizzi separati da una virgola. Non compaiono mai nel sito.' );
 			?>
 		</table>
 		<h2>Zona in cui lavori (per Google)</h2>

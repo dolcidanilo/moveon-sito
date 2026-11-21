@@ -87,7 +87,7 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 	}
 
 	$s     = mo_settings();
-	$to    = is_email( $s['email'] ) ? $s['email'] : get_option( 'admin_email' );
+	$to    = mo_destinatari_richieste();
 	$testo = "Nuova richiesta dal sito\n\n"
 		. "Nome: {$nome}\nEmail: {$email}\n"
 		. ( $telefono ? "Telefono: {$telefono}\n" : '' )
@@ -114,7 +114,7 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 				'post_type'    => MO_RICHIESTE,
 				'post_status'  => 'private',
 				'post_title'   => $nome . ' · ' . $area,
-				'post_content' => $testo . "\n\n" . mo_esito_email( $inviata, $to, $errore_mail ),
+				'post_content' => $testo . "\n\n" . mo_esito_email( $inviata, implode( ', ', $to ), $errore_mail ),
 			)
 		);
 	}
@@ -131,4 +131,23 @@ function mo_esito_email( bool $inviata, string $to, string $errore = '' ): strin
 		return '[Email di avviso spedita a ' . $to . '. Se non la trovi, guarda nella cartella spam della casella]';
 	}
 	return '[Attenzione: l’email di avviso a ' . $to . ' non è partita' . ( '' !== $errore ? ': ' . rtrim( $errore, '. ' ) : '' ) . '. Controlla WP Mail SMTP]';
+}
+
+/** Indirizzi email puliti da un testo (separati da virgola, spazio o a capo), senza doppioni. */
+function mo_email_lista( string $testo ): array {
+	$out = array();
+	foreach ( preg_split( '/[\s,;]+/', $testo ) as $e ) {
+		$e = sanitize_email( $e );
+		if ( is_email( $e ) && ! in_array( strtolower( $e ), array_map( 'strtolower', $out ), true ) ) {
+			$out[] = $e;
+		}
+	}
+	return $out;
+}
+
+/** A chi arriva l'avviso di una nuova richiesta: l'email principale più le copie (MoveOn → Impostazioni → Contatti). */
+function mo_destinatari_richieste(): array {
+	$s     = mo_settings();
+	$prima = is_email( $s['email'] ?? '' ) ? array( $s['email'] ) : array( get_option( 'admin_email' ) );
+	return mo_email_lista( implode( ',', array_merge( $prima, mo_email_lista( (string) ( $s['email_copia'] ?? '' ) ) ) ) );
 }

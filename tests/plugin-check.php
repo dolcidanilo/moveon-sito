@@ -401,5 +401,12 @@ check( 'Analytics: consenso negato di serie, gtag.js caricato solo dopo il conse
 // 1.11.1: esito dell'email di avviso nella copia della richiesta
 check( 'Richieste dal sito: scritto a chi è partita l’email o perché non è partita', str_contains( mo_esito_email( true, 'info@x.it' ), 'spedita a info@x.it' ) && str_contains( mo_esito_email( false, 'info@x.it', 'SMTP Error: Could not authenticate.' ), 'non è partita: SMTP Error: Could not authenticate.' ) );
 
+// 1.11.2: avviso delle richieste anche ad altri indirizzi
+check( 'Avviso delle richieste: indirizzi puliti, senza doppioni né indirizzi sbagliati', array( 'a@x.it', 'b@y.com' ) === mo_email_lista( 'a@x.it, b@y.com;A@x.it  non-valido' ) );
+$s112 = get_option( 'moveon_settings', array() );
+update_option( 'moveon_settings', array_merge( (array) $s112, array( 'email' => 'info@moveonstudio.it', 'email_copia' => 'copia@example.com' ) ) );
+check( 'Avviso delle richieste: email principale e copia', array( 'info@moveonstudio.it', 'copia@example.com' ) === mo_destinatari_richieste() );
+update_option( 'moveon_settings', $s112 );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

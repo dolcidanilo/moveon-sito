@@ -39,7 +39,7 @@ Il file [`CLAUDE.md`](CLAUDE.md) è la memoria del progetto: Claude Code lo legg
 npm install                     # librerie sorgente (GSAP, Lenis, Montserrat)
 npm run wp:prova                # WordPress di prova in /tmp/moveon-wp, http://127.0.0.1:8080/nuovo/
 npm test                        # controlli nel browser (Playwright): 143 controlli, con un «tema ostile» che simula Porto
-npm run test:php                # controlli sul motore PHP: 134 controlli
+npm run test:php                # controlli sul motore PHP: 136 controlli
 npm run zip                     # ricrea dist/moveon-blocks.zip
 ```
 

@@ -19,6 +19,7 @@ function mo_defaults(): array {
 			'telefono'        => '+39 347 461 6434',
 			'whatsapp'        => '+39 347 461 6434',
 			'email'           => 'info@moveonstudio.it',
+			'email_copia'     => '',
 			'header_cta'      => 'Richiedi Preventivo',
 			'cta_link'        => '#contatti',
 			'mobile_cta'      => 'Contattami Ora',
