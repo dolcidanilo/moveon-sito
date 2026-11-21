@@ -9,51 +9,29 @@ const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '..');
 const versione = (/Version:\s+([\d.]+)/.exec(fs.readFileSync(path.join(ROOT, 'wordpress/moveon-blocks/moveon-blocks.php'), 'utf8')) || [])[1] || '';
-const DATA = '19 novembre 2026';
+const DATA = '21 novembre 2026';
 // Passi della parte A già fatti dal cliente (casella spuntata)
-const FATTI = 13;
+const FATTI = 0;
 
 // Ogni passo: [titolo, dettagli (HTML)]
 const parteA = [
-  ['Fai un backup di /nuovo', 'Dal pannello Aruba (backup dello spazio web e del database) o con il tuo plugin di backup. È solo una sicurezza prima delle modifiche.'],
-  ['Aggiorna il plugin MoveOn Blocks alla versione 1.10.1', 'Scarica <b>moveon-blocks.zip</b> (te l’ho mandato in chat, oppure da GitHub, branch «materiali», cartella dist) → <b>Plugin → Aggiungi nuovo → Carica plugin</b> → scegli lo zip → <b>«Sostituisci la versione installata»</b> → svuota la cache.'],
-  ['Metti in ordine i servizi', '<b>MoveOn → Strumenti → «Metti in ordine i servizi»</b>. Poi controlla: in home 4 schede (Social, Siti web, Grafica, Stampa); nel menu a tendina la Formazione è in fondo.'],
-  ['Controlla la zona in cui lavori', '<b>MoveOn → Impostazioni → Zona in cui lavori</b>: ci sono i 23 comuni che mi hai confermato. Cambia solo se vuoi togliere o aggiungere qualcosa, poi <b>Salva</b>.'],
-  ['Pagina Formazione: incolla i testi nuovi', `Apri la pagina Formazione con WPBakery.
-    <div class="testo"><b>Intestazione</b> · Titolo: <i>Lezioni di grafica e WordPress, uno a uno, online.</i><br>
-    Testo: <i>Lezioni individuali online, anche la sera e nel weekend: impari a usare gli strumenti dei professionisti senza togliere tempo al tuo lavoro.</i></div>
-    <div class="testo"><b>Cosa realizzo</b> · al posto di «Corsi per aziende e collaboratori»: <i>Aggiornare da solo il tuo sito</i></div>
-    <div class="testo"><b>Domande frequenti</b><br>
-    <i>Dove si fanno le lezioni?</i> → <i>Online, con lo schermo condiviso: ti basta un computer. Se preferisci, anche da te, a Pescara e dintorni.</i><br>
-    <i>In che orari?</i> → <i>La sera o nel weekend: così non togli ore al tuo lavoro.</i><br>
-    <i>Ho appena fatto il sito: posso imparare ad aggiornarlo?</i> → <i>Sì: in una o due lezioni impari a cambiare testi, foto e pagine da solo.</i></div>`],
-  ['Pagina Contatti: risposta a «Dove lavori?»', `Nelle Domande frequenti della pagina Contatti:
-    <div class="testo"><i>A Pescara e nei comuni vicini, entro circa 30 km: Montesilvano, Chieti, Francavilla al Mare, Spoltore, Città Sant’Angelo, Silvi, Ortona e dintorni. Siti, social e lezioni online li seguo in tutta Italia.</i></div>`],
-  ['Tieni /nuovo nascosto a Google', '<b>Impostazioni → Lettura</b>: spunta <b>«Scoraggia i motori di ricerca dall’effettuare l’indicizzazione di questo sito»</b> → Salva. Lo togliamo noi alla messa online.'],
-  ['Rank Math: compila la scheda della tua attività', `<b>Rank Math SEO → Titoli e Meta → SEO locale</b> (in inglese «Local SEO»). I nomi dei campi possono essere un po’ diversi.
-    <ul><li>Persona o azienda: <b>Azienda</b> (così resti anonimo)</li>
-    <li>Nome: <b>MoveOn Studio</b> · logo · email · telefono</li>
-    <li>Indirizzo: <b>solo</b> comune (Pescara), CAP, provincia, paese. <b>Niente via.</b></li>
-    <li>Tipo di attività, se c’è: <b>Professional Service</b></li></ul>
-    Salva e <b>fai uno screenshot</b> della pagina: mi serve.`],
-  ['Rank Math: tre ritocchi', `<ul><li><b>Impostazioni → Generali → Titolo del sito</b>: <b>MoveOn Studio</b> (non tutto maiuscolo)</li><li>Home in modifica → riquadro Rank Math → <b>Modifica snippet</b> → Titolo: <i>MoveOn Studio · Social, siti web e grafica a Pescara</i> · Descrizione: <i>Social, siti web, grafica e stampa per aziende e professionisti di Pescara e dintorni. Un solo referente dall’idea al prodotto finito.</i> → Aggiorna</li><li><b>Rank Math SEO → Titoli e Meta → Pagine</b> → Tipo di schema: <b>Nessuno</b>; <b>Titoli e Meta → Autori</b> → disattiva <b>Archivi autore</b> → Salva</li></ul>`],
-  ['iubenda: attiva il Consent Mode nel banner', 'Su iubenda.com → <b>Privacy Controls and Cookie Solution → MODIFICA</b>: controlla che sia attivo il <b>Google Consent Mode</b> (di solito tra le impostazioni avanzate o le integrazioni) → Salva. LegalBlink si valuta al rinnovo del dominio (<b>3 febbraio 2027</b>): segnati anche la data di rinnovo di iubenda.'],
-  ['iubenda: installa il banner su /nuovo', '<b>Plugin → Aggiungi nuovo</b> → cerca <b>«iubenda»</b> → installa <b>«iubenda | All-in-one Compliance for GDPR / CCPA Cookie Consent»</b> → Attiva → segui la procedura guidata. Quando chiede il codice, lo trovi su iubenda → Privacy Controls and Cookie Solution → <b>INTEGRA</b>. Poi apri /nuovo in una finestra in incognito: deve comparire il banner. Se hai dubbi, mandami uno screenshot.'],
-  ['Controlla i link Privacy e Cookie', '<b>MoveOn → Impostazioni → Footer e note legali</b>: apri «Link Privacy Policy» e «Link Cookie Policy» e controlla che portino alle <b>tue</b> policy iubenda (i link giusti sono in iubenda → Privacy e Cookie Policy → INTEGRA). Se sono diversi, sostituiscili → Salva.'],
-  ['Google Analytics: il codice di misurazione', 'Se il sito attuale ha già Google Analytics 4: Analytics → <b>Amministrazione → Stream di dati</b> → il tuo sito → copia l’<b>ID misurazione</b> (inizia con <b>G-</b>) e mandamelo: non è un dato segreto. Se non ce l’hai, dimmelo e ti guido a crearlo, con lo stesso account Google della scheda Google.'],
-  ['Aggiorna il plugin alla versione ' + versione + ' e prova Analytics', 'Come al passo 2: <b>Plugin → Aggiungi nuovo → Carica plugin</b> → <b>«Sostituisci la versione installata»</b>. In <b>MoveOn → Impostazioni → Statistiche</b> trovi già il tuo ID (G-MBM70CV9SC). Prova: apri /nuovo in una <b>finestra in incognito</b> (da collegato le tue visite non si contano), <b>accetta i cookie</b>, poi in Analytics → Rapporti → <b>Tempo reale</b> deve comparire 1 utente. Se non compare, mandami uno screenshot.'],
-  ['Scheda Google (Google Business Profile): creala e avvia la verifica', `Vai su <b>business.google.com</b> con l’account Google dell’attività (lo stesso userò per Analytics e Search Console).
-    <ul><li>Nome: solo <b>MoveOn Studio</b> (niente «Pescara» o altre parole: Google penalizza)</li>
-    <li>Categoria principale: la più vicina ai social, es. <b>«Consulente di social media»</b> o <b>«Agenzia di marketing»</b>; secondarie: <b>«Web designer»</b>, <b>«Graphic designer»</b>. Se hai dubbi, mandami lo screenshot delle categorie proposte.</li>
-    <li>«Hai una sede dove ricevi i clienti?» → <b>No</b></li>
-    <li>Zona servita (massimo 20): Pescara, Montesilvano, Chieti, Francavilla al Mare, Spoltore, San Giovanni Teatino, Città Sant’Angelo, Silvi, Pineto, Ortona, Cepagatti, Pianella, Penne, Loreto Aprutino, Cappelle sul Tavo, Collecorvino, Manoppello, Atri, Miglianico, Tollo</li>
-    <li>Google chiede un indirizzo per la verifica ma <b>non lo mostra</b></li>
-    <li>Telefono · sito: <b>moveonstudio.it</b> (resta uguale anche dopo lo spostamento) · orari in cui rispondi davvero</li>
-    <li>Servizi: Social, Siti web, Grafica, Stampa, Formazione · foto: logo, una copertina, qualche lavoro</li>
-    <li>Descrizione, pronta da incollare:</li></ul>
+  ['Installa WP Mail SMTP su /nuovo', '<b>Plugin → Aggiungi nuovo</b> → cerca <b>«WP Mail SMTP»</b> (di WPForms, gratuito) → Installa → Attiva. Se parte una procedura guidata, chiudila: lo configuriamo a mano qui sotto.'],
+  ['Collega la casella info@moveonstudio.it', `<b>WP Mail SMTP → Impostazioni</b>:
+    <ul><li>Email mittente: <b>info@moveonstudio.it</b> e spunta <b>«Forza email mittente»</b></li>
+    <li>Nome mittente: <b>MoveOn Studio</b> e spunta <b>«Forza nome mittente»</b></li>
+    <li>Mailer: <b>Altro SMTP</b> («Other SMTP»)</li>
+    <li>Host SMTP: <b>smtps.aruba.it</b> · Crittografia: <b>SSL</b> · Porta: <b>465</b></li>
+    <li>Autenticazione: <b>sì</b> · Nome utente: <b>info@moveonstudio.it</b> · Password: quella della casella email (la scrivi tu lì, <b>mai in chat</b>)</li></ul>
+    → <b>Salva le impostazioni</b>.`],
+  ['Manda un’email di prova', '<b>WP Mail SMTP → Strumenti → Test email</b>: scrivi un tuo indirizzo Gmail → Invia. Deve arrivare in <b>Posta in arrivo</b>, non nello spam. Se compare un errore, mandami uno screenshot.'],
+  ['Prova il modulo contatti', 'Apri /nuovo in una <b>finestra in incognito</b>, accetta i cookie e compila il modulo usando come email un tuo indirizzo Gmail. Controlla che: la richiesta arrivi su <b>info@moveonstudio.it</b>; premendo <b>«Rispondi»</b> il destinatario sia l’indirizzo Gmail; la richiesta compaia anche nel pannello in <b>Richieste dal sito</b>.'],
+  ['Scheda Google verificata: completala', `Quando Google ha finito la verifica (fino a 5 giorni; prima <b>non modificare</b> la scheda), da <b>Modifica profilo</b>:
+    <ul><li><b>Descrizione</b>, pronta da incollare:</li></ul>
     <div class="testo"><i>Grafica, siti web, social e stampa per aziende e professionisti di Pescara e dintorni. Seguo ogni lavoro dall’idea al prodotto finito, con un solo referente e 25 anni di esperienza nella comunicazione: pagine social curate e pubblicità online, siti chiari e veloci che portano contatti, loghi e immagine coordinata, stampa e allestimenti con fornitori scelti. Ti spiego tutto con parole semplici e ti mando un preventivo chiaro, voce per voce, prima di iniziare. Anche lezioni individuali online di Photoshop, Illustrator, InDesign e WordPress.</i></div>
-    Avvia la verifica e <b>annota il metodo</b> che ti propone Google (la verifica può richiedere giorni: non serve aspettarla per scrivermi).`],
-  ['Scrivimi «tutto fatto»', 'Dimmi se in <b>Tempo reale</b> hai visto la tua visita (passo 14) e quale <b>metodo di verifica</b> ti ha proposto Google (passo 15). Io proseguo con i punti qui sotto.'],
+    <ul><li><b>Categorie secondarie</b>: Web designer, Graphic designer</li>
+    <li><b>Servizi</b>: Social e pubblicità online, Siti web e negozi online, Grafica e immagine, Stampa e allestimenti, Formazione</li>
+    <li><b>Foto</b>: logo quadrato, una copertina, 5–10 lavori (con il permesso dei clienti)</li></ul>`],
+  ['Scrivimi «tutto fatto»', 'Dimmi se l’email di prova e il modulo sono arrivati (e dove: posta in arrivo o spam) e se la scheda Google è verificata. Poi prepariamo lo spostamento del sito (W4).'],
 ];
 
 const parteB = [
@@ -64,13 +42,14 @@ const parteB = [
     Poi sostituisci i segnaposto nell’elemento <b>MoveOn · Recensioni</b>: quelli finti <b>non possono andare online</b>. Quando la scheda Google è verificata, chiedi le recensioni anche lì: pesano molto per farti trovare.`],
   ['Progetti veri', '<b>Progetti portfolio</b>: aggiungi i lavori veri (con il permesso dei clienti) e nascondi o elimina gli 8 progetti di esempio.'],
   ['File per le skill di claude.ai', 'Logo grande in PNG (versione chiara e scura) o PDF, il simbolo da solo, i link ai tuoi profili social e qualche esempio di post.'],
+  ['Numero di telefono dedicato (quando arriva la SIM)', 'Cambialo <b>uguale ovunque</b>: scheda Google (telefono e link WhatsApp <b>https://wa.me/39…</b>), <b>MoveOn → Impostazioni</b> (Telefono e Numero WhatsApp), <b>Rank Math → Titoli e Meta → SEO locale</b>. Su quel numero usa <b>WhatsApp Business</b> con logo e nome MoveOn Studio.'],
 ];
 
 const dopo = [
-  'Controllo la scheda di Rank Math e i dati che legge Google.',
-  'Controllo il banner di iubenda e i link Privacy e Cookie nel footer e nel modulo contatti.',
-  'Rendo affidabile l’invio delle email del modulo (con la tua casella Aruba).',
-  'Poi la W4: lo spostamento del sito nuovo al posto di quello attuale.',
+  'Ti preparo il piano dello spostamento (W4): copia di sicurezza, passaggio di /nuovo al posto del sito attuale, indirizzi vecchi che portano alle pagine nuove.',
+  'Search Console di Google e la mappa del sito, per farti trovare da subito.',
+  'Aggiornamento della policy di iubenda (Google Analytics e il modulo nuovo) il giorno dello spostamento.',
+  'Controllo finale su computer e telefono, poi via «Scoraggia i motori di ricerca».',
 ];
 
 const esc = (t) => String(t);
@@ -108,7 +87,7 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>
   .piede { margin-top: 6mm; padding-top: 3mm; border-top: .3mm solid #e2e8f0; font-size: 8pt; color: #64748b; }
 </style></head><body>
   <h1>Cose da fare</h1>
-  <p class="intro">Tutto quello che ti ho chiesto, in ordine. Fai i passi della <b>parte A</b> uno dopo l’altro e spunta la casella; poi scrivimi <b>«tutto fatto»</b>. La <b>parte B</b> si fa con calma, ma deve essere finita prima della messa online.</p>
+  <p class="intro">Fase nuova (la prima lista è tutta fatta, grazie!). Tutto quello che ti chiedo, in ordine. Fai i passi della <b>parte A</b> uno dopo l’altro e spunta la casella; poi scrivimi <b>«tutto fatto»</b>. La <b>parte B</b> si fa con calma, ma deve essere finita prima della messa online.</p>
   <h2><span>A</span>Da fare adesso, in quest’ordine</h2>
   ${passi(parteA)}
   <h2><span>B</span>Con calma, prima della messa online</h2>
