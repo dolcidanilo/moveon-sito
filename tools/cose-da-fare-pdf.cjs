@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, '..');
 const versione = (/Version:\s+([\d.]+)/.exec(fs.readFileSync(path.join(ROOT, 'wordpress/moveon-blocks/moveon-blocks.php'), 'utf8')) || [])[1] || '';
 const DATA = '21 novembre 2026';
 // Passi della parte A già fatti dal cliente (casella spuntata)
-const FATTI = 0;
+const FATTI = 4;
 
 // Ogni passo: [titolo, dettagli (HTML)]
 const parteA = [
