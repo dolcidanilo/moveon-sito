@@ -393,5 +393,10 @@ unset( $GLOBALS['mo_dati_google_fatti'] );
 $dg10 = mo_dati_google();
 check( 'Senza Rank Math: scheda propria con telefono, email, comune senza via', 'ProfessionalService' === $dg10['@type'] && ! empty( $dg10['telephone'] ) && ! empty( $dg10['email'] ) && 'Pescara' === $dg10['address']['addressLocality'] && ! isset( $dg10['address']['streetAddress'] ) );
 
+// 1.11.0: Google Analytics solo dopo il consenso
+check( 'Analytics: ID controllato (G-…, maiuscole), quelli sbagliati diventano vuoti', 'G-MBM70CV9SC' === mo_analytics_id( ' g-mbm70cv9sc ' ) && '' === mo_analytics_id( 'UA-1234-1' ) && '' === mo_analytics_id( 'G-<script>' ) && '' === mo_analytics_id( '' ) );
+$ga = mo_analytics_codice( 'G-ABC1234' );
+check( 'Analytics: consenso negato di serie, gtag.js caricato solo dopo il consenso', str_contains( $ga, "analytics_storage:'denied'" ) && str_contains( $ga, '"G-ABC1234"' ) && ! str_contains( $ga, '<script async src=' ) && str_contains( $ga, "analytics_storage==='granted'" ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

@@ -932,6 +932,31 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- Google Analytics solo dopo il consenso (1.11.0) ---------------- */
+{
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  const google = [];
+  await page.route(/googletagmanager\.com|google-analytics\.com/, (r) => { google.push(r.request().url()); r.fulfill({ status: 204, body: '' }); });
+  await page.goto(URL, { waitUntil: 'load' });
+  await page.waitForTimeout(800);
+  const prima = await page.evaluate(() => ({ codice: !!document.getElementById('mo-analytics'), tag: document.querySelectorAll('script.mo-gtag').length }));
+  const primaRichieste = google.length;
+  await page.evaluate(() => window.gtag('consent', 'update', { analytics_storage: 'granted' }));
+  await page.waitForTimeout(800);
+  const dopo = await page.evaluate(() => document.querySelector('script.mo-gtag')?.src || '');
+  check('Analytics: niente Google prima del consenso, si carica dopo il consenso alle statistiche', prima.codice && prima.tag === 0 && primaRichieste === 0 && /gtag\/js\?id=G-/.test(dopo) && google.length > 0, JSON.stringify({ prima, primaRichieste, dopo, dopoRichieste: google.length }));
+  // Visita già acconsentita: il banner comunica il consenso prima del nostro codice
+  const p2 = await ctx.newPage();
+  await p2.route(/googletagmanager\.com|google-analytics\.com/, (r) => r.fulfill({ status: 204, body: '' }));
+  await p2.addInitScript(() => { window.dataLayer = [['consent', 'update', { analytics_storage: 'granted' }]]; });
+  await p2.goto(URL, { waitUntil: 'load' });
+  await p2.waitForTimeout(600);
+  const gia = await p2.evaluate(() => document.querySelectorAll('script.mo-gtag').length);
+  check('Analytics: con il consenso già dato (visita successiva) parte subito', gia === 1, String(gia));
+  await ctx.close();
+}
+
 await browser.close();
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} controlli superati`);

@@ -57,6 +57,8 @@ add_action(
 				$out[ $k ] = esc_url_raw( trim( (string) $val ) );
 			} elseif ( 'email' === $k ) {
 				$out[ $k ] = sanitize_email( (string) $val );
+			} elseif ( 'analytics_id' === $k ) {
+				$out[ $k ] = mo_analytics_id( (string) $val );
 			} elseif ( 'zona' === $k ) {
 				$out[ $k ] = sanitize_textarea_field( (string) $val );
 			} else {
@@ -350,6 +352,12 @@ function mo_admin_impostazioni(): void {
 			$text( 'legali', 'Dati legali', 'Compare dopo «© anno»: ragione sociale e P. IVA.' );
 			$text( 'privacy_url', 'Link Privacy Policy', 'Indirizzo della pagina della privacy. Usato nel footer e nel consenso del modulo.', 'url' );
 			$text( 'cookie_url', 'Link Cookie Policy', 'Indirizzo della pagina dei cookie. Lascia vuoto per non mostrarlo.', 'url' );
+			?>
+		</table>
+		<h2>Statistiche (Google Analytics)</h2>
+		<table class="form-table" role="presentation">
+			<?php
+			$text( 'analytics_id', 'ID misurazione', 'Inizia con G- (Analytics → Amministrazione → Stream di dati). Google parte solo dopo che il visitatore accetta i cookie dal banner (iubenda con «Google Consent Mode» attivo). Le tue visite, quando sei collegato al pannello, non si contano. Lascia vuoto per non usare Analytics.' );
 			?>
 		</table>
 		<h2>Pagina Progetti</h2>

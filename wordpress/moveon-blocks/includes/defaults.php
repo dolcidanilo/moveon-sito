@@ -30,6 +30,7 @@ function mo_defaults(): array {
 			'salva_richieste' => 1,
 			'tema_scuro'      => 1,
 			'sfondo_scorre'   => 0,
+			'analytics_id'    => 'G-MBM70CV9SC',
 			'zona'            => "Pescara\nMontesilvano\nSpoltore\nCittà Sant'Angelo\nCappelle sul Tavo\nMoscufo\nCollecorvino\nPianella\nCepagatti\nRosciano\nLoreto Aprutino\nManoppello\nPenne\nChieti\nFrancavilla al Mare\nSan Giovanni Teatino\nOrtona\nTollo\nMiglianico\nRipa Teatina\nSilvi\nPineto\nAtri",
 			'progetti_titolo' => 'Progetti',
 			'progetti_testo'  => 'Identità visive, siti, social e stampa: una selezione dei lavori che abbiamo realizzato. Apri un progetto per vedere com’è nato.',

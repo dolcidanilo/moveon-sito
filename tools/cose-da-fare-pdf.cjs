@@ -11,12 +11,12 @@ const ROOT = path.join(__dirname, '..');
 const versione = (/Version:\s+([\d.]+)/.exec(fs.readFileSync(path.join(ROOT, 'wordpress/moveon-blocks/moveon-blocks.php'), 'utf8')) || [])[1] || '';
 const DATA = '19 novembre 2026';
 // Passi della parte A già fatti dal cliente (casella spuntata)
-const FATTI = 8;
+const FATTI = 13;
 
 // Ogni passo: [titolo, dettagli (HTML)]
 const parteA = [
   ['Fai un backup di /nuovo', 'Dal pannello Aruba (backup dello spazio web e del database) o con il tuo plugin di backup. È solo una sicurezza prima delle modifiche.'],
-  ['Aggiorna il plugin MoveOn Blocks alla versione ' + versione, 'Scarica <b>moveon-blocks.zip</b> (te l’ho mandato in chat, oppure da GitHub, branch «materiali», cartella dist) → <b>Plugin → Aggiungi nuovo → Carica plugin</b> → scegli lo zip → <b>«Sostituisci la versione installata»</b> → svuota la cache.'],
+  ['Aggiorna il plugin MoveOn Blocks alla versione 1.10.1', 'Scarica <b>moveon-blocks.zip</b> (te l’ho mandato in chat, oppure da GitHub, branch «materiali», cartella dist) → <b>Plugin → Aggiungi nuovo → Carica plugin</b> → scegli lo zip → <b>«Sostituisci la versione installata»</b> → svuota la cache.'],
   ['Metti in ordine i servizi', '<b>MoveOn → Strumenti → «Metti in ordine i servizi»</b>. Poi controlla: in home 4 schede (Social, Siti web, Grafica, Stampa); nel menu a tendina la Formazione è in fondo.'],
   ['Controlla la zona in cui lavori', '<b>MoveOn → Impostazioni → Zona in cui lavori</b>: ci sono i 23 comuni che mi hai confermato. Cambia solo se vuoi togliere o aggiungere qualcosa, poi <b>Salva</b>.'],
   ['Pagina Formazione: incolla i testi nuovi', `Apri la pagina Formazione con WPBakery.
@@ -41,6 +41,7 @@ const parteA = [
   ['iubenda: installa il banner su /nuovo', '<b>Plugin → Aggiungi nuovo</b> → cerca <b>«iubenda»</b> → installa <b>«iubenda | All-in-one Compliance for GDPR / CCPA Cookie Consent»</b> → Attiva → segui la procedura guidata. Quando chiede il codice, lo trovi su iubenda → Privacy Controls and Cookie Solution → <b>INTEGRA</b>. Poi apri /nuovo in una finestra in incognito: deve comparire il banner. Se hai dubbi, mandami uno screenshot.'],
   ['Controlla i link Privacy e Cookie', '<b>MoveOn → Impostazioni → Footer e note legali</b>: apri «Link Privacy Policy» e «Link Cookie Policy» e controlla che portino alle <b>tue</b> policy iubenda (i link giusti sono in iubenda → Privacy e Cookie Policy → INTEGRA). Se sono diversi, sostituiscili → Salva.'],
   ['Google Analytics: il codice di misurazione', 'Se il sito attuale ha già Google Analytics 4: Analytics → <b>Amministrazione → Stream di dati</b> → il tuo sito → copia l’<b>ID misurazione</b> (inizia con <b>G-</b>) e mandamelo: non è un dato segreto. Se non ce l’hai, dimmelo e ti guido a crearlo, con lo stesso account Google della scheda Google.'],
+  ['Aggiorna il plugin alla versione ' + versione + ' e prova Analytics', 'Come al passo 2: <b>Plugin → Aggiungi nuovo → Carica plugin</b> → <b>«Sostituisci la versione installata»</b>. In <b>MoveOn → Impostazioni → Statistiche</b> trovi già il tuo ID (G-MBM70CV9SC). Prova: apri /nuovo in una <b>finestra in incognito</b> (da collegato le tue visite non si contano), <b>accetta i cookie</b>, poi in Analytics → Rapporti → <b>Tempo reale</b> deve comparire 1 utente. Se non compare, mandami uno screenshot.'],
   ['Scheda Google (Google Business Profile): creala e avvia la verifica', `Vai su <b>business.google.com</b> con l’account Google dell’attività (lo stesso userò per Analytics e Search Console).
     <ul><li>Nome: solo <b>MoveOn Studio</b> (niente «Pescara» o altre parole: Google penalizza)</li>
     <li>Categoria principale: la più vicina ai social, es. <b>«Consulente di social media»</b> o <b>«Agenzia di marketing»</b>; secondarie: <b>«Web designer»</b>, <b>«Graphic designer»</b>. Se hai dubbi, mandami lo screenshot delle categorie proposte.</li>
@@ -52,7 +53,7 @@ const parteA = [
     <li>Descrizione, pronta da incollare:</li></ul>
     <div class="testo"><i>Grafica, siti web, social e stampa per aziende e professionisti di Pescara e dintorni. Seguo ogni lavoro dall’idea al prodotto finito, con un solo referente e 25 anni di esperienza nella comunicazione: pagine social curate e pubblicità online, siti chiari e veloci che portano contatti, loghi e immagine coordinata, stampa e allestimenti con fornitori scelti. Ti spiego tutto con parole semplici e ti mando un preventivo chiaro, voce per voce, prima di iniziare. Anche lezioni individuali online di Photoshop, Illustrator, InDesign e WordPress.</i></div>
     Avvia la verifica e <b>annota il metodo</b> che ti propone Google (la verifica può richiedere giorni: non serve aspettarla per scrivermi).`],
-  ['Scrivimi «tutto fatto»', 'Allega: <b>l’ID di Google Analytics</b> (passo 13), <b>il metodo di verifica</b> proposto da Google (passo 14) e dimmi se il banner di iubenda compare su /nuovo. Io proseguo con i punti qui sotto.'],
+  ['Scrivimi «tutto fatto»', 'Dimmi se in <b>Tempo reale</b> hai visto la tua visita (passo 14) e quale <b>metodo di verifica</b> ti ha proposto Google (passo 15). Io proseguo con i punti qui sotto.'],
 ];
 
 const parteB = [
@@ -68,7 +69,6 @@ const parteB = [
 const dopo = [
   'Controllo la scheda di Rank Math e i dati che legge Google.',
   'Controllo il banner di iubenda e i link Privacy e Cookie nel footer e nel modulo contatti.',
-  'Aggiungo Google Analytics, che parte solo quando il visitatore accetta i cookie.',
   'Rendo affidabile l’invio delle email del modulo (con la tua casella Aruba).',
   'Poi la W4: lo spostamento del sito nuovo al posto di quello attuale.',
 ];

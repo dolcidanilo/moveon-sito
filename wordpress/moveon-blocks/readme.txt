@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.10.1
+Stable tag: 1.11.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.11.0 =
+* Google Analytics 4 (MoveOn → Impostazioni → Statistiche): il codice di Google si carica solo dopo il consenso alle statistiche dato dal banner dei cookie (Google Consent Mode v2: iubenda oggi, LegalBlink domani). Prima del consenso nessuna richiesta a Google. Le visite di chi è collegato al pannello non si contano.
 
 = 1.10.1 =
 * Telefono: con le frecce avanti/indietro del browser una pagina lasciata con il menu aperto tornava con il menu aperto, e la foto del progetto compariva per un attimo sopra il menu. Ora il menu si chiude subito e la foto non passa più sopra il menu.
