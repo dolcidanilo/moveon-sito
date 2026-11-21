@@ -370,8 +370,9 @@ img,svg{max-width:100%}
 .mo-chk a{color:var(--mo-c5)}
 .mo-form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .mo-form-msg{margin:0;font:600 14px/20px var(--mo-font);color:#fcd34d}
-.mo-form-done{padding:32px;border-radius:12px;background:var(--mo-c2);box-shadow:inset 0 0 0 1px var(--mo-c9)}
-.mo-form-done[hidden]{display:none}
+.mo-form-done{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;min-height:var(--mo-ok-alt,360px);padding:40px;border-radius:12px;background:var(--mo-c2);box-shadow:inset 0 0 0 1px var(--mo-c9)}
+.mo-form-done[hidden],.mo-ct-form[hidden]{display:none}
+@media (max-width:767px){.mo-form-done{--mo-ok-alt:280px;padding:32px 24px}}
 .mo-ok-badge{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;background:#064e3b;color:#6ee7b7;font:700 11px/16px var(--mo-font);letter-spacing:.08em;text-transform:uppercase}
 .mo-ok-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:#10b981}
 .mo-form-done h3{margin:16px 0 8px;font:800 28px/36px var(--mo-font);color:var(--mo-c7)}

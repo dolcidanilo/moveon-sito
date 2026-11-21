@@ -94,12 +94,18 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 		. "Di cosa ha bisogno: {$area}\n\nMessaggio:\n{$messaggio}\n\n"
 		. 'Consenso privacy: sì · ' . wp_date( 'd/m/Y H:i' );
 
+	$errore_mail = '';
+	$su_errore   = function ( $e ) use ( &$errore_mail ) {
+		$errore_mail = is_wp_error( $e ) ? $e->get_error_message() : '';
+	};
+	add_action( 'wp_mail_failed', $su_errore );
 	$inviata = wp_mail(
 		$to,
 		'Nuova richiesta dal sito · ' . $area,
 		$testo,
 		array( 'Reply-To: ' . $nome . ' <' . $email . '>' )
 	);
+	remove_action( 'wp_mail_failed', $su_errore );
 
 	$salvata = false;
 	if ( ! empty( $s['salva_richieste'] ) ) {
@@ -108,7 +114,7 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 				'post_type'    => MO_RICHIESTE,
 				'post_status'  => 'private',
 				'post_title'   => $nome . ' · ' . $area,
-				'post_content' => $testo . ( $inviata ? '' : "\n\n[Attenzione: l’email di avviso non è partita]" ),
+				'post_content' => $testo . "\n\n" . mo_esito_email( $inviata, $to, $errore_mail ),
 			)
 		);
 	}
@@ -117,4 +123,12 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 		return new WP_REST_Response( array( 'ok' => false, 'errore' => 'Invio non riuscito.' ), 500 );
 	}
 	return array( 'ok' => true );
+}
+
+/** Riga aggiunta alla copia della richiesta: a chi è partita l'email di avviso o perché non è partita. */
+function mo_esito_email( bool $inviata, string $to, string $errore = '' ): string {
+	if ( $inviata ) {
+		return '[Email di avviso spedita a ' . $to . '. Se non la trovi, guarda nella cartella spam della casella]';
+	}
+	return '[Attenzione: l’email di avviso a ' . $to . ' non è partita' . ( '' !== $errore ? ': ' . rtrim( $errore, '. ' ) : '' ) . '. Controlla WP Mail SMTP]';
 }

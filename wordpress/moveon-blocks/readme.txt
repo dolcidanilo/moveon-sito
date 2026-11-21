@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.11.0
+Stable tag: 1.11.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,10 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.11.1 =
+* Modulo contatti: dopo l'invio il riquadro «Richiesta inviata» prende il posto del modulo, in linea con «Preferisci parlarmi subito?» (prima restava sotto lo spazio vuoto del modulo), alto il doppio, con i testi a sinistra e al centro in verticale; se è fuori dallo schermo la pagina ci si porta da sola.
+* Richieste dal sito: ogni richiesta dice a quale indirizzo è partita l'email di avviso o, se non è partita, il motivo.
 
 = 1.11.0 =
 * Google Analytics 4 (MoveOn → Impostazioni → Statistiche): il codice di Google si carica solo dopo il consenso alle statistiche dato dal banner dei cookie (Google Consent Mode v2: iubenda oggi, LegalBlink domani). Prima del consenso nessuna richiesta a Google. Le visite di chi è collegato al pannello non si contano.

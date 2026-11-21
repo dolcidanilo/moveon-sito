@@ -398,5 +398,8 @@ check( 'Analytics: ID controllato (G-…, maiuscole), quelli sbagliati diventano
 $ga = mo_analytics_codice( 'G-ABC1234' );
 check( 'Analytics: consenso negato di serie, gtag.js caricato solo dopo il consenso', str_contains( $ga, "analytics_storage:'denied'" ) && str_contains( $ga, '"G-ABC1234"' ) && ! str_contains( $ga, '<script async src=' ) && str_contains( $ga, "analytics_storage==='granted'" ) );
 
+// 1.11.1: esito dell'email di avviso nella copia della richiesta
+check( 'Richieste dal sito: scritto a chi è partita l’email o perché non è partita', str_contains( mo_esito_email( true, 'info@x.it' ), 'spedita a info@x.it' ) && str_contains( mo_esito_email( false, 'info@x.it', 'SMTP Error: Could not authenticate.' ), 'non è partita: SMTP Error: Could not authenticate.' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

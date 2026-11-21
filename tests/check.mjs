@@ -167,6 +167,13 @@ const browser = await chromium.launch();
   await page.waitForTimeout(1500);
   const thanks = await page.evaluate(() => ({ visible: !document.querySelector('.mo-form-done').hidden, title: document.querySelector('.mo-form-done-title').textContent }));
   check('Modulo compilato: conferma “Grazie, Mario!”', thanks.visible && thanks.title === 'Grazie, Mario!', thanks.title);
+  const ok = await page.evaluate(() => {
+    const b = document.querySelector('.mo-form-done').getBoundingClientRect(), t = document.querySelector('.mo-ct-side-title').getBoundingClientRect();
+    const badge = document.querySelector('.mo-ok-badge').getBoundingClientRect(), h3 = document.querySelector('.mo-form-done-title').getBoundingClientRect();
+    const sopra = badge.top - b.top, sotto = b.bottom - document.querySelector('.mo-form-done p').getBoundingClientRect().bottom;
+    return { dTop: Math.round(b.top - t.top), alto: Math.round(b.height), sinistra: Math.round(h3.left - b.left), centro: Math.round(Math.abs(sopra - sotto)), visibile: b.top >= 0 && b.bottom <= innerHeight };
+  });
+  check('Conferma del modulo: in linea con «Preferisci parlarmi subito?», alta il doppio, testi a sinistra e centrati in verticale, visibile', Math.abs(ok.dTop) <= 12 && ok.alto >= 340 && ok.sinistra <= 48 && ok.centro <= 4 && ok.visibile, JSON.stringify(ok));
 
   { const veri = errors.filter((m) => !/Transition was aborted because of invalid state/.test(m)); check('Nessun errore nella console (desktop)', veri.length === 0, veri.join(' | ')); }
   await page.close();

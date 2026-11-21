@@ -112,6 +112,7 @@ function initSite() {
   /* ---------- Scroll fluido ---------- */
   if (!reduce) {
     lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    window.moLenis = lenis; // serve anche fuori da initSite (es. conferma del modulo)
     lenis.on('scroll', ST.update);
     G.ticker.add((t) => lenis.raf(t * 1000));
     G.ticker.lagSmoothing(0);
@@ -1102,9 +1103,23 @@ function initForm(sec, { G, ST, reduce }) {
     }
     const nome = $('[name="nome"]', form).value.trim().split(' ')[0];
     $('.mo-form-done-title', formDone).textContent = `Grazie, ${nome}!`;
-    const show = () => { form.hidden = true; formDone.hidden = false; formDone.focus(); };
+    const show = () => {
+      form.hidden = true;
+      formDone.hidden = false;
+      formDone.focus({ preventScroll: true });
+      const lenis = window.moLenis;
+      ST.refresh(); // la pagina si è accorciata: prima si ricalcolano le animazioni, poi ci si sposta
+      // Il modulo sparisce: la conferma prende il suo posto in alto; se è fuori dallo schermo ci si porta lì
+      const top = formDone.getBoundingClientRect().top;
+      const h = $('.mo-site-header')?.offsetHeight ?? 0;
+      if (top < h + 16 || top > window.innerHeight - 120) {
+        const y = window.scrollY + top - h - 32;
+        if (lenis) { lenis.resize(); lenis.scrollTo(y, { duration: reduce ? 0 : 0.9, force: true }); }
+        else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    };
     if (!reduce) {
-      G.to(form, { opacity: 0, y: -20, duration: 0.35, onComplete: () => { show(); G.fromTo(formDone, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }); ST.refresh(); } });
+      G.to(form, { opacity: 0, y: -20, duration: 0.35, onComplete: () => { show(); G.fromTo(formDone, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }); } });
     } else {
       show();
     }
