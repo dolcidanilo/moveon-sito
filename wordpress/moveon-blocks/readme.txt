@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.12.0
+Stable tag: 1.12.1
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,10 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.12.1 =
+* Pannello: le scelte con testi lunghi (es. «Dietro al titolo») sono un elenco di opzioni con il pallino, chiaramente cliccabili. I campi che servono solo con una scelta compaiono solo con quella (immagine fissa / slide della copertina, foto che si apre del Chi sono).
+* Demo del dentista: copertina con le slide dello studio; la scritta «Foto di esempio» al centro delle foto, così non viene tagliata. «Rimetti la demo come nuova» sostituisce le foto vecchie della demo.
 
 = 1.12.0 =
 * Pannello clienti «Il tuo sito» all'indirizzo /gestione/: il cliente entra con nome utente e password (pagina di accesso con il suo marchio: /gestione/?per=nomeutente) e, senza mai vedere WordPress, cambia testi, elenchi, foto e colori delle sezioni MoveOn delle sue pagine, con anteprima dal vivo (computer e telefono), «Annulla l'ultima modifica», le sue foto e le richieste del modulo (rispondi, chiama, WhatsApp). Funziona su computer e telefono.
