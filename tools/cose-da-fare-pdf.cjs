@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '..');
 const versione = (/Version:\s+([\d.]+)/.exec(fs.readFileSync(path.join(ROOT, 'wordpress/moveon-blocks/moveon-blocks.php'), 'utf8')) || [])[1] || '';
-const DATA = '21 novembre 2026';
+const DATA = '22 novembre 2026';
 // Passi della parte A già fatti dal cliente (casella spuntata)
 const FATTI = 4;
 
@@ -31,7 +31,7 @@ const parteA = [
     <ul><li><b>Categorie secondarie</b>: Web designer, Graphic designer</li>
     <li><b>Servizi</b>: Social e pubblicità online, Siti web e negozi online, Grafica e immagine, Stampa e allestimenti, Formazione</li>
     <li><b>Foto</b>: logo quadrato, una copertina, 5–10 lavori (con il permesso dei clienti)</li></ul>`],
-  ['Scrivimi «tutto fatto»', 'Dimmi se l’email di prova e il modulo sono arrivati (e dove: posta in arrivo o spam) e se la scheda Google è verificata. Poi prepariamo lo spostamento del sito (W4).'],
+  ['Scrivimi «tutto fatto»', 'Quando la scheda Google è verificata e completata. Poi ti preparo il piano dello spostamento del sito (W4), che faremo quando avrai inserito i contenuti veri della parte B.'],
 ];
 
 const parteB = [
@@ -50,6 +50,22 @@ const dopo = [
   'Search Console di Google e la mappa del sito, per farti trovare da subito.',
   'Aggiornamento della policy di iubenda (Google Analytics e il modulo nuovo) il giorno dello spostamento.',
   'Controllo finale su computer e telefono, poi via «Scoraggia i motori di ricerca».',
+];
+
+// Tutto quello che ci siamo detti e che non va dimenticato: [titolo, dettagli (HTML)]
+const ricordare = [
+  ['Demo del pannello clienti (dentista)', 'Resta così com’è, pronta da mostrare: <b>moveonstudio.it/nuovo/gestione/?per=dentista-demo</b>. Nome utente e password sono in <b>MoveOn → Pannello clienti</b>; lì puoi anche cambiare la password e, dopo ogni dimostrazione, premere <b>«Rimetti la demo come nuova»</b>. Lo studio è immaginario e il sito è nascosto a Google.'],
+  ['Scheda Google', 'Finché Google non ha finito la verifica <b>non modificarla</b>. Dopo il passo 5: chiedi le recensioni ai clienti contenti, sono quelle che pesano di più per farti trovare a Pescara.'],
+  ['Rank Math (se non l’hai già fatto)', 'Titolo del sito <b>«MoveOn Studio»</b> (non tutto maiuscolo), titolo e descrizione SEO della home, schema delle pagine = <b>Nessuno</b>, archivi autore spenti. Niente «Legal Name» e niente orari.'],
+  ['Email del modulo', 'Le richieste arrivano a info@moveonstudio.it (e alle copie che metti in <b>MoveOn → Impostazioni → Avviso delle richieste anche a</b>) e restano sempre anche in <b>Richieste dal sito</b>. In Gmail tieni il filtro «Non inviare mai a Spam» per gli avvisi da info@moveonstudio.it.'],
+  ['Gennaio 2027: iubenda o LegalBlink', 'Il dominio scade il <b>3 febbraio 2027</b>: solo al rinnovo si può acquistare LegalBlink di Aruba. Ti ricordo di confrontare i costi con iubenda (guarda anche quando scade iubenda) e poi decidiamo. Fino ad allora resta iubenda, anche su /nuovo.'],
+  ['Il giorno della messa online', 'Si aggiorna la policy di iubenda (Google Analytics e il modulo nuovo): non prima, perché è condivisa con il sito attuale. In Rank Math si controlla che indirizzi e dati restino giusti, senza /nuovo.'],
+  ['Dopo la messa online il sito resta tuo', 'Puoi cambiare testi, foto e colori come adesso. Ogni versione del plugin resta in archivio per tornare indietro; consiglio di tenere /nuovo come copia di prova.'],
+  ['Te lo ricordo io quando il sito è online (fine W4)', `In quest’ordine:
+    <ol><li><b>Siti dei clienti sul tuo spazio Aruba</b>: ogni cliente ha il suo WordPress in una cartella tipo <b>/lavori/nome-cliente/</b>, protetta da password e nascosta a Google; si trasferisce sul suo hosting solo dopo il saldo, con <b>Duplicator</b> o <b>WPvivid</b> (gratuiti, senza il limite di All-in-One WP Migration). Con 5 database: oltre il quinto più siti nello stesso database. Lo costruiamo così: un <b>motore comune</b> (pannello, sezioni, modulo, Google, statistiche, consenso) più un <b>design per ogni cliente</b>, senza Porto e WPBakery (niente licenze); nel pannello aggiungiamo <b>aggiungi / sposta / togli sezioni</b>, <b>nuova pagina</b> e la gestione dei clienti; poi le guide «Nuovo cliente» e «Trasferimento». Nel contratto: acconto 30–50%, software in licenza d’uso, eventuale canone di assistenza.</li>
+    <li><b>Il tuo profilo professionale</b> e le <b>skill</b> di claude.ai (come lavori, gusti, qualità richiesta).</li>
+    <li><b>I social</b>: Instagram, Facebook, LinkedIn.</li>
+    <li>Più avanti, l’idea dell’<b>e-commerce</b> con lo stesso metodo.</li></ol>`],
 ];
 
 const esc = (t) => String(t);
@@ -84,10 +100,15 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>
   .testo { margin: 1.4mm 0; padding: 1.8mm 3mm; background: #f4f5f7; border-left: .8mm solid #2563eb; border-radius: 0 1.5mm 1.5mm 0; }
   .dopo { margin: 2mm 0 0; padding: 0 0 0 5mm; color: #334155; }
   .dopo li { margin: .8mm 0; }
+  .nuova-pagina { break-before: page; margin-top: 0; }
+  .ricorda { display: flex; gap: 3mm; padding: 2.4mm 0; border-top: .3mm solid #e2e8f0; break-inside: avoid; }
+  .segno { flex: none; width: 2.4mm; height: 2.4mm; margin: 1.5mm 1.3mm 0; border-radius: 50%; background: #f59e0b; }
+  .dett ol { margin: 1mm 0 0 4.5mm; padding: 0; }
+  .dett ol li { margin: .8mm 0; }
   .piede { margin-top: 6mm; padding-top: 3mm; border-top: .3mm solid #e2e8f0; font-size: 8pt; color: #64748b; }
 </style></head><body>
   <h1>Cose da fare</h1>
-  <p class="intro">Fase nuova (la prima lista è tutta fatta, grazie!). Tutto quello che ti chiedo, in ordine. Fai i passi della <b>parte A</b> uno dopo l’altro e spunta la casella; poi scrivimi <b>«tutto fatto»</b>. La <b>parte B</b> si fa con calma, ma deve essere finita prima della messa online.</p>
+  <p class="intro">I primi 4 passi sono fatti, grazie! Tutto quello che ti chiedo, in ordine. Fai i passi della <b>parte A</b> uno dopo l’altro e spunta la casella; poi scrivimi <b>«tutto fatto»</b>. La <b>parte B</b> si fa con calma, ma deve essere finita prima della messa online.</p>
   <h2><span>A</span>Da fare adesso, in quest’ordine</h2>
   ${passi(parteA)}
   <h2><span>B</span>Con calma, prima della messa online</h2>
@@ -95,6 +116,9 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>
   ${passi(parteB)}
   <h2>Cosa faccio io dopo il tuo «tutto fatto»</h2>
   <ul class="dopo">${dopo.map((d) => `<li>${d}</li>`).join('')}</ul>
+  <h2 class="nuova-pagina">Da ricordare</h2>
+  <p class="sotto">Tutto quello che ci siamo detti e che non va perso. Non serve spuntare niente.</p>
+  ${ricordare.map(([t, d]) => `<div class="ricorda"><div class="segno"></div><div class="corpo"><div class="titolo">${esc(t)}</div><div class="dett">${d}</div></div></div>`).join('')}
   <p class="piede">MoveOn Studio · sito nuovo (fase W3) · aggiornato al ${DATA} · plugin MoveOn Blocks ${versione}</p>
 </body></html>`;
 
