@@ -11,6 +11,7 @@ Aggiornalo alla fine di ogni lavoro importante (sezioni «Decisioni» e «In sos
 - Conosce **HTML e CSS**, **non PHP**. Vuole poter gestire da solo tutto il sito (testi, immagini, colori) dal pannello.
 - È l'unico a usare il pannello. Usa **solo JPG e PNG** (mai SVG).
 - È un grafico: nota i dettagli (margini, sfumature, allineamenti) e manda screenshot. Prendi sul serio ogni pixel.
+- **Regola fissa (22/11/2026, sua richiesta esplicita)**: a **ogni** richiesta digli prima se ci sono **criticità** o se si può **fare meglio / in altro modo**, anche quando non lo chiede. Le sue conoscenze tecniche sono a volte «basic»: può chiedere cose che non conviene fare. È il suo primo progetto di questo tipo e lo usa per capire **fino a dove può spingersi** e **cosa può offrire ai suoi clienti** (offerta più ampia = più clienti). Quindi: breve parere franco (rischi, costi di manutenzione, alternative più semplici), poi la tua raccomandazione; se la richiesta va bene così, dillo in una riga e procedi. Quando una cosa è vendibile ai clienti, faglielo notare (e cosa comporta per lui).
 - Preferisce che tu **decida la soluzione migliore** quando lo chiede («trova tu la soluzione migliore»), spiegando poi cosa hai fatto e perché. Quando una scelta è sua (gusto, contenuti, costi), chiedi.
 
 ## Dove gira il sito
