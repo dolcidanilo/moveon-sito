@@ -77,6 +77,9 @@ function mo_link_sezione( string $href ): string {
 	if ( ! did_action( 'wp' ) ) {
 		return $href; // fuori da una pagina del sito (es. nel pannello): resta com'è
 	}
+	if ( function_exists( 'mo_marchio_pagina' ) && mo_marchio_pagina() ) {
+		return $href; // pagina con un marchio proprio: le ancore restano nella pagina
+	}
 	if ( '#contatti' === $href && function_exists( 'mo_pagina_pronta' ) ) {
 		$contatti = mo_pagina_pronta( 'contatti' );
 		if ( $contatti && 'publish' === $contatti->post_status && get_queried_object_id() !== $contatti->ID ) {

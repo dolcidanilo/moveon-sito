@@ -964,6 +964,55 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- Pannello clienti «Il tuo sito» (1.12.0) ---------------- */
+{
+  const P = URL + 'gestione/';
+  const anon = await browser.newPage();
+  const r = await anon.request.get(URL + 'wp-json/moveon-pannello/v1/stato');
+  check('Pannello: senza accesso le API non rispondono', r.status() === 401 || r.status() === 403, String(r.status()));
+  await anon.close();
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  const errori = []; page.on('pageerror', (e) => { if (!/Transition was aborted/.test(e.message)) errori.push(e.message); });
+  await page.goto(P + '?per=dentista-demo');
+  const marchio = await page.evaluate(() => ({ titolo: document.querySelector('.mp-accesso h1')?.textContent, utente: document.querySelector('input[name=utente]')?.value }));
+  check('Pannello: accesso con il marchio del cliente', marchio.titolo === 'Studio Dentistico Luce' && marchio.utente === 'dentista-demo', JSON.stringify(marchio));
+  await page.fill('input[name=password]', 'demo-prova-1');
+  await Promise.all([page.waitForNavigation(), page.click('button[type=submit]')]);
+  await page.waitForSelector('.mp-ciao', { timeout: 15000 });
+  const wpadmin = await page.evaluate(() => !!document.getElementById('wpadminbar'));
+  await page.goto(URL + 'wp-admin/');
+  const dopoAdmin = new globalThis.URL(page.url()).pathname;
+  check('Pannello: il cliente non vede WordPress (niente barra, la bacheca lo riporta al pannello)', !wpadmin && /\/gestione\/?$/.test(dopoAdmin), dopoAdmin);
+  await page.goto(P + '#/sito');
+  await page.waitForSelector('.mp-sezioni a');
+  const voci = await page.$$eval('.mp-sezioni a', (a) => a.length);
+  const i = await page.$$eval('.mp-sezioni a', (as) => as.findIndex((a) => /Recensioni/.test(a.textContent)));
+  await page.click(`.mp-sezioni li:nth-child(${i + 1}) a`);
+  await page.waitForSelector('.mp-campi');
+  const nuovo = 'Prova dal pannello ' + Date.now();
+  await page.fill('.mp-campi [data-k="titolo"]', nuovo);
+  await page.click('[data-azione="salva"]');
+  await page.waitForSelector('.mp-toast-ok', { timeout: 10000 });
+  await page.waitForTimeout(500);
+  const pub = await (await ctx.newPage()).goto(URL + 'demo-studio-dentistico/');
+  const html = await pub.text();
+  check('Pannello: si modifica una sezione e il sito si aggiorna', voci >= 8 && html.includes(nuovo), `${voci} sezioni`);
+  // Annulla l'ultima modifica
+  await page.click('.mp-indietro');
+  await page.waitForSelector('[data-azione="annulla-pagina"]');
+  await page.click('[data-azione="annulla-pagina"]');
+  await page.click('.mp-dialogo [data-r="1"]');
+  await page.waitForSelector('.mp-toast-ok');
+  const html2 = await (await (await ctx.newPage()).goto(URL + 'demo-studio-dentistico/')).text();
+  check('Pannello: «Annulla l’ultima modifica» rimette il testo di prima', !html2.includes(nuovo));
+  await page.goto(P + '#/richieste');
+  await page.waitForSelector('.mp-ric');
+  const ric = await page.$$eval('.mp-ric', (x) => x.length);
+  check('Pannello: richieste di esempio, nessun errore', ric >= 3 && errori.length === 0, JSON.stringify({ ric, errori }));
+  await ctx.close();
+}
+
 await browser.close();
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} controlli superati`);

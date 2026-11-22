@@ -199,7 +199,7 @@ add_action(
 
 function mo_admin_page(): void {
 	$tab  = sanitize_key( $_GET['tab'] ?? 'impostazioni' ); // phpcs:ignore WordPress.Security.NonceVerification
-	$tabs = array( 'impostazioni' => 'Impostazioni', 'colori' => 'Colori', 'modelli' => 'Modelli HTML', 'strumenti' => 'Strumenti', 'guida' => 'Guida' );
+	$tabs = array( 'impostazioni' => 'Impostazioni', 'colori' => 'Colori', 'modelli' => 'Modelli HTML', 'strumenti' => 'Strumenti', 'pannello' => 'Pannello clienti', 'guida' => 'Guida' );
 	echo '<div class="wrap"><h1>MoveOn</h1><nav class="nav-tab-wrapper mo-tabs">';
 	foreach ( $tabs as $k => $label ) {
 		printf( '<a href="%s" class="nav-tab %s">%s</a>', esc_url( admin_url( 'admin.php?page=moveon&tab=' . $k ) ), $k === $tab ? 'nav-tab-active' : '', esc_html( $label ) );
@@ -214,6 +214,9 @@ function mo_admin_page(): void {
 			break;
 		case 'strumenti':
 			mo_admin_strumenti();
+			break;
+		case 'pannello':
+			mo_admin_pannello();
 			break;
 		case 'guida':
 			echo '<div class="mo-guida">';

@@ -171,4 +171,16 @@ if ( ! get_page_by_path( "prova-video" ) && file_exists( WP_CONTENT_DIR . "/uplo
   echo "· Pagina prova-video creata\n";
 }
 ' 2>/dev/null
-echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1)"
+# Demo del pannello clienti (studio dentistico), con una password nota per i controlli
+php wpcli.php '
+wp_set_current_user( 1 );
+$d = mo_demo_crea( false );
+$u = get_user_by( "login", MO_DEMO_UTENTE );
+if ( $u && ( $d["password"] ?? "" ) !== "demo-prova-1" ) {
+  wp_set_password( "demo-prova-1", $u->ID );
+  $d["password"] = "demo-prova-1";
+  update_option( "mo_pannello_demo", $d, false );
+}
+flush_rewrite_rules( false );
+' 2>/dev/null
+echo "Pronto: http://127.0.0.1:$PORT/nuovo/  (pannello: admin / prova-moveon-1 · pannello clienti: /nuovo/gestione/ dentista-demo / demo-prova-1)"

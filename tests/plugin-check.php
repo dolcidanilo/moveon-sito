@@ -408,5 +408,32 @@ update_option( 'moveon_settings', array_merge( (array) $s112, array( 'email' => 
 check( 'Avviso delle richieste: email principale e copia', array( 'info@moveonstudio.it', 'copia@example.com' ) === mo_destinatari_richieste() );
 update_option( 'moveon_settings', $s112 );
 
+// 1.12.0: pannello clienti
+check( 'Pannello: ruolo «Cliente del sito» con i soli permessi necessari', ( $r12 = get_role( MO_PANNELLO_RUOLO ) ) && $r12->has_cap( MO_PANNELLO_CAP ) && $r12->has_cap( 'upload_files' ) && ! $r12->has_cap( 'edit_pages' ) && ! $r12->has_cap( 'edit_posts' ) );
+$c12 = array_column( mo_pannello_campi( 'hero' ), 'nome' );
+check( 'Pannello: campi semplici (niente ancore, link, punti focali, opzioni avanzate)', in_array( 'titolo', $c12, true ) && in_array( 'fissa_img', $c12, true ) && ! array_intersect( array( 'anchor', 'pulsante_link', 'fissa_pos', 'colore_titoli', 'sfondo_video' ), $c12 ), implode( ',', $c12 ) );
+$sc12 = '[mo_faq etichetta="Vecchia" anchor="domande" sfondo_colore="#000000"]';
+$n12  = mo_pannello_aggiorna_shortcode( $sc12, array( 'etichetta' => 'Nuova "bella" [ok]', 'titolo' => 'Titolo' ) );
+check( 'Pannello: nello shortcode cambiano solo i campi modificati, gli altri restano identici', 'Nuova "bella" [ok]' === mo_text( shortcode_parse_atts( substr( $n12, 7, -1 ) )['etichetta'] ) && str_contains( $n12, 'anchor="domande" sfondo_colore="#000000"' ) && str_contains( $n12, 'titolo="Titolo"' ), $n12 );
+wp_set_current_user( 1 );
+$demo12 = mo_demo_crea( false );
+$pid12  = (int) $demo12['pagina'];
+$sez12  = mo_pannello_trova_sezioni( (string) get_post( $pid12 )->post_content );
+$faq12  = array_search( 'faq', array_column( $sez12, 0 ), true );
+check( 'Demo del dentista: pagina con marchio proprio, utente che vede solo quella pagina', $pid12 && is_array( get_post_meta( $pid12, '_mo_marchio', true ) ) && array( $pid12 ) === array_map( 'intval', (array) get_user_meta( (int) $demo12['utente'], 'mo_pagine', true ) ) && false !== $faq12 );
+$u12 = (int) $demo12['utente'];
+wp_set_current_user( $u12 );
+$prima12 = (string) get_post( $pid12 )->post_content;
+$res12   = mo_pannello_salva( $pid12, (int) $faq12, array( 'titolo' => "Domande & risposte\n«vere»", 'domande' => array( array( 'domanda' => 'Una?', 'risposta' => 'Sì "certo".' ) ) ) );
+$letta12 = mo_pannello_sezione( 'faq', mo_pannello_trova_sezioni( (string) get_post( $pid12 )->post_content )[ $faq12 ][1], (int) $faq12 )['valori'];
+check( 'Pannello: il cliente salva una sezione e il testo torna identico (a capo, virgolette, &)', ! is_wp_error( $res12 ) && "Domande & risposte\n«vere»" === $letta12['titolo'] && 'Sì "certo".' === $letta12['domande'][0]['risposta'] && 1 === count( $letta12['domande'] ) );
+check( 'Pannello: il cliente non può aprire altre pagine del sito', mo_pannello_puo_pagina( $pid12 ) && ! mo_pannello_puo_pagina( (int) get_option( 'page_on_front' ) ) );
+$ric12 = mo_pannello_richieste();
+check( 'Pannello: la demo vede solo le richieste di esempio', count( $ric12 ) >= 3 && ! array_filter( $ric12, fn( $r ) => ! get_post_meta( $r['id'], '_mo_demo', true ) && (string) $pid12 !== get_post_meta( $r['id'], '_mo_pagina', true ) ) );
+$ann12 = mo_pannello_annulla( $pid12 );
+check( 'Pannello: «Annulla l’ultima modifica» riporta la pagina com’era', true === $ann12 && $prima12 === (string) get_post( $pid12 )->post_content );
+wp_set_current_user( 0 );
+check( 'Pagina con marchio: colori propri e niente motori di ricerca', str_contains( mo_marchio_css( get_post_meta( $pid12, '_mo_marchio', true ) ), '--mo-c1:#0f766e' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

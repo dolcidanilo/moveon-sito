@@ -44,6 +44,9 @@ function mo_analytics_attivo(): bool {
 	if ( isset( $_GET['vc_editable'] ) || isset( $_GET['vc_action'] ) ) {
 		return false;
 	}
+	if ( function_exists( 'mo_marchio_pagina' ) && mo_marchio_pagina() ) {
+		return false; // le pagine dimostrative non entrano nelle statistiche
+	}
 	return '' !== mo_analytics_id();
 }
 

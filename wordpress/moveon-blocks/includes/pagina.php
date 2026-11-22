@@ -130,6 +130,13 @@ function mo_menu_items(): array {
 
 function mo_logo_data(): array {
 	$s = mo_settings();
+	$m = mo_marchio_pagina();
+	if ( $m ) {
+		return array(
+			'logo_scuro'  => ! empty( $m['logo_scuro'] ) ? mo_image( $m['logo_scuro'], '', 'medium_large' ) : null,
+			'logo_chiaro' => ! empty( $m['logo_chiaro'] ) ? mo_image( $m['logo_chiaro'], '', 'medium_large' ) : null,
+		);
+	}
 	return array(
 		'logo_scuro'  => mo_image( $s['logo_scuro_id'], 'logo_scuro', 'medium_large' ),
 		'logo_chiaro' => mo_image( $s['logo_chiaro_id'], 'logo_chiaro', 'medium_large' ),
@@ -146,8 +153,8 @@ function mo_header_html(): string {
 			array(
 				'home_url'  => home_url( '/' ),
 				'logo_href' => is_front_page() && ! mo_is_progetti_view() ? '#top' : home_url( '/' ),
-				'menu'      => mo_menu_items(),
-				'cta'       => '' !== $cta ? array( 'testo' => $cta, 'href' => mo_link_sezione( mo_href( $s['cta_link'] ) ) ) : null,
+				'menu'      => mo_marchio_pagina() ? mo_marchio_menu( mo_marchio_pagina() ) : mo_menu_items(),
+				'cta'       => mo_marchio_pagina() ? ( ! empty( mo_marchio_pagina()['cta'] ) ? array( 'testo' => mo_marchio_pagina()['cta'][0], 'href' => mo_marchio_pagina()['cta'][1] ) : null ) : ( '' !== $cta ? array( 'testo' => $cta, 'href' => mo_link_sezione( mo_href( $s['cta_link'] ) ) ) : null ),
 			)
 		)
 	);
@@ -155,6 +162,13 @@ function mo_header_html(): string {
 
 function mo_footer_html(): string {
 	$s = mo_settings();
+	$m = mo_marchio_pagina();
+	if ( $m ) {
+		$s['claim']      = (string) ( $m['claim'] ?? '' );
+		$s['legali']     = (string) ( $m['legali'] ?? $m['nome'] );
+		$s['mobile_cta'] = (string) ( $m['cta'][0] ?? $s['mobile_cta'] );
+		$s['cta_link']   = (string) ( $m['cta'][1] ?? '#contatti' );
+	}
 	return MO_Tpl::render(
 		'footer',
 		array_merge(
@@ -190,6 +204,10 @@ add_action(
 		$colori = mo_colori_css();
 		if ( '' !== $colori ) {
 			wp_add_inline_style( 'moveon', $colori );
+		}
+		// Pagina con un marchio proprio (es. la demo del pannello clienti): i suoi colori
+		if ( mo_marchio_pagina() ) {
+			wp_add_inline_style( 'moveon', mo_marchio_css( mo_marchio_pagina() ) );
 		}
 
 		$js = MOVEON_URL . 'assets/js/vendor/';

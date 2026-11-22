@@ -691,6 +691,7 @@ function mo_render_contatti( $atts ): string {
 			'privacy_url'     => $s['privacy_url'],
 			'endpoint'        => rest_url( 'moveon/v1/contatti' ),
 			'ts'              => time(),
+			'pagina'          => is_singular() ? (int) get_queried_object_id() : 0,
 			'tel_href'        => mo_tel_href( $s['telefono'] ),
 			'wa_href'         => mo_wa_href( $s['whatsapp'] ),
 			'email_href'      => $s['email'] ? 'mailto:' . $s['email'] : '',

@@ -115,6 +115,10 @@ function mo_contatti_ricevi( WP_REST_Request $req ) {
 				'post_status'  => 'private',
 				'post_title'   => $nome . ' · ' . $area,
 				'post_content' => $testo . "\n\n" . mo_esito_email( $inviata, implode( ', ', $to ), $errore_mail ),
+				'meta_input'   => array(
+					'_mo_dati'   => array( 'nome' => $nome, 'email' => $email, 'telefono' => $telefono, 'area' => $area, 'messaggio' => $messaggio ),
+					'_mo_pagina' => (string) absint( $f( 'pagina' ) ),
+				),
 			)
 		);
 	}
