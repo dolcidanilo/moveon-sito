@@ -27,8 +27,55 @@ function mo_p_text( $n, $h, $d = '', $g = 'Testi', $std = '' ) {
 function mo_p_area( $n, $h, $d = '', $g = 'Testi', $std = '' ) {
 	return mo_p( 'textarea', $n, $h, $d, $g, array( 'std' => $std ) );
 }
-function mo_p_img( $n, $h, $d = '', $g = 'Immagini' ) {
-	return mo_p( 'attach_image', $n, $h, $d, $g );
+/**
+ * Campo immagine. $misura = la misura ideale in px (es. «1920 × 1080 px, orizzontale 16:9»): compare in grassetto
+ * sotto il campo, in WPBakery e nel pannello clienti, così le foto si preparano già della misura giusta.
+ */
+function mo_p_img( $n, $h, $d = '', $g = 'Immagini', $misura = '' ) {
+	$desc = $misura ? '<b>Misura ideale: ' . $misura . '.</b>' . ( $d ? ' ' . $d : '' ) : $d;
+	return mo_p( 'attach_image', $n, $h, $desc, $g, array( 'mo_misura' => $misura, 'mo_aiuto' => $d ) );
+}
+
+/** Versione per smartphone di una foto (campo «…_tel»): stesso gruppo, si usa sugli schermi fino a 767 px. */
+function mo_p_img_tel( $n, $h, $misura, $g = 'Immagini' ) {
+	return mo_p_img( $n, $h, 'Facoltativa. Sul telefono si vede questa; se la lasci vuota si usa quella per computer, tagliata ai lati.', $g, $misura );
+}
+
+/**
+ * Foto per smartphone pronta per i modelli (url, w, h) o null. Il cliente la ritaglia già della misura giusta:
+ * si usa il file intero (WordPress riduce da solo quelli oltre 2560 px).
+ */
+function mo_image_tel( $id ): ?array {
+	if ( ! absint( $id ) ) {
+		return null;
+	}
+	$img = mo_image( $id, '', 'full' );
+	return $img ? array( 'url' => $img['url'], 'w' => $img['w'], 'h' => $img['h'] ) : null;
+}
+
+/** Misure ideali delle foto (le stesse scritte sotto i campi e nella guida). */
+function mo_misure_foto(): array {
+	return array(
+		'hero'         => '1920 × 1080 px (orizzontale 16:9)',
+		'hero_tel'     => '1080 × 2340 px (verticale, come lo schermo)',
+		'apertura'     => '1920 × 960 px (orizzontale 2:1)',
+		'apertura_tel' => '1080 × 2060 px (verticale)',
+		'cb'           => '1000 × 500 px (orizzontale 2:1)',
+		'cb_tel'       => '1000 × 750 px (4:3)',
+		'sfondo'       => '1920 × 1200 px',
+		'sfondo_tel'   => '1080 × 1920 px (verticale)',
+		'contatti'     => '1000 × 1250 px (verticale 4:5)',
+		'servizi'      => '1000 × 1000 px (quadrata)',
+		'punti'        => '1200 × 750 px (orizzontale 16:10)',
+		'nastro'       => '1600 × 600 px',
+		'numero'       => '1600 × 600 px',
+		'idea'         => '1000 × 900 px',
+		'pausa'        => '1920 × 1080 px (orizzontale 16:9)',
+		'icona'        => '200 × 200 px, PNG trasparente',
+		'carosello'    => '900 × 1200 px (verticale 3:4)',
+		'copertina'    => '1800 × 1200 px (orizzontale 3:2)',
+		'galleria'     => '2000 px di larghezza, qualsiasi altezza (si vede intera)',
+	);
 }
 function mo_p_drop( $n, $h, array $values, $std, $d = '', $g = 'Testi' ) {
 	return mo_p( 'dropdown', $n, $h, $d, $g, array( 'value' => $values, 'std' => $std ) );
@@ -52,7 +99,8 @@ function mo_p_sfondo(): array {
 		mo_p( 'colorpicker', 'colore_titoli', 'Colore dei titoli (facoltativo)', 'Titoli e frasi grandi della sezione. Lascia vuoto per il colore automatico.', 'Sfondo' ),
 		mo_p( 'colorpicker', 'colore_testi', 'Colore dei testi (facoltativo)', 'Paragrafi, frasi sotto i titoli, note. Lascia vuoto per il colore automatico.', 'Sfondo' ),
 		mo_p( 'colorpicker', 'colore_etichette', 'Colore di etichette e link (facoltativo)', 'Il piccolo titolo in maiuscolo sopra la sezione, i link e i numeri. Lascia vuoto per il blu del sito.', 'Sfondo' ),
-		mo_p_img( 'sfondo_img', 'Immagine di sfondo', 'JPG o PNG. Sta sopra il colore e sotto testi e illustrazioni. Lascia vuoto per nessuna immagine.', 'Sfondo' ),
+		mo_p_img( 'sfondo_img', 'Immagine di sfondo · computer', 'JPG o PNG. Sta sopra il colore e sotto i testi. Copre tutta la sezione: tieni il soggetto al centro.', 'Sfondo', mo_misure_foto()['sfondo'] ),
+		mo_p_img_tel( 'sfondo_img_tel', 'Immagine di sfondo · smartphone', mo_misure_foto()['sfondo_tel'], 'Sfondo' ),
 		mo_p_drop( 'sfondo_opacita', 'Opacità dell’immagine', $opacita, '30', '100% = piena; più è bassa, più l’immagine si fonde con il colore di sfondo.', 'Sfondo' ),
 		mo_p_drop( 'sfondo_dimensione', 'Dimensione dell’immagine', array( 'Copre tutta la sezione' => 'cover', 'Intera, senza tagli' => 'contain', 'Grandezza originale' => 'auto' ), 'cover', '«Copre tutta la sezione» può tagliare i bordi dell’immagine; «Intera» la mostra tutta.', 'Sfondo' ),
 		mo_p_text( 'sfondo_posizione', 'Posizione dell’immagine', 'In percentuale orizzontale e verticale: «50% 50%» = centrata, «50% 0%» = in alto, «100% 50%» = a destra. Vale anche per il video.', 'Sfondo', '50% 50%' ),
@@ -136,7 +184,8 @@ function mo_sfondo_html( array $a ): string {
 	$amp   = $dove ? ';--mo-sf-amp:' . $amp . '%' : '';
 	if ( $img ) {
 		$op   = max( 0, min( 100, (int) ( $a['sfondo_opacita'] ?? 30 ) ) ) / 100;
-		$out .= '<div class="mo-bg mo-bg--foto" aria-hidden="true"' . $sfuma . ' style="background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . $amp . '"></div>';
+		$tel  = mo_image_tel( $a['sfondo_img_tel'] ?? 0 );
+		$out .= '<div class="mo-bg mo-bg--foto" aria-hidden="true"' . $sfuma . ( $tel ? ' data-tel' : '' ) . ' style="' . ( $tel ? '--mo-bg-tel:url(\'' . esc_url( $tel['url'] ) . '\');' : '' ) . 'background-image:url(\'' . esc_url( $img['url'] ) . '\');background-size:' . $dim . ';background-position:' . $x . '% ' . $y . '%;opacity:' . $op . $amp . '"></div>';
 	}
 	if ( $video ) {
 		// Il video parte solo quando la sezione è vicina allo schermo e si ferma quando esce (moveon.js)
@@ -194,22 +243,24 @@ function mo_blocks(): array {
 	$blocchi = array(
 		'hero'      => array(
 			'name'   => 'MoveOn · Hero',
-			'desc'   => 'Titolo grande parola per parola su immagini a tutto schermo (una per settore) che si compongono pixel dopo pixel; in alternativa la lampadina in pixel.',
+			'desc'   => 'Titolo grande parola per parola su immagini a tutto schermo: slide (una per settore) oppure un’immagine fissa.',
 			'params' => array(
 				mo_p_area( 'titolo', 'Titolo principale', 'Massimo 8 parole. Va a capo dove premi Invio (oppure scrivi | dove vuoi andare a capo). Es. «Creatività, | strategia | e risultati.»', 'Testi', $d['hero']['titolo'] ),
 				mo_p_text( 'parola', 'Parola sottolineata in giallo', 'Scrivi esattamente una parola del titolo, punteggiatura compresa (es. «risultati.»). Scrivi - (un trattino) per nessuna sottolineatura.', 'Testi', $d['hero']['parola'] ),
 				mo_p_area( 'testo', 'Testo sotto il titolo', 'Massimo 2 frasi: beneficio prima della caratteristica.', 'Testi', $d['hero']['testo'] ),
 				mo_p_text( 'pulsante_testo', 'Pulsante: testo', 'Verbo all’imperativo + oggetto, es. «Scopri i Servizi». Scrivi - (un trattino) per non mostrarlo.', 'Testi', $d['hero']['pulsante_testo'] ),
 				mo_p_text( 'pulsante_link', 'Pulsante: porta a', 'L’ancora di una sezione (es. #servizi) oppure un indirizzo intero.', 'Testi', $d['hero']['pulsante_link'] ),
-				mo_p_drop( 'stile', 'Dietro al titolo', array( 'Immagini che si alternano (slide, una per settore)' => 'slide', 'Un’immagine fissa' => 'fissa', 'Lampadina in pixel (versione precedente)' => 'lampadina' ), $d['hero']['stile'], 'Puoi passare dalle slide all’immagine fissa quando vuoi: le immagini delle slide restano salvate.', 'Immagini' ),
-				mo_p_img( 'fissa_img', 'Immagine fissa (orizzontale, almeno 1920 px)', 'Si usa con «Un’immagine fissa». JPG o PNG. Se manca si usa la prima immagine delle slide.' ),
+				mo_p_drop( 'stile', 'Dietro al titolo', array( 'Immagini che si alternano (slide, una per settore)' => 'slide', 'Un’immagine fissa' => 'fissa' ), $d['hero']['stile'], 'Puoi passare dalle slide all’immagine fissa quando vuoi: le immagini delle slide restano salvate.', 'Immagini' ),
+				mo_p_img( 'fissa_img', 'Immagine fissa · computer', 'Si usa con «Un’immagine fissa». JPG o PNG. Se manca si usa la prima immagine delle slide.', 'Immagini', mo_misure_foto()['hero'] ),
+				mo_p_img_tel( 'fissa_img_tel', 'Immagine fissa · smartphone', mo_misure_foto()['hero_tel'] ),
 				mo_p_text( 'fissa_pos', 'Immagine fissa: punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 30% 40% = più a sinistra e in alto.', 'Immagini', $d['hero']['fissa_pos'] ),
 				mo_p_group(
 					'slide',
 					'Immagini (una per settore)',
 					array(
 						mo_p_text( 'settore', 'Settore', 'Breve, es. «Grafica»: compare in basso, sotto la barra che si riempie.', '' ),
-						mo_p_img( 'immagine', 'Immagine (orizzontale, almeno 1920 px)', 'JPG o PNG. Se manca si usa un’immagine di prova.', '' ),
+						mo_p_img( 'immagine', 'Immagine · computer', 'JPG o PNG. Se manca si usa un’immagine di prova.', '', mo_misure_foto()['hero'] ),
+						mo_p_img_tel( 'immagine_tel', 'Immagine · smartphone', mo_misure_foto()['hero_tel'], '' ),
 						mo_p_text( 'posizione', 'Punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 30% 40% = più a sinistra e in alto.', '' ),
 					),
 					$d['hero']['slide'],
@@ -229,7 +280,7 @@ function mo_blocks(): array {
 			'params' => array(
 				mo_p_group( 'riga1', 'Prima riga', array( mo_p_text( 'testo', 'Parola', '', '' ), mo_p_drop( 'stile', 'Stile', $stili, 'navy', '«Riempita con foto» usa la foto della scheda Immagini dentro le lettere.', '' ) ), $d['nastro']['riga1'], 'Da 4 a 6 parole. Trascinale per cambiare l’ordine.' ),
 				mo_p_group( 'riga2', 'Seconda riga', array( mo_p_text( 'testo', 'Parola', '', '' ), mo_p_drop( 'stile', 'Stile', $stili, 'navy', '', '' ) ), $d['nastro']['riga2'], 'Scorre nel verso opposto. Da 4 a 6 parole.' ),
-				mo_p_img( 'foto', 'Foto per le parole riempite', 'Colori saturi e contrastati funzionano meglio. Almeno 1200 px di larghezza.' ),
+				mo_p_img( 'foto', 'Foto per le parole riempite', 'Colori saturi e contrastati funzionano meglio.', 'Immagini', mo_misure_foto()['nastro'] ),
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['nastro']['foto_pos'] ),
 				mo_p_anchor( $d['nastro']['anchor'] ),
 				...mo_p_sfondo(),
@@ -259,15 +310,15 @@ function mo_blocks(): array {
 						mo_p_text( 'titolo', 'Titolo', '', '' ),
 						mo_p_area( 'testo', 'Testo', '', '' ),
 						mo_p_drop( 'icona', 'Icona', $icone, 'stella', '', '' ),
-						mo_p_img( 'icona_img', 'Icona personalizzata (facoltativa)', 'Un’immagine tua al posto dell’icona scelta sopra: meglio SVG o PNG trasparente, quadrata, a tinta unita.', '' ),
+						mo_p_img( 'icona_img', 'Icona personalizzata (facoltativa)', 'Un’immagine tua al posto dell’icona scelta sopra: quadrata, a tinta unita.', '', mo_misure_foto()['icona'] ),
 						mo_p_area( 'etichette', 'Etichette (facoltative)', 'Una per riga.', '' ),
 					),
 					$d['chi_siamo']['motivi'],
 					'Le card che si impilano, da 3 a 5. Il colore si alterna da solo.'
 				),
-				mo_p_img( 'foto_numero', 'Foto che riempie il numero', 'Almeno 1200 px di larghezza.' ),
+				mo_p_img( 'foto_numero', 'Foto che riempie il numero', '', 'Immagini', mo_misure_foto()['numero'] ),
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['chi_siamo']['foto_pos'] ),
-				mo_p_img( 'idea_immagine', 'Immagine dell’idea (facoltativa)', 'Se la lasci vuota resta l’animazione del cubo che si disegna.' ),
+				mo_p_img( 'idea_immagine', 'Immagine dell’idea (facoltativa)', 'Se la lasci vuota resta l’animazione del cubo che si disegna.', 'Immagini', mo_misure_foto()['idea'] ),
 				mo_p_anchor( $d['chi_siamo']['anchor'] ),
 				...mo_p_sfondo(),
 			),
@@ -277,7 +328,7 @@ function mo_blocks(): array {
 			'desc'   => 'Foto che si apre da un cerchio a tutto schermo, con pixel e onde. In home ora è dentro «Chi sono (breve)»: questo elemento resta per altre pagine.',
 			'params' => array(
 				mo_p_area( 'frase', 'Frase', 'Massimo 8 parole. Va a capo dove premi Invio (oppure con |).', 'Testi', $d['pausa']['frase'] ),
-				mo_p_img( 'foto', 'Foto', 'Orizzontale, almeno 1600 px. Controlla che i bordi non abbiano strisce chiare.' ),
+				mo_p_img( 'foto', 'Foto', 'Controlla che i bordi non abbiano strisce chiare.', 'Immagini', mo_misure_foto()['pausa'] ),
 				mo_p_text( 'punto_focale', 'Punto focale (centro del cerchio iniziale)', $fuoco, 'Immagini', $d['pausa']['punto_focale'] ),
 				mo_p_anchor( $d['pausa']['anchor'] ),
 				...mo_p_sfondo(),
@@ -299,7 +350,7 @@ function mo_blocks(): array {
 						mo_p_text( 'nome', 'Nome', '', '' ),
 						mo_p_area( 'beneficio', 'Frase di beneficio', 'Massimo 2 frasi.', '' ),
 						mo_p_area( 'voci', 'Voci incluse', 'Una per riga.', '' ),
-						mo_p_img( 'immagine', 'Immagine (4:3 o 1:1)', 'Facoltativa: se vuota resta l’illustrazione animata scelta sotto.', '' ),
+						mo_p_img( 'immagine', 'Immagine (facoltativa)', 'Se vuota resta l’illustrazione animata scelta sotto.', '', mo_misure_foto()['servizi'] ),
 						mo_p_drop( 'illustrazione', 'Illustrazione di riserva', $illu, 'identita', '', '' ),
 						mo_p_text( 'parola_sfondo', 'Parola di sfondo', 'La parola gigante e trasparente dietro la scheda.', '' ),
 						mo_p_text( 'link', '«Scopri di più» porta a', 'La pagina del servizio, es. /servizi/grafica/. Vuoto = niente link.', '' ),
@@ -349,7 +400,7 @@ function mo_blocks(): array {
 				mo_p_area( 'opzioni', 'Voci di «Di cosa hai bisogno?»', 'Una per riga.', 'Testi', $d['contatti']['opzioni'] ),
 				mo_p_text( 'titolo_pulsanti', 'Titolo dei pulsanti', '', 'Testi', $d['contatti']['titolo_pulsanti'] ),
 				mo_p_area( 'conferma', 'Messaggio di conferma', 'Mostrato dopo l’invio, sotto «Grazie, [nome]!».', 'Testi', $d['contatti']['conferma'] ),
-				mo_p_img( 'foto', 'Foto (4:5)', 'Almeno 800 px di larghezza.' ),
+				mo_p_img( 'foto', 'Foto', 'Stessa forma su computer e telefono.', 'Immagini', mo_misure_foto()['contatti'] ),
 				mo_p_text( 'foto_pos', 'Punto focale della foto', $fuoco, 'Immagini', $d['contatti']['foto_pos'] ),
 				mo_p_anchor( $d['contatti']['anchor'] ),
 				...mo_p_sfondo(),
@@ -405,14 +456,14 @@ function mo_render_hero( $atts ): string {
 	$btn = '-' === $btn ? '' : $btn; // il trattino nasconde
 	// Immagini a tutto schermo (una per settore); se manca una foto si usa un'immagine di prova
 	$stile      = mo_text( $a['stile'] );
-	$slide_mode = 'lampadina' !== $stile;
+	$slide_mode = true; // la vecchia «lampadina in pixel» è stata tolta (1.13.0): chi l'aveva scelta vede le slide
 	$slides     = array();
 	$prova      = array( 'idea', 'pausa', 'contatti' );
 	$elenco     = mo_group( $a['slide'] );
 	// Immagine fissa: la sua foto (o, se manca, la prima delle slide), senza settori né barra
 	if ( 'fissa' === $stile ) {
 		$prima  = $elenco[0] ?? array();
-		$elenco = array( absint( $a['fissa_img'] ?? 0 ) ? array( 'immagine' => $a['fissa_img'], 'posizione' => $a['fissa_pos'] ?? '50% 50%', 'settore' => '' ) : array_merge( $prima, array( 'settore' => '' ) ) );
+		$elenco = array( absint( $a['fissa_img'] ?? 0 ) ? array( 'immagine' => $a['fissa_img'], 'immagine_tel' => $a['fissa_img_tel'] ?? '', 'posizione' => $a['fissa_pos'] ?? '50% 50%', 'settore' => '' ) : array_merge( $prima, array( 'settore' => '' ), absint( $a['fissa_img_tel'] ?? 0 ) ? array( 'immagine_tel' => $a['fissa_img_tel'] ) : array() ) );
 	}
 	foreach ( $elenco as $i => $s ) {
 		$img = mo_image( $s['immagine'] ?? 0, $prova[ $i % 3 ], '2048x2048' );
@@ -429,6 +480,7 @@ function mo_render_hero( $atts ): string {
 			'w'       => $img['w'],
 			'h'       => $img['h'],
 			'pos'     => $x . '% ' . $y . '%',
+			'tel'     => mo_image_tel( $s['immagine_tel'] ?? 0 ),
 			'primo'   => 0 === $n,
 		);
 	}
@@ -443,7 +495,6 @@ function mo_render_hero( $atts ): string {
 			'titolo_piano' => implode( ' ', mo_lines( $a['titolo'] ) ),
 			'testo'        => mo_text( $a['testo'] ),
 			'pulsante'     => '' !== $btn ? array( 'testo' => $btn, 'href' => mo_href( $a['pulsante_link'] ) ) : null,
-			'bulb'         => $slide_mode && $slides ? '' : mo_pixels( 'bulb' ),
 			'slide_mode'   => $slide_mode && $slides,
 			'slides'       => $slides,
 			'piu_slide'    => count( $slides ) > 1,
@@ -671,7 +722,7 @@ function mo_render_garanzie( $atts ): string {
 function mo_render_contatti( $atts ): string {
 	$a   = mo_atts( 'contatti', $atts );
 	$s   = mo_settings();
-	$img = mo_image( $a['foto'], 'contatti', 'large' );
+	$img = mo_image( $a['foto'], 'contatti', '1536x1536' );
 	if ( $img ) {
 		$img['pos'] = implode( '% ', mo_focus( $a['foto_pos'] ) ) . '%';
 	}

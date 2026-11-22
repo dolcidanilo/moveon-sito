@@ -207,7 +207,7 @@ check( 'Il carosello è il Portfolio: nome dell’elemento e ancora #portfolio',
 $html = do_shortcode( '[mo_hero]' );
 check( 'Hero: di serie immagini a tutto schermo (3 di prova), settori e pausa, senza lampadina', 3 === substr_count( $html, 'class="mo-hs-slide' ) && 3 === substr_count( $html, 'class="mo-hs-dot' ) && str_contains( $html, 'mo-hs-pausa' ) && ! str_contains( $html, 'mo-bulb' ) && str_contains( $html, 'data-durata="6"' ) );
 $html = do_shortcode( '[mo_hero stile="lampadina"]' );
-check( 'Hero: la lampadina resta disponibile', str_contains( $html, 'mo-bulb' ) && ! str_contains( $html, 'mo-hs-slide' ) );
+check( 'Hero: la vecchia lampadina in pixel è stata tolta, chi l’aveva scelta vede le immagini', ! str_contains( $html, 'mo-bulb' ) && str_contains( $html, 'mo-hs-slide' ) );
 $html = do_shortcode( '[mo_hero slide="' . rawurlencode( wp_json_encode( array( array( 'settore' => 'Stampa', 'immagine' => (string) $jpg, 'posizione' => '30% 70%' ) ) ) ) . '" scurimento="60" transizione="dissolvenza" durata="10"]' );
 check( 'Hero: immagine scelta, punto focale, velo e tempi; con una sola immagine niente settori', str_contains( $html, wp_basename( (string) wp_get_attachment_image_url( $jpg, '2048x2048' ) ) ) && str_contains( $html, 'object-position:30% 70%' ) && str_contains( $html, '--mo-hs-velo:0.6' ) && str_contains( $html, 'data-transizione="dissolvenza"' ) && str_contains( $html, 'data-durata="10"' ) && ! str_contains( $html, 'mo-hs-nav' ) );
 /* 12) Pagine pronte, home leggera, testi */
@@ -439,6 +439,62 @@ check( 'Pagina con marchio: colori propri e niente motori di ricerca', str_conta
 $h121 = array_column( mo_pannello_campi( 'hero' ), null, 'nome' );
 check( 'Pannello: «Immagine fissa» solo con l’immagine fissa, le slide solo con le slide; niente «versione precedente»', array( 'fissa' ) === ( $h121['fissa_img']['se']['valori'] ?? null ) && array( 'slide' ) === ( $h121['slide']['se']['valori'] ?? null ) && ! in_array( 'lampadina', array_column( $h121['stile']['opzioni'], 'value' ), true ) );
 check( 'Demo: la copertina ha le slide dello studio (non quelle di MoveOn)', str_contains( rawurldecode( (string) get_post( (int) mo_demo()['pagina'] )->post_content ), '"settore":"Prevenzione"' ) );
+
+// 1.13.0: foto per smartphone, misure ideali, protezione degli accessi
+$imgs13 = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'numberposts' => 2, 'fields' => 'ids' ) );
+list( $pc13, $tel13 ) = array( (int) $imgs13[0], (int) $imgs13[1] );
+$telurl = mo_image( $tel13, '', 'full' )['url'];
+$slide13 = rawurlencode( wp_json_encode( array( array( 'settore' => 'A', 'immagine' => (string) $pc13, 'immagine_tel' => (string) $tel13 ), array( 'settore' => 'B', 'immagine' => (string) $pc13 ) ) ) );
+$h13 = do_shortcode( '[mo_hero slide="' . $slide13 . '"]' );
+check( 'Foto per smartphone: la slide con la versione per telefono ha <source> sotto i 767 px, l’altra no', 1 === substr_count( $h13, '<source media="(max-width: 767px)"' ) && str_contains( $h13, 'srcset="' . esc_url( $telurl ) . '"' ) && 2 === substr_count( $h13, '<picture class="mo-pic">' ) );
+$h13f = do_shortcode( '[mo_hero stile="fissa" fissa_img="' . $pc13 . '" fissa_img_tel="' . $tel13 . '"]' );
+check( 'Foto per smartphone: anche l’immagine fissa della hero', 1 === substr_count( $h13f, '<source media="(max-width: 767px)"' ) && 1 === substr_count( $h13f, 'class="mo-hs-slide' ) );
+$cb13 = do_shortcode( '[mo_chi_breve immagine="' . $pc13 . '" immagine_tel="' . $tel13 . '" apertura_img="' . $pc13 . '" apertura_img_tel="' . $tel13 . '"]' );
+check( 'Foto per smartphone: foto e foto che si apre del Chi sono', 2 === substr_count( $cb13, '<source media="(max-width: 767px)"' ) );
+$sf13 = mo_sfondo_html( array( 'sfondo_img' => $pc13, 'sfondo_img_tel' => $tel13 ) );
+check( 'Foto per smartphone: sfondo della sezione (variabile per il telefono)', str_contains( $sf13, ' data-tel ' ) && str_contains( $sf13, "--mo-bg-tel:url('" . esc_url( $telurl ) . "')" ) );
+check( 'Foto per smartphone: senza versione per telefono niente in più', ! str_contains( mo_sfondo_html( array( 'sfondo_img' => $pc13 ) ), 'data-tel' ) && ! str_contains( do_shortcode( '[mo_chi_breve immagine="' . $pc13 . '"]' ), '<source' ) );
+check( 'Foto per smartphone: anche negli sfondi delle pagine dei progetti', $tel13 === mo_sfondo_pulito( array( 'sfondo_img_tel' => $tel13 ) )['sfondo_img_tel'] && 0 === mo_sfondo_pulito( array( 'sfondo_img_tel' => 'x' ) )['sfondo_img_tel'] );
+$foto13 = array();
+foreach ( mo_blocks() as $k13 => $b13 ) {
+	foreach ( $b13['params'] as $p13 ) {
+		foreach ( 'param_group' === $p13['type'] ? $p13['params'] : array( $p13 ) as $q13 ) {
+			if ( 'attach_image' === $q13['type'] && empty( $q13['mo_misura'] ) ) {
+				$foto13[] = $k13 . '.' . $q13['param_name'];
+			}
+		}
+	}
+}
+check( 'Misure ideali: ogni campo foto dice la misura in px', ! $foto13, implode( ', ', $foto13 ) );
+$hp13 = array_column( mo_pannello_campi( 'hero' ), null, 'nome' );
+$sl13 = array_column( $hp13['slide']['campi'], null, 'nome' );
+$cbp13 = array_column( mo_pannello_campi( 'chi_breve' ), null, 'nome' );
+check( 'Pannello: misura ideale e versione per smartphone (con le stesse condizioni della foto per computer)', str_contains( $hp13['fissa_img']['misura'] ?? '', '1920 × 1080' ) && array( 'fissa' ) === ( $hp13['fissa_img_tel']['se']['valori'] ?? null ) && isset( $sl13['immagine_tel']['vuota'] ) && array( 'si' ) === ( $cbp13['apertura_img_tel']['se']['valori'] ?? null ) && isset( $cbp13['sfondo_img_tel'] ) );
+// Bug della 1.12: la prima modifica in assoluto di una pagina (senza revisioni) non si poteva annullare
+wp_set_current_user( 1 );
+$np13 = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Prova annulla', 'post_content' => '[mo_faq titolo="Primo titolo"]' ) );
+$sv13 = mo_pannello_salva( $np13, 0, array( 'titolo' => 'Titolo cambiato' ) );
+$an13 = mo_pannello_annulla( $np13 );
+check( 'Pannello: anche la prima modifica di una pagina nuova si può annullare', ! is_wp_error( $sv13 ) && true === $an13 && '[mo_faq titolo="Primo titolo"]' === (string) get_post( $np13 )->post_content, (string) get_post( $np13 )->post_content );
+wp_delete_post( $np13, true );
+wp_set_current_user( 0 );
+$_SERVER['REMOTE_ADDR'] = '203.0.113.' . wp_rand( 1, 250 );
+$adm13 = get_user_by( 'login', 'admin' );
+for ( $i13 = 0; $i13 < 4; $i13++ ) {
+	wp_authenticate( 'admin', 'sbagliata' );
+}
+$ok13 = wp_authenticate( 'admin', 'prova-moveon-1' );
+check( 'Accessi: 4 password sbagliate non bloccano', $ok13 instanceof WP_User );
+delete_transient( mo_accessi_chiave() );
+for ( $i13 = 0; $i13 < 5; $i13++ ) {
+	wp_authenticate( 'admin', 'sbagliata' );
+}
+$no13 = wp_authenticate( 'admin', 'prova-moveon-1' );
+check( 'Accessi: dopo 5 password sbagliate l’accesso è bloccato per 15 minuti, anche con quella giusta', is_wp_error( $no13 ) && 'mo_troppi_tentativi' === $no13->get_error_code() && 15 === mo_accessi_bloccato() && str_contains( $no13->get_error_message(), '15 minuti' ) );
+$_SERVER['REMOTE_ADDR'] = '198.51.100.7';
+check( 'Accessi: il blocco vale solo per quell’indirizzo internet', wp_authenticate( 'admin', 'prova-moveon-1' ) instanceof WP_User );
+$_SERVER['REMOTE_ADDR'] = '203.0.113.1';
+delete_transient( 'mo_acc_' . md5( '198.51.100.7' ) );
 
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.12.2
+Stable tag: 1.13.0
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,13 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.13.0 =
+* Foto per smartphone: hero (slide e immagine fissa), Chi sono breve (foto sotto il numero e foto che si apre), immagine di sfondo di ogni sezione e delle pagine dei progetti hanno un secondo campo «… · smartphone». Sugli schermi fino a 767 px si vede quella; se è vuoto resta la foto per computer.
+* Misura ideale in px sotto ogni campo foto (WPBakery, pannello clienti, progetti, sfondi dei progetti) e tabella nella guida.
+* Sicurezza: dopo 5 password sbagliate dallo stesso indirizzo internet l'accesso (pannello clienti e wp-login) si blocca per 15 minuti; il pannello avvisa quando restano 2 tentativi.
+* Pannello: «Annulla l'ultima modifica» funziona anche dopo la primissima modifica di una pagina (prima la versione precedente non veniva salvata).
+* Tolta la vecchia «lampadina in pixel» della hero (chi l'aveva scelta vede le immagini). Foto dei Contatti più nitida sugli schermi ad alta risoluzione.
 
 = 1.12.2 =
 * Pannello: la pagina di accesso ha sempre il marchio del cliente, anche aprendo /gestione/ senza altro, dopo «Esci» e se nel sito c'è un solo cliente del pannello (il browser si ricorda dell'ultimo accesso). Il nome utente si compila da solo solo con il link personale (/gestione/?per=…).

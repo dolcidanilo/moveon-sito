@@ -161,12 +161,11 @@ function mo_focus( $v, array $fallback = array( 50, 50 ) ): array {
 }
 
 /* ------------------------------------------------------------------ */
-/* Lampadina e scudo in pixel (animazioni fisse, come nel prototipo)    */
+/* Scudo in pixel delle Garanzie (come nel prototipo)                   */
 /* ------------------------------------------------------------------ */
 
 function mo_pixels( string $kind ): string {
 	$maps = array(
-		'bulb'   => array( '....XXXXX....', '..XXXXXXXXX..', '.XXXXXXXXXXX.', '.XXXAXXXAXXX.', 'XXXXAXXXAXXXX', 'XXXXAAXAAXXXX', 'XXXXXAAAXXXXX', '.XXXXXAXXXXX.', '.XXXXXAXXXXX.', '..XXXXAXXXX..', '...XXXAXXX...', '....XXAXX....', '....SSSSS....', '....sssss....', '....SSSSS....', '.....sss.....' ),
 		'shield' => array( '..XXXXXXXXX..', '.XXXXXXXXXXX.', 'XXXXXXXXXXXXX', 'XXXXXXXXXXCXX', 'XXXXXXXXXCXXX', 'XXXXXXXXCXXXX', 'XXXCXXXCXXXXX', 'XXXXCXCXXXXXX', 'XXXXXCXXXXXXX', '.XXXXXXXXXXX.', '.XXXXXXXXXXX.', '..XXXXXXXXX..', '...XXXXXXX...', '....XXXXX....', '.....XXX.....', '......X......' ),
 	);
 	$out = '';
@@ -179,26 +178,13 @@ function mo_pixels( string $kind ): string {
 				continue;
 			}
 			$cls = 'mo-px mo-px-on';
-			if ( 'bulb' === $kind ) {
-				if ( 'X' === $ch ) {
-					$col = ( $r + $c < 8 ) ? 'var(--mo-c4)' : ( $r + $c > 17 ? 'var(--mo-c3-scuro)' : 'var(--mo-c3)' );
-				} elseif ( 'A' === $ch ) {
-					$col = 'var(--mo-c6)';
-					$cls = 'mo-px mo-px-a mo-px-on';
-				} elseif ( 'S' === $ch ) {
-					$col = '#94a3b8';
-				} else {
-					$col = '#64748b';
-				}
-			} else {
-				$col = 'C' === $ch ? 'var(--mo-c6)' : ( ( $r + $c < 7 ) ? 'var(--mo-c4)' : ( $r + $c > 17 ? 'var(--mo-c3-scuro)' : 'var(--mo-c3)' ) );
-				if ( 'C' === $ch ) {
-					$cls = 'mo-px mo-px-ck mo-px-on';
-				}
+			$col = 'C' === $ch ? 'var(--mo-c6)' : ( ( $r + $c < 7 ) ? 'var(--mo-c4)' : ( $r + $c > 17 ? 'var(--mo-c3-scuro)' : 'var(--mo-c3)' ) );
+			if ( 'C' === $ch ) {
+				$cls = 'mo-px mo-px-ck mo-px-on';
 			}
 			$out .= '<span class="' . $cls . '"><i style="--mo-c:' . $col . '"></i></span>';
 		}
 	}
-	$wrap = 'bulb' === $kind ? 'mo-bulb' : 'mo-shield';
+	$wrap = 'mo-shield';
 	return '<span class="' . $wrap . '" aria-hidden="true">' . $out . '</span>';
 }

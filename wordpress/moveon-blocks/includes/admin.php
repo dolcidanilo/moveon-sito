@@ -266,14 +266,19 @@ function mo_sfondo_campi( string $zona, string $titolo, string $desc ): void {
 				<td><input type="text" class="mo-colore" id="<?php echo esc_attr( $id ); ?>-colore" name="<?php echo esc_attr( $base ); ?>[sfondo_colore]" value="<?php echo esc_attr( $v['sfondo_colore'] ); ?>" data-default-color=""><p class="description">Vuoto = colore di serie.</p></td></tr>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_testi">Stile dei testi e delle card</label></th>
 				<td><?php $sel( 'sfondo_testi', array( '' => 'Automatico', 'chiari' => 'Testi chiari (per sfondi scuri)', 'scuri' => 'Testi scuri (per sfondi chiari)' ) ); ?></td></tr>
-			<tr><th>Immagine di sfondo</th>
+			<?php
+			$misure = mo_misure_foto();
+			foreach ( array( 'sfondo_img' => array( 'img', 'Immagine di sfondo · computer', 'JPG o PNG. Sta sopra il colore e sotto i testi. Copre tutta la zona: tieni il soggetto al centro.', $misure['sfondo'] ), 'sfondo_img_tel' => array( 'img-tel', 'Immagine di sfondo · smartphone', 'Facoltativa. Sul telefono si vede questa; se la lasci vuota si usa quella per computer, tagliata ai lati.', $misure['sfondo_tel'] ) ) as $campo => $c ) :
+				?>
+			<tr><th><?php echo esc_html( $c[1] ); ?></th>
 				<td>
-					<input type="hidden" name="<?php echo esc_attr( $base ); ?>[sfondo_img]" id="<?php echo esc_attr( $id ); ?>-img" value="<?php echo $v['sfondo_img'] ? (int) $v['sfondo_img'] : ''; ?>">
-					<div class="mo-sfondo-anteprima" id="<?php echo esc_attr( $id ); ?>-img-anteprima"><?php echo $v['sfondo_img'] ? wp_get_attachment_image( $v['sfondo_img'], 'medium' ) : ''; // phpcs:ignore ?></div>
-					<button type="button" class="button mo-scegli-immagine" data-target="<?php echo esc_attr( $id ); ?>-img"><?php echo $v['sfondo_img'] ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
-					<button type="button" class="button-link mo-togli-immagine" data-target="<?php echo esc_attr( $id ); ?>-img">Rimuovi</button>
-					<p class="description">JPG o PNG. Sta sopra il colore e sotto i testi.</p>
+					<input type="hidden" name="<?php echo esc_attr( $base ); ?>[<?php echo esc_attr( $campo ); ?>]" id="<?php echo esc_attr( $id . '-' . $c[0] ); ?>" value="<?php echo $v[ $campo ] ? (int) $v[ $campo ] : ''; ?>">
+					<div class="mo-sfondo-anteprima" id="<?php echo esc_attr( $id . '-' . $c[0] ); ?>-anteprima"><?php echo $v[ $campo ] ? wp_get_attachment_image( $v[ $campo ], 'medium' ) : ''; // phpcs:ignore ?></div>
+					<button type="button" class="button mo-scegli-immagine" data-target="<?php echo esc_attr( $id . '-' . $c[0] ); ?>"><?php echo $v[ $campo ] ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
+					<button type="button" class="button-link mo-togli-immagine" data-target="<?php echo esc_attr( $id . '-' . $c[0] ); ?>">Rimuovi</button>
+					<p class="description"><b>Misura ideale: <?php echo esc_html( $c[3] ); ?>.</b> <?php echo esc_html( $c[2] ); ?></p>
 				</td></tr>
+			<?php endforeach; ?>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-opacita">Opacità dell’immagine</label></th>
 				<td><input type="number" min="5" max="100" step="5" class="small-text" id="<?php echo esc_attr( $id ); ?>-opacita" name="<?php echo esc_attr( $base ); ?>[sfondo_opacita]" value="<?php echo (int) $v['sfondo_opacita']; ?>"> % <span class="description">da 5 (appena visibile) a 100 (piena)</span></td></tr>
 			<tr><th><label for="<?php echo esc_attr( $id ); ?>-sfondo_dimensione">Dimensione dell’immagine</label></th>

@@ -1,4 +1,4 @@
-{{! CHI SONO BREVE (home) · anchor sfondo animato etichetta numero frase_numero immagine (url, alt, w, h, pos) animazione titolo; apertura (foto, righe, frase_piana, fx, fy); punti (righe); pulsante (testo, href) }}
+{{! CHI SONO BREVE (home) · anchor sfondo animato etichetta numero frase_numero immagine (url, alt, w, h, pos, tel); foto e immagine hanno tel = versione per smartphone (url, w, h) animazione titolo; apertura (foto, righe, frase_piana, fx, fy); punti (righe); pulsante (testo, href) }}
 <section class="mo-block mo-sec mo-cb{{#apertura}} mo-cb--apertura{{/apertura}}" id="{{anchor}}" data-mo-block="chi-breve">
   {{{sfondo}}}
   {{#animato}}<canvas class="mo-emo-canvas mo-cb-canvas" aria-hidden="true"></canvas>{{/animato}}
@@ -7,7 +7,7 @@
     <div class="mo-cb-num mo-reveal">
       <p class="mo-cb-n" data-anima="{{animazione}}"><span class="mo-cb-n-luce" aria-hidden="true">{{numero}}</span><span class="mo-cb-n-txt">{{numero}}</span></p>
       <p class="mo-cb-frase">{{frase_numero}}</p>
-      {{#immagine}}<div class="mo-cb-img"><img src="{{url}}" alt="{{alt}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}} style="object-position:{{pos}}" loading="lazy" decoding="async"></div>{{/immagine}}
+      {{#immagine}}<div class="mo-cb-img"><picture class="mo-pic">{{#tel}}<source media="(max-width: 767px)" srcset="{{url}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}}>{{/tel}}<img src="{{url}}" alt="{{alt}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}} style="object-position:{{pos}}" loading="lazy" decoding="async"></picture></div>{{/immagine}}
     </div>
     <div class="mo-cb-testo">
       <h2 class="mo-sec-title mo-reveal">{{titolo}}</h2>
@@ -17,7 +17,7 @@
   </div>
   {{#apertura}}
   <div class="mo-cb-apertura" data-fx="{{fx}}" data-fy="{{fy}}"{{#frase_piana}} role="img" aria-label="{{frase_piana}}"{{/frase_piana}}>
-    <div class="mo-cb-sipario">{{#foto}}<img src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" style="object-position:{{pos}}" loading="lazy" decoding="async">{{/foto}}</div>
+    <div class="mo-cb-sipario">{{#foto}}<picture class="mo-pic">{{#tel}}<source media="(max-width: 767px)" srcset="{{url}}"{{#w}} width="{{w}}" height="{{h}}"{{/w}}>{{/tel}}<img src="{{url}}" alt="{{alt}}" width="{{w}}" height="{{h}}" style="object-position:{{pos}}" loading="lazy" decoding="async"></picture>{{/foto}}</div>
     <div class="mo-emo-veil" aria-hidden="true"></div>
     {{#frase_piana}}<p class="mo-emo-text" aria-hidden="true">{{#righe}}<span class="mo-emo-line"><span>{{.}}</span></span>{{/righe}}</p>{{/frase_piana}}
   </div>

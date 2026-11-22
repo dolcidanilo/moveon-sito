@@ -23,10 +23,12 @@ function mo_sezioni_def( array $d ): array {
 				mo_p_text( 'frase_numero', 'Frase sotto il numero', 'Numero e frase insieme sono alti quanto i testi a destra (su computer).', 'Testi', $d['chi_breve']['frase_numero'] ),
 				mo_p_drop( 'animazione', 'Animazione del numero', array( 'Colori che scorrono e bagliore' => 'tutto', 'Solo colori che scorrono' => 'colori', 'Solo bagliore' => 'bagliore', 'Nessuna' => 'nessuna' ), 'tutto', 'Un movimento leggero e continuo dentro il numero. Si ferma da solo per chi ha scelto «riduci movimento».', 'Testi' ),
 				mo_p_area( 'titolo', 'Frase principale', 'Una o due frasi, in parole semplici.', 'Testi', $d['chi_breve']['titolo'] ),
-				mo_p_img( 'immagine', 'Foto (facoltativa)', 'JPG o PNG, almeno 1200 px di larghezza. Con angoli arrotondati, sotto la frase del numero: su telefono e tablet sta tra la frase e il titolo; su computer riempie la colonna di sinistra sotto la frase.' ),
+				mo_p_img( 'immagine', 'Foto · computer (facoltativa)', 'Con angoli arrotondati, sotto la frase del numero: riempie lo spazio libero della colonna, può tagliarsi sopra e sotto.', 'Immagini', mo_misure_foto()['cb'] ),
+				mo_p_img_tel( 'immagine_tel', 'Foto · smartphone', mo_misure_foto()['cb_tel'] ),
 				mo_p_text( 'immagine_pos', 'Punto focale della foto', 'Il punto da tenere sempre visibile, in percentuale orizzontale e verticale: «50% 50%» = centro, «50% 30%» = un po’ più in alto.', 'Immagini', $d['chi_breve']['immagine_pos'] ),
 				mo_p_drop( 'apertura', 'Foto che si apre', array( 'Sì, sotto i testi' => 'si', 'No' => 'no' ), 'si', 'La foto a tutta larghezza che si apre dal centro verso i lati, come un sipario, mentre scorri (era la «Pausa emozionale»). Se nella pagina c’è ancora l’elemento Pausa emozionale, qui non compare, per non ripeterla: usa MoveOn → Strumenti → Alleggerisci la home.', 'Foto che si apre' ),
-				mo_p_img( 'apertura_img', 'Foto', 'Orizzontale, almeno 1600 px. Se manca si usa la foto di prova.', 'Foto che si apre' ),
+				mo_p_img( 'apertura_img', 'Foto · computer', 'Se manca si usa la foto di prova.', 'Foto che si apre', mo_misure_foto()['apertura'] ),
+				mo_p_img_tel( 'apertura_img_tel', 'Foto · smartphone', mo_misure_foto()['apertura_tel'], 'Foto che si apre' ),
 				mo_p_text( 'apertura_pos', 'Punto focale', 'La parte da tenere sempre visibile: 50% 50% = centro; 50% 30% = più in alto.', 'Foto che si apre', $d['chi_breve']['apertura_pos'] ),
 				mo_p_area( 'apertura_frase', 'Frase sulla foto', 'Massimo 8 parole. Va a capo dove premi Invio. Scrivi - (un trattino) per nessuna frase.', 'Foto che si apre', $d['chi_breve']['apertura_frase'] ),
 				mo_p_area( 'punti', 'Tre punti di forza', 'Uno per riga, brevi.', 'Testi', $d['chi_breve']['punti'] ),
@@ -73,7 +75,7 @@ function mo_sezioni_def( array $d ): array {
 					array(
 						mo_p_text( 'titolo', 'Titolo', '', '' ),
 						mo_p_area( 'testo', 'Testo', 'Una o due frasi.', '' ),
-						mo_p_img( 'immagine', 'Foto (facoltativa)', 'JPG o PNG, orizzontale.', '' ),
+						mo_p_img( 'immagine', 'Foto (facoltativa)', 'JPG o PNG. Stessa forma su computer e telefono.', '', mo_misure_foto()['punti'] ),
 					),
 					$d['punti']['punti'],
 					'Trascinale per cambiare l’ordine.'
@@ -213,6 +215,7 @@ function mo_render_chi_breve( $atts ): string {
 	$img = mo_image( $a['immagine'] ?? '', '', 'large' );
 	if ( $img ) {
 		$img['pos'] = implode( '% ', mo_focus( $a['immagine_pos'] ?? '50% 50%' ) ) . '%';
+		$img['tel'] = mo_image_tel( $a['immagine_tel'] ?? 0 );
 	}
 	// Foto che si apre (la vecchia Pausa emozionale). Se nella pagina c'è ancora l'elemento Pausa, il Chi sono prende
 	// la sua foto, il punto focale e la frase (se qui non sono stati scelti) e la Pausa non si mostra: una sezione sola.
@@ -229,6 +232,7 @@ function mo_render_chi_breve( $atts ): string {
 		$foto            = mo_image( $a['apertura_img'] ?? '', 'pausa', '2048x2048' );
 		if ( $foto ) {
 			$foto['pos'] = $fx . '% ' . $fy . '%';
+			$foto['tel'] = mo_image_tel( $a['apertura_img_tel'] ?? 0 );
 			$frase       = mo_facoltativo( $a['apertura_frase'] ?? '' );
 			$righe       = '' !== $frase ? mo_lines( $frase ) : array();
 			$apertura    = array( 'foto' => $foto, 'righe' => $righe, 'frase_piana' => implode( ' ', $righe ), 'fx' => $fx, 'fy' => $fy );

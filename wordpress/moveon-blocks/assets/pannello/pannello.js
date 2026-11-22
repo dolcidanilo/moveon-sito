@@ -272,9 +272,9 @@
         }
         return `<label class="mp-campo" for="${id}"><span>${esc(f.etichetta)}</span><select id="${id}" data-k="${esc(chiave)}">${f.opzioni.map((o) => `<option value="${esc(o.value)}"${String(v) === o.value ? ' selected' : ''}>${esc(o.label)}</option>`).join('')}</select>${aiuto}</label>`;
       case 'foto':
-        return `<div class="mp-campo"><span>${esc(f.etichetta)}</span>${v && v.url
+        return `<div class="mp-campo mp-campo-foto"><span>${esc(f.etichetta)}</span>${f.misura ? `<small class="mp-misura">Misura ideale: <b>${esc(f.misura)}</b></small>` : ''}${v && v.url
           ? `<div class="mp-foto-campo"><img src="${esc(v.url)}" alt=""><div class="mp-foto-az"><button type="button" class="mp-btn mp-btn-chiaro" data-scegli="${esc(chiave)}">${ico('foto')}<span>Cambia foto</span></button><button type="button" class="mp-btn mp-btn-icona mp-btn-chiaro" data-togli="${esc(chiave)}" aria-label="Togli la foto">${ico('cestino')}</button></div></div>`
-          : `<button type="button" class="mp-foto-vuota" data-scegli="${esc(chiave)}">${ico('foto')}<strong>Aggiungi una foto</strong><small>JPG o PNG. Se lasci vuoto si usa quella di serie.</small></button>`}${aiuto}</div>`;
+          : `<button type="button" class="mp-foto-vuota" data-scegli="${esc(chiave)}">${ico('foto')}<strong>Aggiungi una foto</strong><small>${esc(f.vuota || 'JPG o PNG. Se lasci vuoto si usa quella di serie.')}</small></button>`}${aiuto}</div>`;
       case 'colore': {
         const tav = ['', '#ffffff', '#f4f5f7', '#0f172a', getComputedStyle(document.documentElement).getPropertyValue('--p').trim()];
         return `<div class="mp-campo"><span>${esc(f.etichetta)}</span><div class="mp-colori">${tav.map((c) => `<button type="button" class="mp-colore${c === '' ? ' mp-colore-nessuno' : ''}" style="${c ? 'background:' + esc(c) : ''}" data-k="${esc(chiave)}" data-v="${esc(c)}" aria-pressed="${(v || '') === c}" aria-label="${c || 'Colore originale'}">${c === '' ? 'Originale' : ''}</button>`).join('')}<label class="mp-colore mp-colore-scegli" aria-label="Scegli un colore"><input type="color" data-k="${esc(chiave)}" value="${esc(v || '#ffffff')}">${ico('piu')}</label></div>${aiuto}</div>`;

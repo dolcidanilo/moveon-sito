@@ -964,6 +964,32 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await ctx.close();
 }
 
+/* ---------------- Foto per smartphone (1.13.0) ---------------- */
+{
+  const nomi = () => ({
+    hero: document.querySelector('.mo-hs-slide img')?.currentSrc.split('/').pop(),
+    cb: document.querySelector('.mo-cb-img img')?.currentSrc.split('/').pop(),
+    sipario: document.querySelector('.mo-cb-sipario img')?.currentSrc.split('/').pop(),
+    sfondo: (getComputedStyle(document.querySelector('.mo-cb > .mo-bg--foto')).backgroundImage.match(/([^/]+)"?\)$/) || [])[1],
+    garanzie: (getComputedStyle(document.querySelector('#g2 > .mo-bg--foto, .mo-gar > .mo-bg--foto')).backgroundImage.match(/([^/]+)"?\)$/) || [])[1],
+  });
+  const pc = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await pc.goto(URL + 'prova-foto-telefono/', { waitUntil: 'load' });
+  await pc.waitForTimeout(800);
+  const a = await pc.evaluate(nomi);
+  await pc.close();
+  const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+  const m = await ctx.newPage();
+  await m.goto(URL + 'prova-foto-telefono/', { waitUntil: 'load' });
+  await m.waitForTimeout(800);
+  const b = await m.evaluate(nomi);
+  await ctx.close();
+  const tel = (x) => /contatti-lettore/.test(x || '');
+  check('Foto per smartphone: sul computer hero, Chi sono, foto che si apre e sfondo usano quelle per computer', !tel(a.hero) && !tel(a.cb) && !tel(a.sipario) && !tel(a.sfondo), JSON.stringify(a));
+  check('Foto per smartphone: sul telefono si vedono le versioni per smartphone (hero, Chi sono, foto che si apre, sfondo)', tel(b.hero) && tel(b.cb) && tel(b.sipario) && tel(b.sfondo), JSON.stringify(b));
+  check('Foto per smartphone: senza versione per smartphone resta la foto per computer', !!b.garanzie && !tel(b.garanzie) && b.garanzie === a.garanzie, JSON.stringify([a.garanzie, b.garanzie]));
+}
+
 /* ---------------- Pannello clienti «Il tuo sito» (1.12.0) ---------------- */
 {
   const P = URL + 'gestione/';
@@ -974,6 +1000,15 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   const errori = []; page.on('pageerror', (e) => { if (!/Transition was aborted/.test(e.message)) errori.push(e.message); });
+  // Password sbagliate: dopo la terza avvisa quanti tentativi restano (il blocco vero si controlla in PHP; l'accesso giusto qui sotto azzera il conto)
+  const msgErr = [];
+  for (let k = 1; k <= 3; k++) {
+    await page.goto(P + '?per=dentista-demo');
+    await page.fill('input[name=password]', 'sbagliata-' + k);
+    await Promise.all([page.waitForNavigation(), page.click('button[type=submit]')]);
+    msgErr.push(await page.evaluate(() => document.querySelector('.mp-accesso-card')?.innerText || ''));
+  }
+  check('Accesso: con la password sbagliata avvisa prima del blocco (ancora 2 tentativi)', /non corretti/.test(msgErr[0]) && !/tentativ/.test(msgErr[0]) && /ancora 2 tentativi/.test(msgErr[2]), msgErr[2].slice(0, 160));
   await page.goto(P + '?per=dentista-demo');
   const marchio = await page.evaluate(() => ({ titolo: document.querySelector('.mp-accesso h1')?.textContent, utente: document.querySelector('input[name=utente]')?.value }));
   check('Pannello: accesso con il marchio del cliente', marchio.titolo === 'Studio Dentistico Luce' && marchio.utente === 'dentista-demo', JSON.stringify(marchio));

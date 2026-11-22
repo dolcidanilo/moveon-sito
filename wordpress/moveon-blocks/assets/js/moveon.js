@@ -162,74 +162,8 @@ function initSite() {
 }
 
 /* =================== HERO =================== */
-function initHero(sec, { G, reduce, fine, setHeroPlay }) {
-  if (sec.classList.contains('mo-hero--slide')) { initHeroSlide(sec, { G, reduce, setHeroPlay }); return; }
-  const px = $$('.mo-bulb .mo-px-on i', sec);
-  const words = $$('.mo-hw-in', sec);
-  const hl = $$('.mo-hl-path', sec);
-  const fade = $$('.mo-hero-sub, .mo-hero-actions', sec);
-  const glow = $('.mo-bulb-glow', sec);
-  const heroTl = G.timeline({ paused: true });
-  if (!reduce) {
-    G.set(px, {
-      x: () => G.utils.random(-520, 520),
-      y: () => G.utils.random(-420, 420),
-      rotation: () => G.utils.random(-180, 180),
-      scale: 0.2,
-      opacity: 0,
-    });
-    G.set(words, { yPercent: 115 });
-    if (hl.length) G.set(hl, { strokeDasharray: 1, strokeDashoffset: 1 });
-    G.set(fade, { y: 24, opacity: 0 });
-    if (glow) G.set(glow, { opacity: 0 });
-    heroTl
-      .to(px, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, duration: 1.5, ease: 'expo.out', stagger: { each: 0.007, from: 'random' } }, 0)
-      .to(words, { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.1 }, 0.15)
-      .to(fade, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.12 }, 0.85)
-      .add(() => {
-        G.to($$('.mo-bulb .mo-px-a i', sec), { boxShadow: '0 0 18px 3px rgba(245,158,11,.75)', duration: 1.4, repeat: -1, yoyo: true, ease: 'sine.inOut', stagger: 0.06 });
-      }, 1.3);
-    if (hl.length) heroTl.to(hl, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut' }, 0.95);
-    if (glow) heroTl.to(glow, { opacity: 1, duration: 1.2 }, 1.1);
-  }
-  setHeroPlay(() => heroTl.play());
-  if (reduce) return;
-
-  const heroST = { trigger: sec, start: 'top top', end: 'bottom top', scrub: 0.6 };
-  G.to($$('.mo-bulb .mo-px-on', sec), {
-    x: () => G.utils.random(-260, 260),
-    y: () => G.utils.random(-320, 60),
-    rotation: () => G.utils.random(-120, 120),
-    opacity: 0.15,
-    ease: 'none',
-    scrollTrigger: heroST,
-  });
-  G.to($('.mo-hero-copy', sec), { y: -90, ease: 'none', scrollTrigger: heroST });
-  G.to($('.mo-dots', sec), { y: 140, ease: 'none', scrollTrigger: heroST });
-  G.to($('.mo-ring', sec), { y: 220, ease: 'none', scrollTrigger: heroST });
-  G.to($('.mo-sq', sec), { y: -280, rotation: 180, ease: 'none', scrollTrigger: heroST });
-  G.to($('.mo-sq2', sec), { y: -140, rotation: -45, ease: 'none', scrollTrigger: heroST });
-
-  const bw = $('.mo-bulb-wrap', sec);
-  bw.addEventListener('click', () => {
-    G.timeline()
-      .to(px, { x: () => G.utils.random(-240, 240), y: () => G.utils.random(-240, 240), rotation: () => G.utils.random(-180, 180), scale: 0.4, duration: 0.45, ease: 'power3.in', stagger: { each: 0.003, from: 'center' } })
-      .to(px, { x: 0, y: 0, rotation: 0, scale: 1, duration: 1.1, ease: 'expo.out', stagger: { each: 0.006, from: 'random' } });
-  });
-
-  // Parallax con il mouse (solo mouse, mai al tocco)
-  if (fine) {
-    const bx = G.quickTo(bw, 'x', { duration: 0.9, ease: 'power3' });
-    const by = G.quickTo(bw, 'y', { duration: 0.9, ease: 'power3' });
-    const deco = $('.mo-hero-deco', sec);
-    const dx = G.quickTo(deco, 'x', { duration: 1.1, ease: 'power3' });
-    const dy = G.quickTo(deco, 'y', { duration: 1.1, ease: 'power3' });
-    sec.addEventListener('mousemove', (e) => {
-      const nx = e.clientX / window.innerWidth - 0.5;
-      const ny = e.clientY / window.innerHeight - 0.5;
-      bx(nx * 30); by(ny * 30); dx(-nx * 50); dy(-ny * 50);
-    });
-  }
+function initHero(sec, { G, reduce, setHeroPlay }) {
+  initHeroSlide(sec, { G, reduce, setHeroPlay });
 }
 
 /* =================== HERO A IMMAGINI =================== */

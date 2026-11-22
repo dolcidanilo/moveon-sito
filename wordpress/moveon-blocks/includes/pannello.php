@@ -147,7 +147,7 @@ function mo_pannello_trova_sezioni( string $c ): array {
 /** Campi del pannello per un elemento: solo quelli utili al cliente, con nomi semplici. */
 function mo_pannello_campi( string $k ): array {
 	$fuori      = array( 'anchor', 'link', 'pulsante_link' );
-	$sfondo_ok  = array( 'sfondo_colore', 'sfondo_img', 'sfondo_opacita' );
+	$sfondo_ok  = array( 'sfondo_colore', 'sfondo_img', 'sfondo_img_tel', 'sfondo_opacita' );
 	$gruppi     = array( 'Testi' => 'Testi', 'Elenchi' => 'Elenchi', 'Immagini' => 'Foto', 'Foto che si apre' => 'Foto', 'Sfondo' => 'Sfondo' );
 	$campo      = function ( array $p ) use ( &$campo ) {
 		$tipi = array( 'textfield' => 'testo', 'textarea' => 'testo_lungo', 'dropdown' => 'scelta', 'attach_image' => 'foto', 'param_group' => 'elenco', 'colorpicker' => 'colore' );
@@ -155,7 +155,7 @@ function mo_pannello_campi( string $k ): array {
 		if ( '' === $tipo ) {
 			return null;
 		}
-		$aiuto = (string) ( $p['description'] ?? '' );
+		$aiuto = (string) ( $p['mo_aiuto'] ?? ( $p['description'] ?? '' ) );
 		if ( strlen( $aiuto ) > 160 || false !== strpos( $aiuto, '→' ) || false !== stripos( $aiuto, 'trattino' ) ) {
 			$aiuto = '';
 		}
@@ -165,6 +165,13 @@ function mo_pannello_campi( string $k ): array {
 			'etichetta' => preg_replace( '/\s*\((facoltativ[ao]|opzionale)\)\s*$/i', '', (string) $p['heading'] ),
 			'aiuto'     => $aiuto,
 		);
+		if ( 'foto' === $tipo && ! empty( $p['mo_misura'] ) ) {
+			$f['misura'] = (string) $p['mo_misura']; // misura ideale in px, ben visibile sopra la foto
+		}
+		if ( 'foto' === $tipo && str_ends_with( (string) $p['param_name'], '_tel' ) ) {
+			$f['vuota'] = 'Facoltativa: se la lasci vuota, sul telefono si usa la foto per computer.';
+			$f['aiuto'] = '';
+		}
 		if ( 'scelta' === $tipo ) {
 			$f['opzioni'] = array();
 			foreach ( (array) ( $p['value'] ?? array() ) as $label => $val ) {
@@ -189,8 +196,8 @@ function mo_pannello_campi( string $k ): array {
 	};
 	// Campi che si vedono solo con una certa scelta (così il cliente vede solo quello che serve)
 	$dipende = array(
-		'hero'      => array( 'fissa_img' => array( 'stile', array( 'fissa' ) ), 'slide' => array( 'stile', array( 'slide' ) ), 'durata' => array( 'stile', array( 'slide' ) ), 'transizione' => array( 'stile', array( 'slide' ) ) ),
-		'chi_breve' => array( 'apertura_img' => array( 'apertura', array( 'si' ) ), 'apertura_frase' => array( 'apertura', array( 'si' ) ) ),
+		'hero'      => array( 'fissa_img' => array( 'stile', array( 'fissa' ) ), 'fissa_img_tel' => array( 'stile', array( 'fissa' ) ), 'slide' => array( 'stile', array( 'slide' ) ), 'durata' => array( 'stile', array( 'slide' ) ), 'transizione' => array( 'stile', array( 'slide' ) ) ),
+		'chi_breve' => array( 'apertura_img' => array( 'apertura', array( 'si' ) ), 'apertura_img_tel' => array( 'apertura', array( 'si' ) ), 'apertura_frase' => array( 'apertura', array( 'si' ) ) ),
 	);
 	$out = array();
 	foreach ( mo_blocks()[ $k ]['params'] ?? array() as $p ) {
@@ -346,6 +353,9 @@ function mo_pannello_salva( int $pid, int $i, array $valori ) {
 	}
 	$sc = mo_pannello_aggiorna_shortcode( substr( $c, $pos, $len ), $nuovi );
 	$c  = substr( $c, 0, $pos ) . $sc . substr( $c, $pos + $len );
+	// Copia della pagina com'è adesso, se non c'è già: senza, la prima modifica in assoluto non si potrebbe annullare
+	// (WordPress salva come revisione solo il testo nuovo). Se la copia esiste già, WordPress non la ripete.
+	wp_save_post_revision( $pid );
 	kses_remove_filters(); // i valori sono già puliti campo per campo; così i testi restano esattamente come scritti
 	$r = wp_update_post( array( 'ID' => $pid, 'post_content' => wp_slash( $c ) ), true );
 	kses_init(); // rimette i filtri come prima (solo per chi non può scrivere HTML libero)
@@ -573,7 +583,10 @@ add_action(
 					is_ssl()
 				);
 				if ( is_wp_error( $u ) ) {
-					$errore = 'Nome utente o password non corretti.';
+					// Dopo 5 tentativi sbagliati l'accesso si blocca per qualche minuto (includes/accessi.php): avvisa prima
+					$blocco  = mo_accessi_bloccato();
+					$restano = MO_ACCESSI_MAX - (int) mo_accessi_stato()['n'];
+					$errore  = $blocco ? mo_accessi_messaggio( $blocco ) : 'Nome utente o password non corretti.' . ( $restano <= 2 ? sprintf( ' Attenzione: %s, poi l’accesso si blocca per %d minuti.', 1 === $restano ? 'ancora un tentativo' : 'ancora ' . $restano . ' tentativi', MO_ACCESSI_MINUTI ) : '' );
 				} else {
 					if ( mo_pannello_e_cliente( $u ) ) {
 						mo_pannello_ricorda_cliente( $u->user_login );

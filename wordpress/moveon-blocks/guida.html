@@ -26,11 +26,32 @@
 	<li>Dentro l’editor di WPBakery le animazioni pesanti sono spente apposta: le vedi nella pagina vera.</li>
 </ul>
 
+<h2>Misure delle foto (computer e smartphone)</h2>
+<p>Sotto ogni campo foto c’è la <strong>misura ideale in px</strong>: prepara le foto già di quella misura (JPG o PNG, qualità 80–85%), così il sito resta leggero e niente viene ingrandito o sgranato.</p>
+<p>Dove sul telefono la forma cambia molto (orizzontale sul computer, verticale sul telefono) c’è anche il campo <strong>«… · smartphone»</strong>: carica lì una versione tagliata per il telefono. È facoltativo: se lo lasci vuoto, sul telefono si usa la foto per computer, tagliata ai lati (con il punto focale che scegli). «Smartphone» vuol dire schermi fino a 767 px di larghezza; i tablet usano la foto per computer.</p>
+<table>
+	<tr><th>Foto</th><th>Computer</th><th>Smartphone</th></tr>
+	<tr><td>Hero (slide e immagine fissa)</td><td>1920 × 1080 px (16:9)</td><td>1080 × 2340 px (verticale, come lo schermo)</td></tr>
+	<tr><td>Chi sono (breve): foto che si apre</td><td>1920 × 960 px (2:1)</td><td>1080 × 2060 px (verticale)</td></tr>
+	<tr><td>Chi sono (breve): foto sotto il numero</td><td>1000 × 500 px (2:1)</td><td>1000 × 750 px (4:3)</td></tr>
+	<tr><td>Immagine di sfondo di una sezione (scheda Sfondo) e delle pagine dei progetti</td><td>1920 × 1200 px</td><td>1080 × 1920 px (verticale)</td></tr>
+	<tr><td>Contatti</td><td colspan="2">1000 × 1250 px (verticale 4:5), uguale su computer e telefono</td></tr>
+	<tr><td>Servizi</td><td colspan="2">1000 × 1000 px (quadrata)</td></tr>
+	<tr><td>Punti di forza</td><td colspan="2">1200 × 750 px (16:10)</td></tr>
+	<tr><td>Progetti: copertina</td><td colspan="2">1800 × 1200 px (3:2); nelle card della pagina Progetti diventa 4:3, tagliata ai lati</td></tr>
+	<tr><td>Progetti: immagine del carosello</td><td colspan="2">900 × 1200 px (verticale 3:4)</td></tr>
+	<tr><td>Progetti: immagini del progetto</td><td colspan="2">2000 px di larghezza, qualsiasi altezza (si vedono intere)</td></tr>
+	<tr><td>Nastro e numero «25» del Chi siamo (foto dentro le lettere)</td><td colspan="2">1600 × 600 px, colori saturi</td></tr>
+	<tr><td>Icona personalizzata dei motivi</td><td colspan="2">200 × 200 px, PNG trasparente</td></tr>
+</table>
+<p>Le sezioni con lo sfondo hanno altezze diverse a seconda dei testi: l’immagine di sfondo copre sempre tutta la sezione, quindi tieni il soggetto al centro. Sul telefono le sezioni lunghe sono molto alte: lì funzionano meglio foto «di atmosfera» o con la sfumatura.</p>
+<p>Se hai modificato il modello <code>hero</code> o <code>chi-breve</code> in <strong>MoveOn → Modelli HTML</strong>, le foto per smartphone lì non compaiono: premi «Ripristina originale» su quel modello.</p>
+
 <h2>Immagini: dove si cambiano</h2>
 <table>
 	<tr><th>Immagine</th><th>Dove</th></tr>
-	<tr><td>Copertina di un progetto (card della pagina Progetti, grande immagine in cima alla pagina del progetto)</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra (orizzontale 4:3)</td></tr>
-	<tr><td>Immagine nel Portfolio (carosello)</td><td>Stesso progetto → riquadro «Dettagli del progetto» → <strong>Immagine del carosello</strong> (verticale 3:4): <strong>Scegli</strong>, <strong>Sostituisci</strong>, <strong>Rimuovi</strong>. Se manca si usa la copertina, ritagliata al centro</td></tr>
+	<tr><td>Copertina di un progetto (card della pagina Progetti, grande immagine in cima alla pagina del progetto)</td><td><strong>Progetti portfolio</strong> → apri un progetto (o «Aggiungi progetto») → riquadro <strong>Copertina</strong> a destra (1800 × 1200 px, 3:2)</td></tr>
+	<tr><td>Immagine nel Portfolio (carosello)</td><td>Stesso progetto → riquadro «Dettagli del progetto» → <strong>Immagine del carosello</strong> (900 × 1200 px, verticale 3:4): <strong>Scegli</strong>, <strong>Sostituisci</strong>, <strong>Rimuovi</strong>. Se manca si usa la copertina, ritagliata al centro</td></tr>
 	<tr><td>Sfondo delle pagine dei progetti e della pagina Progetti</td><td><strong>MoveOn → Impostazioni</strong> → <strong>Sfondi delle pagine dei progetti</strong> (colore, immagine con opacità, dimensione, posizione)</td></tr>
 	<tr><td>Immagini nella pagina del progetto</td><td>Stesso progetto → <strong>Immagini del progetto</strong>: <strong>Aggiungi immagini</strong>; su ogni miniatura <strong>Sostituisci</strong> o <strong>×</strong> per toglierla; <strong>trascinale</strong> per cambiare l’ordine. Nella pagina la 1ª, la 4ª, la 7ª… sono a tutta larghezza, le altre a due a due</td></tr>
 	<tr><td>Illustrazioni dei Servizi</td><td>Elemento <strong>MoveOn · Servizi</strong> → scheda <strong>Elenchi</strong> → apri il servizio → <strong>Immagine (4:3 o 1:1)</strong>: prende il posto dell’illustrazione animata</td></tr>
@@ -41,8 +62,8 @@
 	<tr><td>Foto che si apre nel Chi sono e foto dei Contatti</td><td>Elemento <strong>MoveOn · Chi sono (breve)</strong> → scheda <strong>Foto che si apre</strong>; elemento <strong>MoveOn · Contatti</strong> → scheda <strong>Immagini</strong></td></tr>
 	<tr><td>Colore e immagine di sfondo di una sezione</td><td>Qualsiasi elemento MoveOn → scheda <strong>Sfondo</strong>: <strong>colore di sfondo</strong> (con trasparenza), <strong>stile dei testi e delle card</strong> (automatico, chiari per sfondi scuri, scuri per sfondi chiari), <strong>colore dei titoli</strong>, <strong>colore dei testi</strong> (frase sotto il titolo, descrizioni) e <strong>colore delle etichette</strong> (scritte piccole come «PORTFOLIO» e link); valgono per i testi che stanno direttamente sullo sfondo della sezione, mentre pulsanti, card e pannelli, che hanno un loro sfondo, tengono i colori automatici (seguono lo stile dei testi chiari o scuri); lasciali vuoti per i colori automatici; <strong>immagine</strong> (JPG o PNG) con <strong>opacità</strong> da 5% a 100%, dimensione (copre tutta la sezione / intera senza tagli / grandezza originale) e posizione (<code>50% 50%</code> = centrata). Il colore sta sotto l’immagine: puoi combinarli. <strong>Video di sfondo</strong>: carica il video in Media → Aggiungi file multimediale, aprilo, premi «Copia URL negli appunti» e incollalo nel campo <strong>Video di sfondo</strong>; scegli l’<strong>opacità del video</strong> e se mostrarlo anche <strong>sul telefono</strong> (oppure solo l’immagine, per risparmiare dati). Usa un MP4 senza audio di 10–20 secondi (si ripete all’infinito), al massimo 10–15 MB. Il video parte solo quando la sezione arriva sullo schermo e si ferma quando esce; se c’è anche l’immagine, fa da copertina mentre il video si carica (poi sfuma via) e resta per chi ha scelto «riduci movimento». <strong>Sfumatura di video e immagine</strong>: in basso, in alto, in alto e in basso o tutto intorno, corta, media o lunga: video e immagine svaniscono nel colore di sfondo. Nell’Intestazione di pagina c’è anche la «sfumatura in basso» della scheda Testi, che fa proseguire foto e video sotto la sezione dopo. Nei Servizi lo sfondo si vede dietro la prima e l’ultima scheda: le schede dei servizi hanno un loro colore pieno.</td></tr>
 	<tr><td>Logo</td><td><strong>MoveOn → Impostazioni</strong></td></tr>
-	<tr><td>Immagini della hero (una per settore)</td><td>Elemento <strong>MoveOn · Hero</strong> → scheda <strong>Immagini</strong> → <strong>Immagini (una per settore)</strong>: per ognuna il nome del settore, la foto (orizzontale, almeno 1920 px) e il punto focale. Trascinale per cambiare l’ordine. Nella stessa scheda: tempo per ogni immagine, tipo di passaggio, velo scuro. Finché una foto manca si vede un’immagine di prova</td></tr>
-	<tr><td>Scudo (garanzie) e lampadina (hero, se scegli «Lampadina in pixel»)</td><td>Sono animazioni in pixel che si compongono: si cambiano solo come disegno, chiedendolo</td></tr>
+	<tr><td>Immagini della hero (una per settore)</td><td>Elemento <strong>MoveOn · Hero</strong> → scheda <strong>Immagini</strong> → <strong>Immagini (una per settore)</strong>: per ognuna il nome del settore, la foto per computer (1920 × 1080 px), se vuoi quella per smartphone (1080 × 2340 px) e il punto focale. Trascinale per cambiare l’ordine. Nella stessa scheda: tempo per ogni immagine, tipo di passaggio, velo scuro. Finché una foto manca si vede un’immagine di prova</td></tr>
+	<tr><td>Scudo (garanzie)</td><td>Sono animazioni in pixel che si compongono: si cambiano solo come disegno, chiedendolo</td></tr>
 </table>
 <p><strong>File SVG</strong>: WordPress, per sicurezza, non accetta SVG nella Libreria media. Per caricarli installa il plugin gratuito <strong>Safe SVG</strong> (li ripulisce da codice pericoloso): il sito li mostra correttamente in tutti i campi immagine. In alternativa usa PNG trasparenti. Chi conosce l’SVG può anche modificare il disegno delle illustrazioni da <strong>MoveOn → Modelli HTML</strong> (cartella «parti», modelli <code>illustrazione-…</code> e <code>cubo</code>).</p>
 
@@ -78,7 +99,8 @@
 <h2>Pannello clienti «Il tuo sito»</h2>
 <ul>
 	<li>Un’area separata da WordPress, all’indirizzo <strong>/gestione/</strong>: il cliente entra con nome utente e password e vede solo le sue pagine. Cambia testi, elenchi (domande, recensioni, servizi…), foto e colori delle sezioni MoveOn, con l’anteprima del sito accanto, su computer e telefono. Legge anche le richieste del modulo.</li>
-	<li>Ogni salvataggio aggiorna subito il sito; «Annulla l’ultima modifica» lo riporta com’era.</li>
+	<li>Ogni salvataggio aggiorna subito il sito; «Annulla l’ultima modifica» lo riporta com’era (anche dopo la primissima modifica di una pagina).</li>
+	<li><strong>Sicurezza</strong>: dopo 5 password sbagliate dallo stesso collegamento l’accesso si blocca per 15 minuti (dalla terza avvisa quanti tentativi restano). Vale anche per la pagina di accesso di WordPress, quindi anche per te: se ti capita, aspetta 15 minuti.</li>
 	<li><strong>MoveOn → Pannello clienti</strong>: crea la <strong>demo del dentista</strong> (studio immaginario con logo e colori propri) da far provare ai potenziali clienti. Lì trovi indirizzo, nome utente e password. Dopo averla fatta provare, «Rimetti la demo come nuova».</li>
 	<li>Da amministratore, aprendo /gestione/ entri già collegato e vedi tutte le pagine MoveOn. Per provarlo come il cliente usa una finestra in incognito.</li>
 </ul>
@@ -106,11 +128,10 @@
 
 <h2>Hero</h2>
 <ul>
-	<li>Scheda <strong>Immagini → Dietro al titolo</strong>: <strong>immagini che si alternano</strong> (una per ogni settore che tratti), <strong>un’immagine fissa</strong> (campo «Immagine fissa» con il suo punto focale; se è vuoto si usa la prima delle slide) oppure la lampadina. Puoi cambiare quando vuoi: le immagini delle slide restano salvate.</li>
+	<li>Scheda <strong>Immagini → Dietro al titolo</strong>: <strong>immagini che si alternano</strong> (una per ogni settore che tratti), <strong>un’immagine fissa</strong> (campo «Immagine fissa» con il suo punto focale; se è vuoto si usa la prima delle slide). Puoi cambiare quando vuoi: le immagini delle slide restano salvate.</li>
 	<li><strong>Passaggio tra le immagini</strong> (vale anche per l’entrata della prima foto e dell’immagine fissa): <strong>Cubi 3D</strong> (di serie: la hero si divide in colonne che ruotano come cubi e mostrano la nuova foto sull’altra faccia, ogni volta in un verso diverso), <strong>Portale</strong> (la nuova foto si apre da una finestra al centro con la cornice gialla, mentre la vecchia ti viene incontro), <strong>Pixel</strong> (le tessere quadrate di prima) o <strong>Dissolvenza</strong>.</li>
 	<li>In basso ci sono i <strong>settori</strong>: la barra arancione mostra quanto manca all’immagine successiva; un clic su un settore lo mostra subito; il pulsante a destra <strong>ferma</strong> lo scorrimento.</li>
-	<li>Per foto belle e leggibili: orizzontali, almeno 1920 px di larghezza, con il soggetto lontano dal lato sinistro (dove c’è il titolo). Se il testo si legge male, aumenta il <strong>velo scuro</strong>.</li>
-	<li>Nella scheda <strong>Immagini</strong> puoi anche tornare alla <strong>lampadina in pixel</strong> della versione precedente.</li>
+	<li>Per foto belle e leggibili: 1920 × 1080 px, con il soggetto lontano dal lato sinistro (dove c’è il titolo). Per il telefono carica la versione verticale 1080 × 2340 px nel campo «Immagine · smartphone»: lì il titolo sta in alto e a sinistra, il pulsante e i settori in basso. Se il testo si legge male, aumenta il <strong>velo scuro</strong>.</li>
 </ul>
 
 <h2>Progetti del portfolio</h2>
@@ -160,7 +181,7 @@
 	<tr><td><code>--mo-header-blur</code>, <code>--mo-header-opacita</code></td><td>Header quando scorri: sfocatura di ciò che passa sotto (di serie <code>6.5px</code>, <code>0px</code> = niente) e copertura del suo sfondo (di serie <code>82%</code>, <code>100%</code> = pieno)</td></tr>
 </table>
 <p><strong>Cambiare carattere</strong>: carica il nuovo font (es. con un plugin per Google Fonts, oppure con <code>@import</code> in cima al CSS aggiuntivo) e poi scrivi <code>:root{ --mo-font: "Nome Font", Arial, sans-serif; }</code>. Montserrat è incluso nel plugin e non fa richieste a Google.</p>
-<p>Alcuni colori dentro le illustrazioni (lampadina, scudo, bollino) sono scritti nei disegni: si cambiano da <strong>Modelli HTML</strong> (vedi sotto).</p>
+<p>Alcuni colori dentro le illustrazioni (scudo, bollino) sono scritti nei disegni: si cambiano da <strong>Modelli HTML</strong> (vedi sotto).</p>
 
 <h2>Modelli HTML</h2>
 <p>In <strong>MoveOn → Modelli HTML</strong> modifichi l’HTML di ogni sezione e delle parti fisse (header, footer, menu mobile), e di illustrazioni e icone (cartella «parti»). Le modifiche restano anche quando aggiorni il plugin; «Ripristina originale» annulla tutto.</p>

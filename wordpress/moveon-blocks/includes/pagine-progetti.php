@@ -108,11 +108,13 @@ function mo_zone_sfondo(): array {
 function mo_sfondo_pulito( $v ): array {
 	$v   = is_array( $v ) ? $v : array();
 	$img = absint( $v['sfondo_img'] ?? 0 );
+	$tel = absint( $v['sfondo_img_tel'] ?? 0 );
 	$op  = (int) ( $v['sfondo_opacita'] ?? 30 );
 	return array(
 		'sfondo_colore'     => mo_colore( $v['sfondo_colore'] ?? '' ),
 		'sfondo_testi'      => in_array( $v['sfondo_testi'] ?? '', array( 'chiari', 'scuri' ), true ) ? $v['sfondo_testi'] : '',
 		'sfondo_img'        => $img && wp_attachment_is_image( $img ) ? $img : 0,
+		'sfondo_img_tel'    => $tel && wp_attachment_is_image( $tel ) ? $tel : 0,
 		'sfondo_opacita'    => $op >= 5 && $op <= 100 ? $op : 30,
 		'sfondo_dimensione' => in_array( $v['sfondo_dimensione'] ?? '', array( 'cover', 'contain', 'auto' ), true ) ? $v['sfondo_dimensione'] : 'cover',
 		'sfondo_posizione'  => sanitize_text_field( (string) ( $v['sfondo_posizione'] ?? '' ) ) ?: '50% 50%',

@@ -15,7 +15,7 @@ function mo_colori_base(): array {
 		1  => array( 'nome' => 'Blu intenso', 'colore' => '#223ab8', 'uso' => 'Sfondi scuri (Hero, Pausa, Portfolio, Contatti, footer, menu del telefono), titoli sui fondi chiari, testo dei pulsanti gialli.' ),
 		2  => array( 'nome' => 'Blu notte', 'colore' => '#182343', 'uso' => 'Fascia del logo nel menu del telefono, campi del modulo, titoli delle card, sfondi scuri alternativi.' ),
 		3  => array( 'nome' => 'Blu brillante', 'colore' => '#2563eb', 'uso' => 'Pulsanti blu, link, etichette in maiuscolo e numeri sui fondi chiari, il «25».' ),
-		4  => array( 'nome' => 'Azzurro', 'colore' => '#60a5fa', 'uso' => 'Link ed etichette sui fondi scuri, illustrazioni, pixel della lampadina e dello scudo.' ),
+		4  => array( 'nome' => 'Azzurro', 'colore' => '#60a5fa', 'uso' => 'Link ed etichette sui fondi scuri, illustrazioni, pixel dello scudo delle Garanzie.' ),
 		5  => array( 'nome' => 'Azzurro chiaro', 'colore' => '#93c5fd', 'uso' => 'Dettagli sui fondi scuri: etichette dei servizi, contorno dei campi attivi.' ),
 		6  => array( 'nome' => 'Giallo', 'colore' => '#f59e0b', 'uso' => 'Pulsanti d’azione (Richiedi Preventivo, Invia Richiesta, Chiedimi un consiglio), barra di avanzamento, spunte, virgolette, sottolineatura della hero.' ),
 		7  => array( 'nome' => 'Bianco del sito', 'colore' => '#f4f5f7', 'uso' => 'Testi sui fondi scuri e sfondi chiari delle sezioni.' ),

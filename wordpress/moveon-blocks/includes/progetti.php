@@ -2,7 +2,7 @@
 /**
  * Progetti del portfolio: ogni lavoro è una scheda a sé (menu "Progetti portfolio").
  * - Titolo = nome del progetto / cliente
- * - Immagine in evidenza = copertina (4:3): card della pagina Progetti e grande immagine in cima alla pagina del progetto
+ * - Immagine in evidenza = copertina (3:2, 1800 × 1200 px): card della pagina Progetti e grande immagine in cima alla pagina del progetto
  * - Immagine del carosello (verticale 3:4): card del Portfolio a carosello (se manca si usa la copertina)
  * - Galleria: le immagini della pagina del progetto
  * - Testo (editor): racconto facoltativo nella pagina del progetto; Riassunto = descrizione breve
@@ -46,7 +46,7 @@ add_action(
 					'not_found_in_trash' => 'Nessun progetto nel cestino',
 					'all_items'          => 'Tutti i progetti',
 					'menu_name'          => 'Progetti portfolio',
-					'featured_image'     => 'Copertina (orizzontale 4:3, almeno 1600 px)',
+					'featured_image'     => 'Copertina · 1800 × 1200 px (3:2)',
 					'set_featured_image' => 'Scegli la copertina',
 					'remove_featured_image' => 'Rimuovi la copertina',
 					'use_featured_image' => 'Usa come copertina',
@@ -195,7 +195,7 @@ function mo_progetto_metabox( WP_Post $post ): void {
 				<div id="mo_carosello_img-anteprima" class="mo-car-anteprima"><?php echo $car_id ? wp_get_attachment_image( $car_id, 'medium' ) : ''; ?></div>
 				<button type="button" class="button mo-scegli-immagine" data-target="mo_carosello_img"><?php echo $car_id ? 'Sostituisci' : 'Scegli l’immagine'; ?></button>
 				<button type="button" class="button-link mo-togli-immagine" data-target="mo_carosello_img">Rimuovi</button>
-				<p class="description">Verticale (3:4, almeno 900×1200 px). È la card del Portfolio (carosello). Se manca si usa la copertina, ritagliata al centro.</p>
+				<p class="description"><b>Misura ideale: <?php echo esc_html( mo_misure_foto()['carosello'] ); ?>.</b> È la card del Portfolio (carosello). Se manca si usa la copertina, ritagliata al centro.</p>
 			</td>
 		</tr>
 		<tr>
@@ -209,7 +209,7 @@ function mo_progetto_metabox( WP_Post $post ): void {
 				?></ul>
 				<button type="button" class="button mo-aggiungi-galleria" data-target="mo_galleria">Aggiungi immagini</button>
 				<button type="button" class="button-link mo-svuota-galleria" data-target="mo_galleria">Togli tutte</button>
-				<p class="description">Compaiono nella pagina del progetto. <strong>Trascinale</strong> per cambiare l’ordine; su ogni immagine: <strong>Sostituisci</strong> o <strong>×</strong> per toglierla. Le immagini restano comunque nella Libreria media.</p>
+				<p class="description"><b>Misura ideale: <?php echo esc_html( mo_misure_foto()['galleria'] ); ?>.</b> Compaiono nella pagina del progetto. <strong>Trascinale</strong> per cambiare l’ordine; su ogni immagine: <strong>Sostituisci</strong> o <strong>×</strong> per toglierla. Le immagini restano comunque nella Libreria media.</p>
 			</td>
 		</tr>
 		<tr>

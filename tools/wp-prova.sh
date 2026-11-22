@@ -156,6 +156,19 @@ if ( ! get_page_by_path( "prova-pausa-unita" ) ) {
   echo "· Pagina prova-pausa-unita creata\n";
 }
 ' 2>/dev/null
+# Foto per smartphone (1.13.0): ogni foto ha la sua versione per il telefono
+php wpcli.php '
+if ( ! get_page_by_path( "prova-foto-telefono" ) ) {
+  $pc = mo_importa_immagine( "pausa-cuffie.jpg", "Foto di prova per lo sfondo" );
+  $tel = mo_importa_immagine( "contatti-lettore.jpg", "Foto di prova per Chi sono" );
+  $cb = mo_importa_immagine( "idea-arcobaleno.jpg", "Foto di prova 2" );
+  $slide = rawurlencode( wp_json_encode( array( array( "settore" => "Uno", "immagine" => (string) $pc, "immagine_tel" => (string) $tel, "posizione" => "50% 50%" ), array( "settore" => "Due", "immagine" => (string) $cb, "posizione" => "50% 50%" ) ) ) );
+  $c = mo_riga( "[mo_hero slide=\"$slide\"]" ) . mo_riga( "[mo_chi_breve immagine=\"$cb\" immagine_tel=\"$tel\" apertura_img=\"$pc\" apertura_img_tel=\"$tel\" sfondo_img=\"$pc\" sfondo_img_tel=\"$tel\" sfondo_opacita=\"40\"]" ) . mo_riga( "[mo_garanzie sfondo_img=\"$pc\" anchor=\"g2\"]" );
+  $id = wp_insert_post( array( "post_type" => "page", "post_status" => "publish", "post_title" => "Prova foto telefono", "post_name" => "prova-foto-telefono", "post_content" => $c ) );
+  update_post_meta( $id, "_wp_page_template", "moveon-pagina-intera" );
+  echo "· Pagina prova-foto-telefono creata\n";
+}
+' 2>/dev/null
 # Video di sfondo: un breve video di prova (serve ffmpeg) e la pagina prova-video
 if command -v ffmpeg >/dev/null && [ ! -f wp/wp-content/uploads/prova-video.mp4 ]; then
   mkdir -p wp/wp-content/uploads
