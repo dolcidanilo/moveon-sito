@@ -435,5 +435,10 @@ check( 'Pannello: «Annulla l’ultima modifica» riporta la pagina com’era', 
 wp_set_current_user( 0 );
 check( 'Pagina con marchio: colori propri e niente motori di ricerca', str_contains( mo_marchio_css( get_post_meta( $pid12, '_mo_marchio', true ) ), '--mo-c1:#0f766e' ) );
 
+// 1.12.1: scelte chiare e campi che dipendono da una scelta
+$h121 = array_column( mo_pannello_campi( 'hero' ), null, 'nome' );
+check( 'Pannello: «Immagine fissa» solo con l’immagine fissa, le slide solo con le slide; niente «versione precedente»', array( 'fissa' ) === ( $h121['fissa_img']['se']['valori'] ?? null ) && array( 'slide' ) === ( $h121['slide']['se']['valori'] ?? null ) && ! in_array( 'lampadina', array_column( $h121['stile']['opzioni'], 'value' ), true ) );
+check( 'Demo: la copertina ha le slide dello studio (non quelle di MoveOn)', str_contains( rawurldecode( (string) get_post( (int) mo_demo()['pagina'] )->post_content ), '"settore":"Prevenzione"' ) );
+
 echo "\n{$ok}/" . ( $ok + $fail ) . " controlli superati\n";
 exit( $fail ? 1 : 0 );

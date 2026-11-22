@@ -18,9 +18,13 @@ function mo_demo(): array {
 
 /** Carica nella Libreria media un'immagine della cartella della demo (una volta sola). */
 function mo_demo_foto( string $file, int $autore ): int {
-	$d = mo_demo();
-	if ( ! empty( $d['foto'][ $file ] ) && get_post( (int) $d['foto'][ $file ] ) ) {
+	$d    = mo_demo();
+	$hash = (string) md5_file( MOVEON_DIR . 'assets/pannello/demo/' . $file );
+	if ( ! empty( $d['foto'][ $file ] ) && get_post( (int) $d['foto'][ $file ] ) && ( $d['md5'][ $file ] ?? '' ) === $hash ) {
 		return (int) $d['foto'][ $file ];
+	}
+	if ( ! empty( $d['foto'][ $file ] ) && get_post( (int) $d['foto'][ $file ] ) ) {
+		wp_delete_attachment( (int) $d['foto'][ $file ], true ); // la foto della demo è cambiata: via la vecchia, niente doppioni
 	}
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -33,6 +37,7 @@ function mo_demo_foto( string $file, int $autore ): int {
 	}
 	$d                   = mo_demo();
 	$d['foto'][ $file ] = $id;
+	$d['md5'][ $file ]  = $hash;
 	update_option( 'mo_pannello_demo', $d, false );
 	return (int) $id;
 }
@@ -40,7 +45,7 @@ function mo_demo_foto( string $file, int $autore ): int {
 /** Contenuto della pagina demo, sezione per sezione. */
 function mo_demo_contenuto( array $f ): string {
 	$sez = array(
-		array( 'hero', array( 'titolo' => "Il tuo sorriso,\nin buone mani.", 'parola' => 'sorriso,', 'testo' => 'Cure dentali attente e senza fretta, con tecnologie moderne e un preventivo chiaro prima di iniziare.', 'pulsante_testo' => 'Prenota una visita', 'pulsante_link' => '#contatti', 'stile' => 'fissa', 'fissa_img' => $f['studio.jpg'], 'anchor' => 'top' ) ),
+		array( 'hero', array( 'titolo' => "Il tuo sorriso,\nin buone mani.", 'parola' => 'sorriso,', 'testo' => 'Cure dentali attente e senza fretta, con tecnologie moderne e un preventivo chiaro prima di iniziare.', 'pulsante_testo' => 'Prenota una visita', 'pulsante_link' => '#contatti', 'stile' => 'fissa', 'fissa_img' => $f['studio.jpg'], 'anchor' => 'top', 'slide' => array( array( 'settore' => 'Lo studio', 'immagine' => (string) $f['studio.jpg'] ), array( 'settore' => 'Prevenzione', 'immagine' => (string) $f['accoglienza.jpg'] ), array( 'settore' => 'Tecnologia', 'immagine' => (string) $f['tecnologia.jpg'] ), array( 'settore' => 'Sorrisi', 'immagine' => (string) $f['sorriso.jpg'] ) ) ) ),
 		array( 'numeri', array( 'etichetta' => 'Lo studio in numeri', 'numeri' => array( array( 'numero' => '20', 'testo' => 'anni di esperienza' ), array( 'numero' => '4.000+', 'testo' => 'pazienti seguiti' ), array( 'numero' => '6', 'testo' => 'specialisti nello studio' ) ) ) ),
 		array( 'punti', array( 'etichetta' => 'Perché sceglierci', 'titolo' => 'Cure attente, senza fretta.', 'anchor' => 'studio', 'punti' => array(
 			array( 'titolo' => 'Ti ascoltiamo', 'testo' => 'La prima visita serve a capire cosa ti serve davvero. Ti spieghiamo tutto con parole semplici.', 'immagine' => (string) $f['accoglienza.jpg'] ),

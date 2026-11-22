@@ -63,7 +63,7 @@ def foto(nome, w, h, a, b, seme, etichetta='Foto di esempio · sostituiscila dal
     f = ImageFont.truetype(FONT_M, max(18, s // 38))
     tw = d.textlength(etichetta, font=f)
     pad = s // 60
-    x, y = w - tw - pad * 4, h - pad * 4 - f.size
+    x, y = (w - tw) / 2, h * 0.8 - f.size / 2  # al centro in orizzontale: resta visibile anche quando la foto viene ritagliata
     d.rounded_rectangle((x - pad * 1.6, y - pad, x + tw + pad * 1.6, y + f.size + pad * 1.3), radius=pad * 2, fill=(0, 0, 0, 70))
     d.text((x, y), etichetta, font=f, fill=(255, 255, 255, 235))
     img.convert('RGB').save(os.path.join(OUT, nome), quality=84, optimize=True, progressive=True)

@@ -251,7 +251,7 @@
   function disegnaCampi() {
     const s = S.sezione;
     const box = $('#mp-campi');
-    box.innerHTML = s.campi.filter((f) => f.gruppo === S.gruppo).map((f) => campoHTML(f, S.bozza[f.nome], f.nome)).join('');
+    box.innerHTML = s.campi.filter((f) => f.gruppo === S.gruppo && (!f.se || f.se.valori.includes(String(S.bozza[f.se.campo])))).map((f) => campoHTML(f, S.bozza[f.nome], f.nome)).join('');
     autoAltezza(box);
   }
 
@@ -264,6 +264,9 @@
       case 'testo_lungo':
         return `<label class="mp-campo" for="${id}"><span>${esc(f.etichetta)}</span><textarea id="${id}" data-k="${esc(chiave)}" rows="2">${esc(v)}</textarea>${aiuto || '<small class="mp-aiuto">Per andare a capo premi Invio.</small>'}</label>`;
       case 'scelta':
+        if (f.opzioni.length <= 4 && f.opzioni.some((o) => o.label.length > 16)) {
+          return `<div class="mp-campo"><span>${esc(f.etichetta)}</span><div class="mp-opzioni" role="radiogroup">${f.opzioni.map((o) => `<button type="button" class="mp-opzione" role="radio" data-k="${esc(chiave)}" data-v="${esc(o.value)}" aria-checked="${String(v) === o.value}"><i aria-hidden="true"></i><span>${esc(o.label)}</span></button>`).join('')}</div>${aiuto}</div>`;
+        }
         if (f.opzioni.length <= 3) {
           return `<div class="mp-campo"><span>${esc(f.etichetta)}</span><div class="mp-seg mp-seg-campo" role="radiogroup">${f.opzioni.map((o) => `<button type="button" role="radio" data-k="${esc(chiave)}" data-v="${esc(o.value)}" aria-checked="${String(v) === o.value}">${esc(o.label)}</button>`).join('')}</div>${aiuto}</div>`;
         }
@@ -535,7 +538,10 @@
   });
   root.addEventListener('change', (e) => {
     const t = e.target;
-    if (t.matches('select[data-k]') && S.sezione) imposta(t.dataset.k, t.value);
+    if (t.matches('select[data-k]') && S.sezione) {
+      imposta(t.dataset.k, t.value);
+      if (S.sezione.campi.some((f) => f.se && f.se.campo === t.dataset.k)) disegnaCampi();
+    }
   });
   root.addEventListener('click', async (e) => {
     const b = e.target.closest('button, a');
@@ -544,6 +550,7 @@
     if (b.dataset.v !== undefined && b.dataset.k) {
       imposta(b.dataset.k, b.dataset.v);
       $$(`[data-k="${CSS.escape(b.dataset.k)}"][data-v]`).forEach((x) => x.setAttribute(x.getAttribute('role') === 'radio' ? 'aria-checked' : 'aria-pressed', String(x === b)));
+      if (S.sezione && S.sezione.campi.some((f) => f.se && f.se.campo === b.dataset.k)) disegnaCampi(); // compaiono i campi di questa scelta
       return;
     }
     if (b.dataset.scegli) {

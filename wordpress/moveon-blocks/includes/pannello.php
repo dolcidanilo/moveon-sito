@@ -187,6 +187,11 @@ function mo_pannello_campi( string $k ): array {
 		}
 		return $f;
 	};
+	// Campi che si vedono solo con una certa scelta (così il cliente vede solo quello che serve)
+	$dipende = array(
+		'hero'      => array( 'fissa_img' => array( 'stile', array( 'fissa' ) ), 'slide' => array( 'stile', array( 'slide' ) ), 'durata' => array( 'stile', array( 'slide' ) ), 'transizione' => array( 'stile', array( 'slide' ) ) ),
+		'chi_breve' => array( 'apertura_img' => array( 'apertura', array( 'si' ) ), 'apertura_frase' => array( 'apertura', array( 'si' ) ) ),
+	);
 	$out = array();
 	foreach ( mo_blocks()[ $k ]['params'] ?? array() as $p ) {
 		$n = (string) $p['param_name'];
@@ -200,7 +205,10 @@ function mo_pannello_campi( string $k ): array {
 		$f = $campo( $p );
 		if ( $f ) {
 			$f['gruppo'] = $gruppi[ $g ];
-			$out[]       = $f;
+			if ( isset( $dipende[ $k ][ $n ] ) ) {
+				$f['se'] = array( 'campo' => $dipende[ $k ][ $n ][0], 'valori' => $dipende[ $k ][ $n ][1] );
+			}
+			$out[] = $f;
 		}
 	}
 	return $out;
