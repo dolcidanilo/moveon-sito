@@ -1009,6 +1009,18 @@ const hzShim = (hz) => `(() => { let q = []; setInterval(() => { const t = perfo
   await page.goto(P + '#/richieste');
   await page.waitForSelector('.mp-ric');
   const ric = await page.$$eval('.mp-ric', (x) => x.length);
+  // Uscendo, la pagina di accesso resta quella dello studio; anche aprendo /gestione/ senza niente
+  await page.goto(P + '#/');
+  await page.waitForSelector('.mp-esci');
+  await Promise.all([page.waitForNavigation(), page.click('.mp-side .mp-esci')]);
+  const fuori = await page.evaluate(() => document.querySelector('.mp-accesso h1')?.textContent);
+  await page.goto(P);
+  const fuori2 = await page.evaluate(() => document.querySelector('.mp-accesso h1')?.textContent);
+  const nuovo2 = await browser.newPage();
+  await nuovo2.goto(P);
+  const fuori3 = await nuovo2.evaluate(() => ({ h1: document.querySelector('.mp-accesso h1')?.textContent, utente: document.querySelector('input[name=utente]')?.value }));
+  await nuovo2.close();
+  check('Pannello: dopo «Esci» e aprendo /gestione/ la pagina di accesso ha sempre il marchio dello studio', fuori === 'Studio Dentistico Luce' && fuori2 === 'Studio Dentistico Luce' && fuori3.h1 === 'Studio Dentistico Luce' && fuori3.utente === '', JSON.stringify({ fuori, fuori2, fuori3 }));
   check('Pannello: richieste di esempio, nessun errore', ric >= 3 && errori.length === 0, JSON.stringify({ ric, errori }));
   await ctx.close();
 }

@@ -2,7 +2,7 @@
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.12.1
+Stable tag: 1.12.2
 License: GPLv2 or later
 
 Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e animazioni del prototipo approvato.
@@ -25,6 +25,9 @@ Le sezioni del sito MoveOn Studio come elementi WPBakery, con header, footer e a
 * Montserrat — SIL Open Font License 1.1
 
 == Changelog ==
+
+= 1.12.2 =
+* Pannello: la pagina di accesso ha sempre il marchio del cliente, anche aprendo /gestione/ senza altro, dopo «Esci» e se nel sito c'è un solo cliente del pannello (il browser si ricorda dell'ultimo accesso). Il nome utente si compila da solo solo con il link personale (/gestione/?per=…).
 
 = 1.12.1 =
 * Pannello: le scelte con testi lunghi (es. «Dietro al titolo») sono un elenco di opzioni con il pallino, chiaramente cliccabili. I campi che servono solo con una scelta compaiono solo con quella (immagine fissa / slide della copertina, foto che si apre del Chi sono).

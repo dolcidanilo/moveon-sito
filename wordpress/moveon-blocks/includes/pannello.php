@@ -575,6 +575,9 @@ add_action(
 				if ( is_wp_error( $u ) ) {
 					$errore = 'Nome utente o password non corretti.';
 				} else {
+					if ( mo_pannello_e_cliente( $u ) ) {
+						mo_pannello_ricorda_cliente( $u->user_login );
+					}
 					wp_safe_redirect( mo_pannello_url() );
 					exit;
 				}
@@ -582,14 +585,22 @@ add_action(
 		}
 		// phpcs:enable
 		if ( isset( $_GET['esci'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['esci'] ) ), 'mo_pannello_esci' ) ) {
+			$chi = mo_pannello_e_cliente() ? wp_get_current_user()->user_login : '';
 			wp_logout();
-			wp_safe_redirect( mo_pannello_url() );
+			wp_safe_redirect( $chi ? add_query_arg( 'per', $chi, mo_pannello_url() ) : mo_pannello_url() );
 			exit;
 		}
 		mo_pannello_stampa( $errore );
 		exit;
 	}
 );
+
+/** Il browser si ricorda di quale cliente è il pannello (per la pagina di accesso con il suo marchio). */
+function mo_pannello_ricorda_cliente( string $login ): void {
+	if ( ! headers_sent() ) {
+		setcookie( 'mo_pannello_per', $login, array( 'expires' => time() + YEAR_IN_SECONDS, 'path' => COOKIEPATH ? COOKIEPATH : '/', 'secure' => is_ssl(), 'httponly' => true, 'samesite' => 'Lax' ) );
+	}
+}
 
 function mo_pannello_stampa( string $errore ): void {
 	$v      = MOVEON_VERSION;
@@ -598,13 +609,35 @@ function mo_pannello_stampa( string $errore ): void {
 	$fonts  = MOVEON_URL . 'assets/css/fonts.css?ver=' . $v;
 	$entra  = mo_pannello_puo();
 	$m      = $entra ? mo_pannello_marchio() : array( 'nome' => 'Il tuo sito', 'colore' => '#223ab8', 'iniziali' => '', 'logo' => '' );
-	$per    = sanitize_user( wp_unslash( $_GET['per'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
-	$cliente = ( ! $entra && '' !== $per ) ? get_user_by( 'login', $per ) : null;
-	if ( $cliente && mo_pannello_e_cliente( $cliente ) ) {
-		$m = mo_pannello_marchio( $cliente->ID ); // la pagina di accesso con il marchio del cliente
-	} else {
-		$per = '';
+	// Pagina di accesso con il marchio del cliente: dall'indirizzo (?per=utente), poi dal browser che si ricorda
+	// dell'ultimo accesso, altrimenti se nel sito c'è un solo cliente del pannello (senza scrivere il suo nome utente)
+	$per      = sanitize_user( wp_unslash( $_GET['per'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
+	$ricordo  = sanitize_user( wp_unslash( $_COOKIE['mo_pannello_per'] ?? '' ) );
+	$cliente  = null;
+	$compila  = '';
+	if ( ! $entra ) {
+		foreach ( array( $per, $ricordo ) as $nome ) {
+			$u = '' !== $nome ? get_user_by( 'login', $nome ) : null;
+			if ( $u && mo_pannello_e_cliente( $u ) ) {
+				$cliente = $u;
+				$compila = $nome;
+				break;
+			}
+		}
+		if ( ! $cliente ) {
+			$soli = get_users( array( 'role' => MO_PANNELLO_RUOLO, 'number' => 2, 'fields' => 'all' ) );
+			if ( 1 === count( $soli ) ) {
+				$cliente = $soli[0];
+			}
+		}
+		if ( $cliente ) {
+			$m = mo_pannello_marchio( $cliente->ID );
+			if ( '' !== $per && $compila === $per ) {
+				mo_pannello_ricorda_cliente( $per );
+			}
+		}
 	}
+	$per = $cliente ? $compila : '';
 	$moveon = MOVEON_URL . 'assets/img/logo-chiaro.png';
 	header( 'Content-Type: text/html; charset=utf-8' );
 	?>
@@ -630,12 +663,12 @@ function mo_pannello_stampa( string $errore ): void {
 	<?php else : ?>
 <main class="mp-accesso">
 	<form class="mp-accesso-card" method="post" action="<?php echo esc_url( $per ? add_query_arg( 'per', $per, mo_pannello_url() ) : mo_pannello_url() ); ?>">
-		<?php if ( $per && $m['logo'] ) : ?>
+		<?php if ( $cliente && $m['logo'] ) : ?>
 		<div class="mp-accesso-marchio mp-accesso-logo"><img src="<?php echo esc_url( $m['logo'] ); ?>" alt=""></div>
 		<?php else : ?>
 		<div class="mp-accesso-marchio" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
 		<?php endif; ?>
-		<h1><?php echo esc_html( $per ? $m['nome'] : 'Il tuo sito' ); ?></h1>
+		<h1><?php echo esc_html( $cliente ? $m['nome'] : 'Il tuo sito' ); ?></h1>
 		<p class="mp-accesso-sotto">Entra per cambiare testi e foto del tuo sito.</p>
 		<?php if ( $errore ) : ?><p class="mp-accesso-errore" role="alert"><?php echo esc_html( $errore ); ?></p><?php endif; ?>
 		<label class="mp-campo"><span>Nome utente o email</span><input name="utente" autocomplete="username" required value="<?php echo esc_attr( $per ); ?>"<?php echo $per ? '' : ' autofocus'; ?>></label>
